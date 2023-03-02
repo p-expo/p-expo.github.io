@@ -20,24 +20,33 @@ You view that file locally in Chrome. You make changes to the file. You reload t
 Sorted from most important to least important:
 * textfile editing
 * generating a self-signed certificate and installing http-server as described in this README file
+
 --- everything above this line is enough to create presentation using Noisepoint
 * running OBS studio
+
 --- if you want to record or stream your presentation
 * Proper clothing and a solid coloured background wall
+
 --- now you can show yourself together with your material as well
 * a $30 lavalier microphone
+
 --- now your online viewers can hear you properly
 * $150 Video light setup
+
 --- if you'd like to get a better quality video
 * DLSR
+
 --- if you'd like to get an even better quality video
 * HTML/CSS
+
 --- if you'd like to personalize the static look of the presentation
 Javascript coding
+
 --- if you'd like to personalize the movements, fading, graphs or 
 * WebGL shader coding
 * 3d asset creation in Blender
 * cables.gl effect creation
+
 --- if you want to spice up the animations and 3d effects
 
 
@@ -49,48 +58,55 @@ More info here: https://web.dev/how-to-use-local-https/
 The description below is for usage with MacOS. Something very similar will work under Linux versions as well.
 For this, I use Homebrew on macos: https://brew.sh
 This is a linux packet manager software running in userland. With brew, I install http-server:
-  brew install http-server
+
+    brew install http-server
+
 Add a single row into your /etc/hosts file:
-  127.0.0.1 local.pextufvesson.se
+
+    127.0.0.1 local.noisepoint.se
+
 You'll need to create your own signed certificate:
-  brew install mkcert
-  mkcert -install
-  mkcert local.pextufvesson.se
-Go into the /minimal_version folder, and start serving the files:
-  cd minimal_version
-  http-server -p 8580 -S -C /Users/pex/phd/js/cert/local.pextufvesson.se.pem -K /Users/pex/phd/js/cert/local.pextufvesson.se-key.pem
+
+    brew install mkcert
+    mkcert -install
+    mkcert local.noisepoint.se
+
+Go into the /noisepoint folder, and start serving the files:
+
+    cd noisepoint
+    http-server -p 8580 -S -C /Users/pex/phd/js/cert/local.noisepoint.se.pem -K /Users/pex/phd/js/cert/local.noisepoint.se-key.pem
+
 Now open this URL in Chrome:
-  https://local.pextufvesson.se:8580/
+
+    https://local.noisepoint.se:8580/
 
 
 ### Streaming your presentation webpage to an online audience
 For this, I use Open Broadcaster Software "OBS studio". https://obsproject.com
+
 Through OBS, the "virtual webcam" can stream your presentation to Zoom/Microsoft Teams or similar.
 
 
 These software modules are used:
 
-### ThreeJS
-https://threejs.org
+### ThreeJS https://threejs.org
 For realtime visualization of 3d-stuff in a browser.
 You could of course use vanilla WebGL, but threejs contains lots of nice helper functions to make the math easier.
 
-### Blender
-Edit your 3d models in Blender. Free and open source: https://blender.org
+### Blender https://blender.org
+Edit your 3d models in Blender. Free and open source: 
 Kind of difficult to learn, since it's a full-blown 3d movie/nle video authoring tool.
 Export in GLTF file format. Keep it uncompressed. Save textures separately.
 
-### Chart.js
-For animated drawing of bar charts, pie charts, etc. https://chartjs.org
+### Chart.js https://chartjs.org
+For animated drawing of bar charts, pie charts, etc. 
 
-### Audio
-I use Reaper to edit audio. Kind of difficult to learn, since it's a full-blown music production system. https://reaper.fm
+### Audio https://reaper.fm
+I use Reaper to edit audio. Kind of difficult to learn, since it's a full-blown music production system. But it's worth it!
 
-### mathjs
-https://mathjs.org
+### mathjs https://mathjs.org
 
-### snap svg
-https://snapsvg.io
+### snap svg https://snapsvg.io
 
 ### fonts
 There are some fonts included that you can use. I will find their license files soon.
@@ -100,8 +116,11 @@ Hardware like this will make your presentation nicer:
 
 ### Teleprompter
 With the OBS software, I composite the private notes on top of my presentation, and show that on my teleprompter https://en.wikipedia.org/wiki/Teleprompter
+
 I built one myself using an old 24" monitor, black foamboard, and a teleprompter glass that's 30% reflective, 70% transmissive.
+
 I ordered mine here: https://tele-prompter.de/teleprompter_glass   - I used the 500 * 400mm version.
+
 Foamboard: https://panduro.com/sv-se/produkter/papper-stamplar/baspapper/kartong/cellplastkartong-a3-svart-434707
 
 ### Microphone
