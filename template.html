@@ -1,0 +1,3228 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<title>Noisepoint presentation</title>
+<style>
+html, body {margin:0 0; overflow:hidden; background:#000; color:#ccc}
+#all {margin:0 0; width:960px; height:540px; border:0px;}
+#clip {width:100%; height:100%; clip-path:inset(0% 0% 0% 0% round 4rem)}
+#all svg {display:inline-block; position:absolute; top:0; left:0; margin:0px 0px; width:960px; height:540px;}
+#webcam_element {width: 960px; height: 540px; background-color: #000; transform: scaleX(-1); z-index:3}
+#audiencecam_element {position: absolute; top:0px; left:350px;width: 610px; height: 343.125px; background-color: #666; transform: scaleX(-1); z-index:4; display: none}
+#video_div {display: block; position: absolute; overflow: hidden; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; z-index: 5}
+#snippet_element {display: inline-block; position: absolute; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; transform: scaleX(-1); z-index: 3.5}
+#replay_element {display: inline-block; position: absolute; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; transform: scaleX(-1); z-index: 3.1}
+#notes {width: 960px; height: 250px; line-height: 250px; background-color: #000000; font-size: 300%; z-index: 19}
+#notes p {line-height: 45px; vertical-align: middle; display: inline-block; background-color: #000000; color: #ffa090; font-family: "Arial"; text-shadow: #ffff00 0px 0px 3px; -webkit-font-smoothing: antialiased; z-index: 20;}
+#sunburst {position: absolute; width: 960px; height: 540px; overflow: hidden; opacity: 40%; z-index: 10; display: none;}
+.inner {width: 300%; height: 300%; position: absolute; top: 110%; left: 50%; transform: translate(-50%, -50%); animation: spin 55s linear infinite;}
+@keyframes spin {from{transform: translate(-50%, -50%) rotate(0deg);} to {transform: translate(-50%, -50%) rotate(360deg);}}
+.gradient-wrap {width: 100%; height: 60%; overflow: hidden;}
+.gradient-wrap:last-child {transform: rotate(180deg);}
+.gradient {width: 100%; height: 200%; background: repeating-conic-gradient(hsl(0deg 0% 80% / 31%) 0deg 15deg, hsla(0,0%,100%,0) 0deg 30deg) #3c1c32 }
+#tr_div {position:fixed;left:0px;top:0px;width:960px;height:540px;z-index:8;display:block;overflow:hidden}
+#tr3d {position:fixed;left:0px;top:0px;width:960px;height:540px;z-index:8;display:block;overflow:hidden}
+#chart_holder {position:absolute;left:0px;top:0px;width:540px;height:540px;z-index:2;display:block;overflow:hidden}
+#slider_r {-webkit-appearance: none;appearance: none;width: 900px;height: 25px;outline: 1.0;opacity: 1.0}
+#slider_g {-webkit-appearance: none;appearance: none;width: 900px;height: 25px;outline: 1.0;opacity: 1.0}
+#slider_b {-webkit-appearance: none;appearance: none;width: 900px;height: 25px;outline: 1.0;opacity: 1.0}
+#dot_1 {height: 45px;width: 45px;position: fixed;top: 200px;left: 620px;background: #ffff00;border-radius: 50%}
+#dot_2 {height: 45px;width: 45px;position: fixed;top: 200px;left: 820px;background: #ffff00;border-radius: 50%}
+#monte_slider_div {position:fixed;left:0px;top:500px;width:960px;height:40px;z-index:40;display:block;overflow:hidden}
+#monte_sliderN_div {position:fixed;left:0px;top:470px;width:960px;height:40px;z-index:40;display:block;overflow:hidden}
+#monte_sliderSigma2_div {position:fixed;left:0px;top:440px;width:960px;height:40px;z-index:40;display:block;overflow:hidden}
+#monte_sliderA_div {position:fixed;left:0px;top:410px;width:960px;height:40px;z-index:40;display:block;overflow:hidden}
+#cables {position:absolute;left:0px;top:0px;width:960px;height:540px;z-index:9;display:block;overflow:hidden;outline:0}
+#logo1 {position:absolute;left:875px;top:40px;width:960px;height:540px;z-index:999;display:block;overflow:hidden;outline:0;opacity:0.5}
+#logo2 {position:absolute;left:855px;top:130px;width:960px;height:540px;z-index:999;display:block;overflow:hidden;outline:0;opacity:0.5}
+/* disable on touch highlights of html elements, especially on mobile! */
+* { -webkit-tap-highlight-color: transparent; -webkit-touch-callout:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;}
+</style>
+<script src="js/snap.svg-min.js"></script>
+<script type="module" src="js/three.module.js"></script>
+<script type="module" src="js/GLTFLoader.js"></script>
+<script src="js/chart360.min.js"></script>
+<script src="js/mathjs_9.5.1.js"></script>
+<script type="text/javascript" src="cables/cables.min.js"></script>
+<script type="text/javascript" src="cables/cgl_copytexture.js"></script>
+<script type="text/javascript" src="cables/cgl_shadermodifier.js"></script>
+<script type="text/javascript" src="cables/cgl_wireframes.js"></script>
+<script type="text/javascript" src="cables/libs.core.min.js"></script>
+<script type="text/javascript" src="cables/Point_Cloud_Text/js/ops.js"></script>
+<script type="text/javascript" src="cables/Sine_scroller/js/ops.js"></script>
+<script type="text/javascript" src="cables/vargetset.js"></script>
+
+</head><body>
+<div class="all" id="all">
+ <div class="clip" id="clip">
+  <div id="sunburst"><div class="inner"><div class="gradient-wrap"><div class="gradient"></div></div><div class="gradient-wrap"><div class="gradient"></div></div></div></div>
+  <video id="webcam_element" autoplay playsinline muted></video>
+  <video id="replay_element" autoplay playsinline></video>
+  <video id="snippet_element" autoplay playsinline></video>
+  <video id="audiencecam_element" autoplay playsinline muted></video>
+  <div id="video_div"></div>
+  <div id="chart_holder"><center><canvas id="chart-area" /></center></div>
+  <svg id="svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMinYMin meet"></svg>
+  <div id="tr_div"><canvas id="tr3d"></canvas></div>
+  <div id="cables"><canvas class="glcanvas" id="glcanvas" tabindex="1"></canvas></div>
+  <!--Permanent logos on top of everything goes here:!-->
+  <!--<div id="logo2"><img src="media/logotypes/the_logo.png" opacity=0.7 width="9%" height="auto"></div> !-->
+ </div>
+</div>
+<div id="notes" style="text-align: center"><p></p></div>
+Main cam: <select id="webcam_select"><option></option></select>
+Audio input: <select id="audioin_select"><option></option></select>
+<button id="webcam_start_button">Start camera</button>
+<button id="webcam_stop_button">Stop camera</button>
+<input type="checkbox" id="auto_progress" name="auto_progress" checked><label for="auto_progress">Auto progress:</label> <span id="duration"></span>
+<br>
+Audience cam, if any: <select id="audiencecam_select"><option></option></select>
+<button id="notes_button">Open notes window</button>
+<button id="set_screen_size">set Screen Size</button>
+<button id="full_screen">-> Full screen</button>
+<br>
+<!--Replay events:<input type="file" id="event_file_to_load" accept="txt/*" value="js_saved_events_1646399449165.txt" />-->
+<button id="replay_events_button">Replay Events</button>
+<button id="stop_replay_button">Stop Replay</button>
+<button id="download_events_button">Download events</button>
+Replay timeline: <input type="range" min="0" max="100.0" value="0.0" id="replay_timeline" style="width: 420px">
+<span id="replay_text_element">0.0</span>
+<br>
+<button id="muzak_start_button">Start muzak</button>
+<button id="muzak_stop_button">Stop muzak</button>
+Muzak+FX volume: <input type="range" min="0" max="1.0" value="1.0" step="0.01" id="audio_volume_slider">
+Snippet volume: <input type="range" min="0" max="1.0" value="1.0" step="0.01" id="snippet_volume_slider">
+<br>
+Keyboard shortcuts:
+Shift+[1-0] start recording snippet,
+[1-0] start playback of snippet,
+§ stop snippet.
+Snippet 8 is "left".
+Snippet 9 is "right".
+a = toggle auto progress<br>
+<span id="cam_effect_mode_display">Cam effect:</span>
+<span id="snippet_record_display"></span><br>
+<span style="color:#ff0000">&nbsp;R</span> <input type="range" min="0" max="255" value="70" id="slider_r"><span id="r_value">70</span><br>
+<span style="color:#00ff00">&nbsp;G</span> <input type="range" min="0" max="255" value="70" id="slider_g"><span id="g_value">70</span><br>
+<span style="color:#0000ff">&nbsp;B</span> <input type="range" min="0" max="255" value="70" id="slider_b"><span id="b_value">70</span><br>
+<div id="threshold_colour" width="300px" height="200px" style="background: #202020">= Threshold colour</div>
+
+<script id="vSh" type="x-shader/x-vertex">
+precision mediump float;
+precision mediump int;
+attribute vec4 position;
+attribute vec2 uv;
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = position;
+}
+</script><script id="fSh" type="x-shader/x-fragment">
+// This shader will slowly fade the 8-bit pencil bitmap to 0.5
+precision mediump float;
+precision mediump int;
+uniform sampler2D webcam;
+uniform sampler2D previous;
+uniform vec3 threshold;
+varying vec2 vUv;
+void main() {
+  vec4 webcam_col = texture2D(webcam, vUv);
+  float prev = texture2D(previous, vUv).r;
+  vec3 pencil = smoothstep(threshold, threshold + vec3(0.05, 0.05, 0.05), webcam_col.rgb);
+  float pencil_with_threshold = pencil.r * pencil.g * pencil.b;
+  float decay = 1.0/256.0 * step(0.5, prev);
+  float next = prev + pencil_with_threshold - decay;
+  // Output the feedback pencil_bitmap in the alpha channel, range 0.0-1.0
+  gl_FragColor = vec4(next, next, next, next);
+}
+</script><script id="fSh_erase" type="x-shader/x-fragment">
+// This shader is used for erasing the pencil bitmap texture:
+precision mediump float;
+precision mediump int;
+uniform sampler2D webcam;
+uniform sampler2D previous;
+uniform vec3 threshold;
+varying vec2 vUv;
+void main() {
+  float prev = texture2D(previous, (vUv - vec2(0.5,0.5)) * 1.01 + vec2(0.5,0.5)).r;
+  float next = prev - 1.0/256.0;
+  gl_FragColor = vec4(next, next, next, next);
+}
+</script><script id="vSh2" type="x-shader/x-vertex">
+precision mediump float;
+precision mediump int;
+attribute vec4 position;
+attribute vec2 uv;
+varying vec2 vUv;
+void main() {
+  vUv = vec2(1.0-uv.x, uv.y);
+  gl_Position = position;
+}
+</script><script id="fSh2" type="x-shader/x-fragment">
+// This shader will draw the pencil bitmap 1.0-0.0 with a generated colourmap and alpha
+precision mediump float;
+precision mediump int;
+uniform sampler2D pencil;
+varying vec2 vUv;
+void main() {
+  float pen_value = texture2D(pencil, vUv).a;
+  float one_minus_pen = 1.0 - pen_value;
+  float alpha_from_pen = 1.0 - one_minus_pen * one_minus_pen;
+  vec3 col_from_pen = vec3(0.97,0.7,0.68) + vec3(0.3,0.6,0.3) * cos(6.28318 * (vec3(0.8,0.5,2.0) * pen_value + vec3(0.0,0.33,0.67)));
+  float black_from_pen = 1.0 - one_minus_pen * one_minus_pen * one_minus_pen;
+  col_from_pen = col_from_pen * black_from_pen;
+  gl_FragColor = vec4(col_from_pen.r, col_from_pen.g, col_from_pen.b, alpha_from_pen);
+}
+</script>
+<script id="dialog_vertex_shader" type="x-shader/x-vertex">
+precision mediump float;
+precision mediump int;
+attribute vec4 position;
+attribute vec2 uv;
+attribute vec2 uv2;
+varying vec2 vUv;
+varying vec2 vUv2;
+void main() {
+  vUv = uv;
+  vUv2 = uv2;
+  gl_Position = position;
+}
+</script>
+<script id="dialog_spinner_fshader" type="x-shader/x-fragment">
+precision mediump float;
+precision mediump int;
+uniform float spin;
+uniform float animate;
+uniform sampler2D map;
+varying vec2 vUv;
+varying vec2 vUv2;
+void main() {
+  vec4 dialog_col = texture2D(map, vUv);
+  float dist = length(vUv2);
+  float angle = abs(fract(%%%TWIST%%% * dist + spin + %%%NOF_ARMS%%% * atan(vUv2.y, vUv2.x) / 2.0 / 3.14159265358979) - 0.5);
+  float alpha = 0.92 * smoothstep(1.25 * animate, animate, dist + angle);
+  gl_FragColor = vec4(dialog_col.r, dialog_col.g, dialog_col.b, alpha);
+}
+</script>
+<script id="dialog_circle_fshader" type="x-shader/x-fragment">
+precision mediump float;
+precision mediump int;
+uniform float spin;
+uniform float animate;
+uniform sampler2D map;
+varying vec2 vUv;
+varying vec2 vUv2;
+void main() {
+  vec4 dialog_col = texture2D(map, vUv);
+  float dist = length(vUv2);
+  float angle = abs(fract(%%%TWIST%%% * dist + spin + %%%NOF_ARMS%%% * atan(vUv2.y, vUv2.x) / 2.0 / 3.14159265358979) - 0.5);
+  float alpha = 0.95 * smoothstep(1.45 * animate, animate, dist + angle);
+  float extra = smoothstep(animate, 1.3 * animate, dist + angle);
+  gl_FragColor = vec4(dialog_col.r + extra, dialog_col.g + extra, dialog_col.b + extra, alpha);
+}
+</script>
+<script id="dialog_wave_fshader" type="x-shader/x-fragment">
+precision mediump float;
+precision mediump int;
+uniform float spin;
+uniform float animate;
+uniform sampler2D map;
+varying vec2 vUv;
+varying vec2 vUv2;
+void main() {
+  // wave distortion
+  float x = sin( 6.0*vUv.y + 8.0*vUv.x + 2.0*3.1415926535*spin) * 0.003;
+  float y = sin( 6.0*vUv.y + 8.0*vUv.x + 4.0*3.1415926535*spin) * 0.004;
+  vec4 dialog_col = texture2D(map, vec2(vUv.x + x, vUv.y + y));
+  float dist = length(vUv2);
+  float angle = abs(fract(%%%TWIST%%% * dist + spin + %%%NOF_ARMS%%% * atan(vUv2.y, vUv2.x) / 2.0 / 3.14159265358979) - 0.5);
+  float alpha = 0.96 * smoothstep(1.45 * animate, animate, dist + angle);
+  float extra = smoothstep(animate, 1.3 * animate, dist + angle);
+  gl_FragColor = vec4(dialog_col.r + 0.5*extra, dialog_col.g + 0.6*extra, dialog_col.b + extra, alpha);
+}
+</script>
+<script type="module">
+'use strict';
+
+import * as THREE from './js/three.module.js';
+import {GLTFLoader} from './js/GLTFLoader.js';
+import {Text} from "./js/troika-three-text.esm.js";
+import {preloadFont} from "./js/troika-three-text.esm.js";
+
+// Create the dynamic SVG image:
+let s = Snap("#svg");
+let logo = null;
+
+// Global variables, how could we live without them? ----------------------------------------------------------------------------
+
+const webcam_element = document.getElementById("webcam_element");
+const webcam_start_button = document.getElementById('webcam_start_button');
+const webcam_stop_button = document.getElementById('webcam_stop_button');
+const notes_button = document.getElementById('notes_button');
+const download_events_button = document.getElementById('download_events_button');
+const replay_events_button = document.getElementById('replay_events_button');
+const replay_element = document.getElementById("replay_element");
+const replay_text_element = document.getElementById('replay_text_element');
+const stop_replay_button = document.getElementById('stop_replay_button');
+const webcam_select = document.getElementById('webcam_select');
+const auto_progress_element = document.getElementById('auto_progress');
+const duration_element = document.getElementById('duration');
+const audiencecam_element = document.getElementById("audiencecam_element");
+const audiencecam_select = document.getElementById('audiencecam_select');
+const video_div = document.getElementById("video_div");
+const audioin_select = document.getElementById('audioin_select');
+const muzak_start_button = document.getElementById('muzak_start_button');
+const muzak_stop_button = document.getElementById('muzak_stop_button');
+const audio_volume_slider = document.getElementById('audio_volume_slider');
+const snippet_element = document.getElementById("snippet_element");
+const snippet_volume_slider = document.getElementById('snippet_volume_slider');
+const svg_element = document.getElementById("svg");
+const my_notes = document.getElementById("notes");
+const snippet_record_display = document.getElementById("snippet_record_display");
+const cam_effect_mode_display = document.getElementById("cam_effect_mode_display");
+const tr_div = document.getElementById("tr_div");
+const chart_holder = document.getElementById("chart_holder");
+const sunburst_div = document.getElementById("sunburst");
+const slider_r = document.getElementById("slider_r");
+const slider_g = document.getElementById("slider_g");
+const slider_b = document.getElementById("slider_b");
+const r_value = document.getElementById("r_value");
+const g_value = document.getElementById("g_value");
+const b_value = document.getElementById("b_value");
+const threshold_colour_div = document.getElementById("threshold_colour");
+// An associative array with all SVG objects that are visible right now:
+let a = {}
+// The collected info about all objects:
+let infos = {}
+// A dictionary of videos to pause at a certain time:
+let videos_to_pause = {};
+// At which second to pause:
+let videos_to_pause_at = {};
+// A dictionary of videos to loop at a certain time:
+let videos_to_loop = {};
+// At which second to pause:
+let videos_to_loop_at = {};
+// For how long this slide is to be shown if using auto progress:
+let duration = 0.0;
+let auto_progress = true;
+let currentStream;
+let currentAudienceStream;
+let webcam_captureStream;
+let video_offset_y = 0;
+let threshold = new THREE.Vector3(70/255.0, 70/255.0, 70/255.0);
+let camera_shake = 0.0;
+let webcam_texture = null;
+let pencil_texture_source = 0;
+let pencil_texture_dest = 1;
+let my_dpr = 2; // = Number of pixels per CSS pixel
+const w = 1920;
+const h = 1080;
+let aspect_ratio = w / h;
+let xmax = aspect_ratio;
+let ymax = 1.0;
+let renderer;
+let scene;
+let camera_scale = 1.0;
+let camera;
+let pencil_scene;
+let feedback_texture = [];
+let pencil_mat;
+let pencil_output_mat;
+let all_3d_models = {};
+let environment_texture;
+let monte_slider_div;
+let monte_sliderN_div;
+let monte_sliderA_div;
+let monte_sliderSigma2_div;
+// This is where all "soon to happen" timeouts are registered, so we may cancel them:
+let timeouts = {};
+let font_is_loaded = null;
+
+// Audio stuff ----------------------------------------------------------------------------
+
+let audio_boom = new Audio('media/audio/short_audio_clip.mp3');
+let audio_muzak = new Audio('media/audio/Pex_Mahoney_Tufvesson_-_Polhems_Getar.mp3');
+
+audio_volume_slider.oninput = function() {audio_muzak.volume = this.value; audio_boom.volume = this.value;};
+snippet_volume_slider.oninput = function() {snippet_element.volume = this.value};
+
+muzak_start_button.addEventListener('click', event => {
+  audio_muzak.currentTime = 0.0;
+  audio_muzak.loop = true;
+  audio_muzak.play();
+});
+
+muzak_stop_button.addEventListener('click', event => {
+  audio_muzak.pause();
+});
+
+// Camera stuff -----------------------------------------------------------------------------
+
+function decide_pixel_dimensions_for_a_cam(cam_text) {
+  let width = 1920;
+  let height = 1080;
+  if (cam_text.startsWith("LUMIX Webcam Software")) {
+    // Panasonic Lumix GH5 with a USB-C connection only supports 1280x720:
+    width = 1280;
+    height = 720;
+  } else if (cam_text.startsWith("FaceTime-HD")) {
+    // Internal webcam for a MacBook Pro only supports 1280x720:
+    width = 1280;
+    height = 720;
+  } else if (cam_text.startsWith("USB Camera VID:1133 PID:2449")) {
+    // Logitech old webcam:
+    console.log("Logitech cam");
+    width = 1280;
+    height = 720;
+  }
+  return [width, height];
+}
+
+function start_audience_cam() {
+  let this_one = audiencecam_select.value;
+  if (typeof currentAudienceStream !== 'undefined') {
+    stopMediaTracks(currentAudienceStream);
+  }
+  const videoConstraints = {};
+  if (this_one === '') {
+    videoConstraints.facingMode = 'user';  // environment, left, right
+  } else {
+    videoConstraints.deviceId = { exact: this_one };
+  }
+  let cam_text = audiencecam_select.options[audiencecam_select.selectedIndex].text;
+  let dimensions = decide_pixel_dimensions_for_a_cam(cam_text);
+  videoConstraints.width = dimensions[0];
+  videoConstraints.height = dimensions[1];
+  const constraints = {
+    video: videoConstraints,
+    audio: false
+  };
+  navigator.mediaDevices
+    .getUserMedia(constraints)
+    .then(stream => {
+      currentAudienceStream = stream;
+      audiencecam_element.srcObject = stream;
+      return;
+    })
+}
+
+function stop_audience_cam() {
+  if (typeof currentAudienceStream !== 'undefined') {
+    stopMediaTracks(currentAudienceStream);
+  }
+}
+
+function add_devices_to_audiencecam_selector(mediaDevices) {
+  audiencecam_select.innerHTML = '';
+  audiencecam_select.appendChild(document.createElement('option'));
+  let count = 1;
+  mediaDevices.forEach(mediaDevice => {
+    if (mediaDevice.kind === 'videoinput') {
+      const option = document.createElement('option');
+      option.value = mediaDevice.deviceId;
+      const label = mediaDevice.label || `Camera ${count++}`;
+      const textNode = document.createTextNode(label);
+      if (label.startsWith("USB Camera VID:1133 PID:2449")) {
+        option.selected = true;
+      }
+      option.appendChild(textNode);
+      audiencecam_select.appendChild(option);
+    }
+  });
+}
+
+function stopMediaTracks(stream) {
+  stream.getTracks().forEach(track => {
+    track.stop();
+  });
+}
+
+function stop_webcam() {
+  if (typeof currentStream !== 'undefined') {
+    stopMediaTracks(currentStream);
+  }
+}
+
+webcam_start_button.addEventListener('click', event => {
+  set_new_webcam_stream(webcam_select.value);
+});
+
+webcam_stop_button.addEventListener('click', event => {
+  stop_webcam();
+});
+
+function set_new_webcam_stream () {
+  if (typeof currentStream !== 'undefined') {
+    stopMediaTracks(currentStream);
+  }
+  const videoConstraints = {};
+  let this_one = webcam_select.value;
+  if (this_one === '') {
+    videoConstraints.facingMode = 'user';  // environment, left, right
+  } else {
+    videoConstraints.deviceId = { exact: this_one };
+  }
+  let cam_text = webcam_select.options[webcam_select.selectedIndex].text;
+  let dimensions = decide_pixel_dimensions_for_a_cam(cam_text);
+  console.log(dimensions);
+  videoConstraints.width = dimensions[0];
+  videoConstraints.height = dimensions[1];
+  //videoConstraints.facingMode = 'user';
+  const audioConstraints = {};
+  audioConstraints.deviceId = { exact: audioin_select.value };
+
+  const constraints = {
+    video: videoConstraints,
+    audio: audioConstraints
+  };
+  navigator.mediaDevices
+    .getUserMedia(constraints)
+    .then(stream => {
+      currentStream = stream;
+      webcam_element.srcObject = stream;
+      webcam_captureStream = webcam_element.captureStream || webcam_element.mozCaptureStream;
+      return;
+    })
+}
+
+function add_devices_to_selector(mediaDevices) {
+  webcam_select.innerHTML = '';
+  webcam_select.appendChild(document.createElement('option'));
+  let count = 1;
+  mediaDevices.forEach(mediaDevice => {
+    if (mediaDevice.kind === 'videoinput') {
+      const option = document.createElement('option');
+      option.value = mediaDevice.deviceId;
+      const label = mediaDevice.label || `Camera ${count++}`;
+      const textNode = document.createTextNode(label);
+      if (label.startsWith("FaceTime-HD")) {
+        option.selected = true;
+      }
+      option.appendChild(textNode);
+      webcam_select.appendChild(option);
+    } else if (mediaDevice.kind === 'audioinput') {
+      const option = document.createElement('option');
+      option.value = mediaDevice.deviceId;
+      const label = mediaDevice.label || `Mic ${count++}`;
+      const textNode = document.createTextNode(label);
+      if (label.startsWith("Standard")) {
+        option.selected = true;
+      }
+      option.appendChild(textNode);
+      audioin_select.appendChild(option);
+    }
+  });
+}
+
+function start_default_webcam () {
+  if ( navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
+    // For a presentation with the builtin webcam of p64:
+    const constraints = { audio: true, video: { width: 1280, height: 720, facingMode: 'user' } };
+    // For a presentation with HDMI input from GH5:
+    //const constraints = { audio: true, video: { width: 1920, height: 1080, facingMode: 'user' } };
+    navigator.mediaDevices.getUserMedia( constraints )
+      .then(function (stream) {
+        currentStream = stream;
+        webcam_element.srcObject = stream;
+        webcam_captureStream = webcam_element.captureStream || webcam_element.mozCaptureStream;
+        webcam_element.play();
+        webcam_element.volume = 0;
+        webcam_element.muted = true;
+      })
+      .catch(function (error) {
+        console.error('Unable to access the camera/webcam.', error );
+      });
+  } else {
+    console.error('MediaDevices interface not available.');
+  }
+}
+
+function webcam_init () {
+  // Grab a list of all available cams connected right now:
+  webcam_select.addEventListener('change', event => {
+    console.log("onchange webcam");
+    set_new_webcam_stream();
+  });
+  audioin_select.addEventListener('change', event => {
+    console.log("onchange audioin");
+    set_new_webcam_stream();
+  });
+  navigator.mediaDevices.enumerateDevices().then(add_devices_to_selector);
+  navigator.mediaDevices.enumerateDevices().then(add_devices_to_audiencecam_selector);
+
+  // Start the default webcam
+  //start_default_webcam();
+}
+
+//-----------------------------------------------------------------------------
+
+let then = 0;
+let skip_frames = 0;
+let last_timestamp = 0;
+let maxFPS = 70;
+let timestep = 1000 / maxFPS; // ms for each frame
+
+function animate (newtime) {
+  // timestamps are ms passed since document creation.
+  // lastTimestamp can be initialized to 0, if main loop is executed immediately
+  // skip if timestep ms hasn't passed since last frame
+  if (newtime - last_timestamp < timestep) {
+    requestAnimationFrame(animate);
+    return;
+  }
+  last_timestamp = newtime;
+  let time_between_frames = newtime - then;
+  then = newtime;
+//  console.log("time_between_frames = " + time_between_frames);
+
+  if (auto_progress == true) {
+    let old_duration = duration;
+    // time_between_frames might be NaN at start
+    if (time_between_frames > 0) {
+      duration = duration - time_between_frames*0.001;
+      if (math.round(old_duration * 10) != math.round(duration * 10)) {
+        duration_element.innerHTML = duration.toFixed(1);
+      }
+      if (duration <= 0.0) {
+        goto_next();
+      }
+    }
+  }
+
+  animate_slideshow(time_between_frames);
+
+  if (all_3d_models["brain"] != null) {
+    try{
+      all_3d_models["brain"].rotation.z += 0.002 * time_between_frames / 1000 * 120;
+    } catch {}
+  }
+
+  // Check if there's any video to pause right now:
+  const keys = Object.keys(videos_to_pause);
+  keys.forEach((name, index) => {
+    let the_video = videos_to_pause[name];
+    let pause_at_time = videos_to_pause_at[name];
+    if (the_video.currentTime >= pause_at_time) {
+      try {
+        if (the_video.paused == false) {
+          the_video.pause()
+          console.log("pausing video " + name + " at " + pause_at_time);
+        }
+      } catch {};
+    }
+  });
+
+  // Check if there's any video to loop right now:
+  const keys2 = Object.keys(videos_to_loop);
+  keys2.forEach((name, index) => {
+    let the_video = videos_to_loop[name];
+    let loop_at_time = videos_to_loop_at[name];
+    if (the_video.currentTime >= loop_at_time) {
+      try {
+        the_video.currentTime = infos[name].start_at;
+        console.log("looping video " + name + " at " + loop_at_time);
+      } catch {};
+    }
+  });
+
+
+  // animate camera shake:
+  if (camera_shake >= 0.001) {
+    camera_shake = 0.96 * camera_shake;
+    if (camera_shake < 0.001) {
+      camera_shake = 0;
+    }
+    // update the camera
+    let rotation = 0.2 * camera_shake * (Math.random() - 0.5);
+    let offset_x = 0.1 * camera_shake * (Math.random() - 0.5) * w;
+    let offset_y = 0.1 * camera_shake * (Math.random() - 0.5) * h;
+    let scale = 1.0 + 0.2 * camera_shake;
+    // Let's shake the webcam + svg:
+    webcam_element.style.transform = "translate(" + (offset_x) + "px, " + (offset_y) + "px) rotate(" + (2*rotation) + "rad) scale(" + (-scale) + "," + (scale) +")";
+    replay_element.style.transform = "translate(" + (offset_x) + "px, " + (offset_y) + "px) rotate(" + (2*rotation) + "rad) scale(" + (-scale) + "," + (scale) +")";
+    tr_div.style.transform = "translate(" + (offset_x) + "px, " + (offset_y) + "px) rotate(" + (2*rotation) + "rad) scale(" + (scale) +")";
+    svg_element.style.transform = "translate(" + (offset_x) + "px, " + (offset_y) + "px) rotate(" + (2*rotation) + "rad) scale(" + (scale) +")";
+    // Let's shake the video, if any:
+    video_div.style.transform = "translate(" + (offset_x) + "px, " + (offset_y + video_offset_y) + "px) rotate(" + (2*rotation) + "rad) scale(" + (scale) +")";
+  } else {
+    video_div.style.transform = "translate(0px, " + (video_offset_y) + "px) rotate(0rad) scale(1)";
+    webcam_element.style.transform = "translate(0px, " + (video_offset_y) + "px) rotate(0rad) scale(-1,1)";
+    replay_element.style.transform = "translate(0px, " + (video_offset_y) + "px) rotate(0rad) scale(-1,1)";
+  }
+
+
+  if (font_is_loaded) {
+    // Do movements only when we have gotten the fonts:
+    animate_dialog();
+  }
+
+  // Do the automatic switching of slides if we are replaying a recorded presentation.
+  if (replay_is_playing == true) {
+    replay_update_slides();
+  }
+
+  // Render the feedback pencil_image:
+  if ((current_cam_effect_mode == "writing") || (nof_frames_of_erasing_left > 0)) {
+    render_pencil_bitmap();
+  }
+  render_all_3d_stuff();
+
+  requestAnimationFrame(animate);
+}
+
+let nof_frames_of_erasing_left = 0;
+function erase_text_on_screen() {
+  nof_frames_of_erasing_left = 130;
+}
+
+let current_cam_effect_mode = 0;
+function toggle_cam_effect_mode() {
+  if (current_cam_effect_mode == 0) {
+    current_cam_effect_mode = "writing";
+  } else if (current_cam_effect_mode == "writing") {
+    erase_text_on_screen();
+    current_cam_effect_mode = 0;
+  }
+  cam_effect_mode_display.innerHTML = "Cam effect:" + current_cam_effect_mode;
+}
+
+// Snippet stuff -----------------------------------------------------------------------------
+
+let now_recording_snippet_no = -1;
+let recorded_snippets = {}
+let snippet_recorder;
+let recorded_chunks;
+
+function stop_snippets() {
+  console.log("stop snippets");
+  snippet_record_display.innerHTML = "";
+  // Remove the video so it's not displayed anymore:
+  snippet_element.pause();
+  snippet_element.removeAttribute('src'); // empty source
+  snippet_element.load();
+}
+
+function on_snippet_video_ended(e) {
+  stop_snippets();
+}
+
+function start_playing_snippet(snippet_no) {
+  console.log("start playing snippet");
+  snippet_record_display.innerHTML = "Playing snippet #" + snippet_no;
+  if (snippet_no == 8) {
+    // Show only the leftmost 1/3 of this video
+    snippet_element.style.clip = "rect(0px,"+current_screen_width+"px,"+current_screen_height+"px,"+(current_screen_width*2/3)+"px)"; // Full height
+  } else if (snippet_no == 9) {
+    // Show only the rightmost 1/3 of this video
+    snippet_element.style.clip = "rect(0px,"+(current_screen_width/3)+"px,"+current_screen_height+"px,0px)"; // Full height
+  } else {
+    snippet_element.style.clip = ""; // Show all
+  }
+  snippet_element.src = URL.createObjectURL(recorded_snippets[snippet_no]);
+  snippet_element.play();
+  snippet_element.addEventListener('ended',on_snippet_video_ended,false);
+}
+
+function start_recording_snippet(snippet_no) {
+  if (now_recording_snippet_no >= 0) {
+    // Stop recording the current one before starting the next one.
+    snippet_recorder.stop();
+  } else {
+    console.log("recording initiated for snippet " + snippet_no);
+    snippet_record_display.innerHTML = "Recording snippet #" + snippet_no;
+    now_recording_snippet_no = snippet_no;
+    recorded_chunks = [];
+    let options = {
+      audioBitsPerSecond : 128000,  //Default is 128000, cannot choose any higher than that.
+      videoBitsPerSecond : 6000000, // Default is 2500000
+      mimeType : 'video/webm'
+    }
+    snippet_recorder = new MediaRecorder(webcam_element.captureStream(), options);
+    snippet_recorder.ondataavailable = event => {recorded_chunks.push(event.data);
+      snippet_record_display.innerHTML = "";
+      recorded_snippets[now_recording_snippet_no] = new Blob(recorded_chunks, { type: "video/webm" });
+      console.log("Did successfully record " + recorded_snippets[now_recording_snippet_no].size + " bytes of " + recorded_snippets[now_recording_snippet_no].type + " media.");
+  //  downloadButton.href = URL.createObjectURL(recorded_snippets[snippet_no]);
+  //  downloadButton.download = "RecordedVideo.webm";
+      now_recording_snippet_no = -1;
+    };
+    snippet_recorder.start();
+    console.log(snippet_recorder.state + " now to snippet " + now_recording_snippet_no);
+  }
+}
+
+function stop_recording_snippet() {
+  console.log("manually stopping recording");
+  snippet_recorder.stop();
+}
+
+function handle_snippets(snippet_no, shift_is_pressed) {
+  console.log("handle_snippets(" + snippet_no + ",shift=" + shift_is_pressed + ")");
+  if (shift_is_pressed == true) {
+    start_recording_snippet(snippet_no);
+  } else {
+    if (now_recording_snippet_no >= 0) {
+      // Stop recording the current one before starting the next one.
+      stop_recording_snippet();
+    } else {
+      start_playing_snippet(snippet_no);
+    }
+  }
+}
+
+// Handle slide navigation -----------------------------------------------------------------------------
+
+// This is an array with everything that has happened so far during the presentation.
+// Can be used to "replay" the presentation with a pre-recorded video:
+let saved_events = [];
+// This is the time when the page was loaded:
+const start_date = Date.now();
+saved_events.push("" + new Date().toLocaleString() + " 0");
+
+download_events_button.addEventListener('click', event => {
+  download_saved_events("js_saved_events_" + (Date.now()) + ".txt");
+});
+
+replay_events_button.addEventListener('click', event => {
+  replay_saved_events();
+});
+
+stop_replay_button.addEventListener('click', event => {
+  stop_replay();
+});
+
+function download_saved_events(filename) {
+  var element = document.createElement('a');
+  let text = saved_events.join("\n");
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
+
+let loaded_event_file_txt = null;
+let replay_video_filename = "recording_220304/P1066355.MP4";
+let replay_audio_filename = "recording_220304/fixed_audio/fixed_audio_220304_GH5_v01.wav";
+//let replay_audio_filename = "recording_220304/fixed_audio/P1066355_v01.wav";
+let replay_global_offset = 319.4; //309 //582 - 259; // Click at 238s, click at 259s - compare to 582692 value below: 582-259
+let replay_start_time = 285.0; //285 is a good starting point
+let replay_is_playing = false;
+let replay_events = [];  // Gets the contents of the text below, but parsed into a list of dicts:
+let replay_event_file_lines = [
+'2022-03-04 12:54:44 0 Start',
+'2022-03-04 12:54:47 2464 Meta',
+'2022-03-04 13:01:16 391542 Meta',
+'2022-03-04 13:01:27 402318 Meta',
+'2022-03-04 13:01:42 417965 Meta',
+'2022-03-04 13:03:17 512974 Meta',
+'2022-03-04 13:04:27 582692 ArrowRight',
+'2022-03-04 13:04:40 595752 Meta',
+'2022-03-04 13:05:01 616808 ArrowRight',
+'2022-03-04 13:05:16 631382 ArrowRight',     //<- Title = step_to_slide 3
+'2022-03-04 13:05:46 661814 ArrowRight',
+'2022-03-04 13:05:53 669068 ArrowRight',
+'2022-03-04 13:05:55 670908 ArrowLeft',
+'2022-03-04 13:06:47 722207 ArrowRight',
+'2022-03-04 13:07:00 735590 ArrowRight',
+'2022-03-04 13:07:16 751221 ArrowRight',
+'2022-03-04 13:07:37 773034 ArrowRight',
+'2022-03-04 13:08:46 841725 ArrowRight',
+'2022-03-04 13:09:16 871357 ArrowRight',
+'2022-03-04 13:09:50 905957 ArrowRight',
+'2022-03-04 13:10:16 931881 ArrowRight',
+'2022-03-04 13:11:11 986356 ArrowRight',
+'2022-03-04 13:11:49 1024480 ArrowRight',
+'2022-03-04 13:12:01 1036904 ArrowRight',
+'2022-03-04 13:13:27 1122305 ArrowRight',
+'2022-03-04 13:13:33 1129012 ArrowRight',
+'2022-03-04 13:13:58 1153329 ArrowRight',
+'2022-03-04 13:14:42 1198158 ArrowRight',
+'2022-03-04 13:14:52 1208005 ArrowRight',
+'2022-03-04 13:16:17 1292905 ArrowRight',
+'2022-03-04 13:16:29 1304565 ArrowRight',
+'2022-03-04 13:16:46 1321557 ArrowRight',
+'2022-03-04 13:17:03 1338720 ArrowRight',
+'2022-03-04 13:17:30 1365288 ArrowRight',
+'2022-03-04 13:17:46 1381930 ArrowRight',
+'2022-03-04 13:18:06 1401528 ArrowRight',
+'2022-03-04 13:18:41 1436247 ArrowRight',
+'2022-03-04 13:18:59 1455149 ArrowRight',
+'2022-03-04 13:19:42 1497846 ArrowRight',
+'2022-03-04 13:20:07 1522553 ArrowRight',
+'2022-03-04 13:20:26 1541221 ArrowRight',
+'2022-03-04 13:20:59 1574688 ArrowRight',
+'2022-03-04 13:22:48 1683955 ArrowRight',
+'2022-03-04 13:23:35 1730719 ArrowRight',
+'2022-03-04 13:24:05 1761061 ArrowRight',
+'2022-03-04 13:24:54 1809629 ArrowRight',
+'2022-03-04 13:26:34 1909785 ArrowRight',
+'2022-03-04 13:27:11 1946902 ArrowRight',
+'2022-03-04 13:27:19 1954445 ArrowRight',
+'2022-03-04 13:28:00 1995297 ArrowRight',
+'2022-03-04 13:28:10 2005870 ArrowRight',
+'2022-03-04 13:28:22 2017216 ArrowRight',
+'2022-03-04 13:28:43 2038270 ArrowRight',
+'2022-03-04 13:29:16 2071264 ArrowRight',
+'2022-03-04 13:30:00 2116035 ArrowRight',
+'2022-03-04 13:30:55 2170636 ArrowRight',
+'2022-03-04 13:31:02 2178046 ArrowRight',
+'2022-03-04 13:31:46 2221241 ArrowRight',
+'2022-03-04 13:32:01 2236196 ArrowRight',
+'2022-03-04 13:32:01 2237074 ArrowRight',
+'2022-03-04 13:32:03 2238329 ArrowRight',
+'2022-03-04 13:32:20 2255753 ArrowRight',
+'2022-03-04 13:32:52 2288112 ArrowRight',
+'2022-03-04 13:33:04 2299673 ArrowRight',
+'2022-03-04 13:33:16 2311236 ArrowRight',
+'2022-03-04 13:33:24 2319454 ArrowRight',
+'2022-03-04 13:33:33 2328186 ArrowRight',
+'2022-03-04 13:33:37 2332343 ArrowRight',
+'2022-03-04 13:33:45 2340553 ArrowRight',
+'2022-03-04 13:34:00 2355679 ArrowRight',
+'2022-03-04 13:34:31 2386719 ArrowRight',
+'2022-03-04 13:34:39 2394679 ArrowRight',
+'2022-03-04 13:36:04 2479826 ArrowRight',
+'2022-03-04 13:36:53 2528585 ArrowRight',
+'2022-03-04 13:37:04 2539543 ArrowRight',
+'2022-03-04 13:37:09 2545051 ArrowRight',
+'2022-03-04 13:37:38 2573560 ArrowRight',
+'2022-03-04 13:38:15 2610709 ArrowRight',
+'2022-03-04 13:38:40 2635976 ArrowRight',
+'2022-03-04 13:38:52 2648068 ArrowRight',
+'2022-03-04 13:38:55 2650573 ArrowRight',
+'2022-03-04 13:39:42 2697482 ArrowRight',
+'2022-03-04 13:40:14 2729751 ArrowRight',
+'2022-03-04 13:40:16 2731950 ArrowRight',
+'2022-03-04 13:41:12 2787608 ArrowRight',
+'2022-03-04 13:41:48 2824075 ArrowRight',
+'2022-03-04 13:41:51 2827022 ArrowRight',
+'2022-03-04 13:42:35 2870805 ArrowRight',
+'2022-03-04 13:43:44 2939829 ArrowRight',
+'2022-03-04 13:44:31 2987174 ArrowRight',
+'2022-03-04 13:44:45 3001122 ArrowRight',
+'2022-03-04 13:45:26 3042132 ArrowRight',
+'2022-03-04 13:45:32 3047829 ArrowRight',
+'2022-03-04 13:45:35 3050430 ArrowRight',
+'2022-03-04 13:45:49 3064638 ArrowRight',
+'2022-03-04 13:46:14 3089519 ArrowRight',
+'2022-03-04 13:47:04 3140173 ArrowRight',
+'2022-03-04 13:47:34 3169229 ArrowRight',
+'2022-03-04 13:47:59 3194934 ArrowRight',
+'2022-03-04 13:48:13 3208598 ArrowRight',
+'2022-03-04 13:48:28 3223589 ArrowRight',
+'2022-03-04 13:48:39 3234741 ArrowRight',
+'2022-03-04 13:49:10 3265812 ArrowRight',
+'2022-03-04 13:53:10 3505759 ArrowRight',  // Tech insight
+'2022-03-04 13:53:33 3528609 ArrowRight',  // Thanks for listening
+'2022-03-04 14:05:32 4248138 Meta',
+'2022-03-04 14:09:45 4500638 Meta',
+'2022-03-04 14:10:21 4536518 Meta'];
+
+let replay_audio;
+let replay_video_length = 1*60*60 + 6*60 + 43;  // 1.06.43
+
+function replay_seek_to_percent(percent) {
+  let target_time = replay_video_length * percent / 100.0;
+  replay_element.currentTime = target_time;
+  replay_audio.currentTime = target_time;
+}
+
+replay_timeline.oninput = function() {replay_seek_to_percent(this.value)};
+
+function replay_update_slides() {
+  let current_time = replay_element.currentTime;
+  if (current_time > 3188.2) {
+    replay_audio.pause();
+    replay_element.pause();
+  }
+  let time_text = parseFloat(current_time.toFixed(1)) + "s";
+  if (time_text != replay_text_element.innerHTML) {
+    replay_text_element.innerHTML = time_text;
+
+    // We get here 10 times per second.
+    // Check if we need to switch slide:
+    // Do a linear search in these ~100 recorded events to find out where we are:
+    let current_recorded_event_no = 0;
+    let current_ms = (current_time + replay_global_offset) * 1000 ;
+    //console.log(current_ms);
+    for (let event_no = 0; event_no < replay_events.length; event_no++) {
+      if (current_ms < replay_events[event_no]["ms_since_start"]) {
+        current_recorded_event_no = event_no;
+        break;
+      }
+    }
+  //1: {date: '2022-03-04', wall_time: '12:54:47', ms_since_start: '2464', key: 'Meta', slide_no: 0}
+    let expected_slide_no = replay_events[current_recorded_event_no]["slide_no"];
+    if (expected_slide_no != current_slide) {
+      console.log("Triggering event_no "+ + current_recorded_event_no);
+      console.log(replay_events[current_recorded_event_no]);
+      goto(expected_slide_no);
+    }
+
+    // We get here 10 times per second.
+    // ToDo: Check that the audio currentTime is aligned with video currentTime.
+    let time_difference = replay_element.currentTime - replay_audio.currentTime;
+    // Positive time difference = video is ahead of audio
+    if (Math.abs(time_difference) > 0.020) {
+      console.log("Adjusting audio/video time diff, since it's");
+      console.log(time_difference);
+      replay_audio.currentTime = replay_element.currentTime + 0.07;
+    }
+
+  }
+}
+
+function stop_replay() {
+  // Remove the video so it's not displayed anymore:
+  replay_is_playing = false;
+  replay_element.pause();
+  try {
+    replay_audio.pause();
+  } catch {}
+  replay_element.removeAttribute('src'); // empty source
+  replay_element.load();
+  replay_element.muted = false;
+}
+
+function replay_saved_events() {
+//  let fileToLoad = document.getElementById("event_file_to_load").files[0];
+//  let fileReader = new FileReader();
+//  fileReader.onload = function(fileLoadedEvent){
+//    loaded_event_file_txt = fileLoadedEvent.target.result;
+//    replay_video_filename = "/recording_220304/P1066355.MP4";
+//    replay_audio_filename = "/recording_220304/fixed_audio/fixed_audio_220304_v01.wav";
+//    replay_global_offset = 0;
+//    replay_event_file_lines = loaded_event_file_txt.split("\n");
+  console.log(replay_event_file_lines);
+
+  stop_webcam();
+  // setup video for playing
+  stop_replay();
+  //snippet_element.src = "recording.mp4";
+  replay_element.src = replay_video_filename;
+  replay_element.controls = false;
+  replay_element.muted = true;
+  replay_element.playbackRate = 1.0;
+  replay_element.currentTime = replay_start_time;
+  replay_element.loop = false;
+
+  replay_audio = new Audio(replay_audio_filename);
+  replay_audio.currentTime = replay_start_time;
+  replay_audio.loop = false;
+
+  replay_element.play();
+  replay_audio.play();
+
+  //<input type="range" min="0" max="100.0" value="0.0" id="replay_timeline" style="width: 500px"><br>
+
+    // ToDo: setup audio for playing
+    // ToDo: start handling events from the file.
+
+  replay_events = [];  // Gets the contents of the text below, but parsed into a list of dicts
+  let current_slide_no = 0;
+  for (let line_no = 0; line_no < replay_event_file_lines.length; line_no++) {
+    let line = replay_event_file_lines[line_no];
+    // 2022-03-04 13:05:01 616808 ArrowRight
+    let new_dict_entry = {};
+    // 2022-03-04 13:05:01 616808 ArrowRight
+    //const re = /(.*) (.*) (.*) (.*)/g;
+    const re = /(.*) (.*) (.*) (.*)/;
+    let m = line.match(re);
+    new_dict_entry["date"] = m[1];
+    new_dict_entry["wall_time"] = m[2];
+    new_dict_entry["ms_since_start"] = m[3];
+    let key = m[4];
+    new_dict_entry["key"] = key;
+    new_dict_entry["slide_no"] = current_slide_no;
+    replay_events.push(new_dict_entry);
+    if ((key == " ") || (key == "ArrowRight")) {
+      current_slide_no += 1;
+    } else if (key == "ArrowLeft") {
+      current_slide_no -= 1;
+    }
+  }
+  console.log(replay_events);
+  //1: {date: '2022-03-04', wall_time: '12:54:47', ms_since_start: '2464', key: 'Meta', slide_no: 0}
+//  };
+//  fileReader.readAsText(fileToLoad, "UTF-8");
+  replay_is_playing = true;
+}
+
+
+let previous_back_time = -1000.0;
+const milliseconds_for_double_press = 1000.0;
+function on_key_down (event) {
+  let new_event = new Date().toLocaleString();
+  let now = Date.now();
+  const millis =  now - start_date;
+  new_event += " " + millis;
+  new_event += " " + event.key;
+  saved_events.push(new_event);
+  // Go forward either on "space" or on arrow right:
+  if ((event.key == " ") || (event.key == "ArrowRight")) {
+    goto_next();
+  } else if (event.key == "ArrowLeft") {
+    // Grab number of milliseconds since epoch:
+    let now = Date.now();
+    if ((now - previous_back_time) > milliseconds_for_double_press) {
+      goto_prev();
+      // Single click means toggle the effect used on the cam input:
+      //toggle_cam_effect_mode();
+    } else {
+      // Double click means go back in the slides:
+      goto_prev();
+    }
+    previous_back_time = now;
+  } else if ((event.code >= "Digit0") && (event.code <= "Digit9")) {
+    handle_snippets(parseInt(event.code[5]), event.shiftKey);
+    event.preventDefault();
+  } else if (event.key == "§") {
+    stop_snippets();
+    fade_dialog_glpos(0, 0);
+    // Remove all 3d objects:
+    goodbye_all_3d_objects();
+  } else if (event.key == "a") {
+    toggle_auto_progress();
+  } else if (event.key == "Escape") {
+    goto(0);
+  }
+}
+
+// Handle the slides
+let current_slide = -1;
+
+function goto_next () {
+  goto(current_slide + 1);
+}
+
+function goto_prev () {
+  goto(current_slide - 1);
+}
+
+function goto (slide_no) {
+  if (slide_no < 0) {
+    duration = 1.0;
+    current_slide = -1;
+    // Nothing to do here. Just return.
+    return;
+  } else if (slide_no == 0) {
+    show_slide_no(0, -1);
+  }
+  if (slide_no > current_slide) {
+    let done = false;
+    while ((slide_no > current_slide) & (done==false)) {
+      done = step_to_slide_no(current_slide + 1);
+    }
+  } else {
+    let done = false;
+    while ((slide_no < current_slide) & (done==false)) {
+      done = step_to_slide_no(current_slide - 1);
+    }
+  }
+}
+
+function step_to_slide_no(dst_slide) {
+  if (((dst_slide == current_slide + 1) || (dst_slide == current_slide - 1)) == false) {
+    // We're only allowed to take one step at a time through the slides.
+    console.log("ERROR - jumping too far");
+    return true;
+  }
+  let direction = dst_slide - current_slide;
+  console.log("step_to_slide_no " + dst_slide);
+  return show_slide_no(dst_slide, direction);
+}
+
+// Object creation and removal -----------------------------------------------------------------------------
+
+// This is where we add a new object to the screen:
+function hello (name, info) {
+  console.log("hello(" + name + ")");
+  if (infos[name] != null) {
+    console.log("### warning - adding the object " + name + " but it's already there.");
+  }
+  if (info.dest_x == null) info.dest_x = info.x;
+  if (info.dest_y == null) info.dest_y = info.y;
+  if (info.dest_a == null) info.dest_a = info.a;
+  if (info.dest_rot == null) info.dest_rot = info.rot;
+  if (info.dest_blur == null) info.dest_blur = info.blur;
+  if (info.line_height == null) info.line_height = "1.2em";
+  if (info.t == "text") {
+    if (a[name] == null) {
+      let svg_x = (info.x + 1.0) * 1920 / 2;
+      let svg_y = (info.y + 1.0) * 1080 / 2;
+      a[name] = s.text(svg_x, svg_y, info.text);
+      a[name].selectAll("tspan:nth-child(n+2)").attr({
+         dy: info.line_height,
+         x: svg_x
+      });
+      a[name].node.setAttributeNS("http://www.w3.org/XML/1998/namespace", "xml:space", "preserve");
+      a[name].attr({'font-size':info.fontsize, 'font-family':info.font, 'font-weight':info.fontweight});
+      let align = "start";  // SVG-lingo for "left-aligned text"
+      if (info.align != null) { // "left", "middle" or "right"
+        if (info.align == "right") {
+          align = "end";
+        } else if (info.align == "left") {
+          align = "start";
+        } else if (info.align == "middle") {
+          align = "middle";
+        }
+        a[name].attr({'text-anchor':align});
+      }
+      if (info.colour != null) {
+        a[name].attr({'fill' : info.colour});
+      }
+      if (info.rot != null) {
+        a[name].attr({ transform: "r" + info.rot + ","});
+      }
+      a[name].attr({opacity: info.a});
+    }
+    if (info.dest_a != info.a) {
+      a[name].animate({ opacity: info.dest_a }, 1000);
+    }
+    if (info.dest_rot != info.rot) {
+      a[name].animate({ opacity: info.dest_rot }, 1000);
+    }
+    if (info.blur != null) {
+      if (a[name+"_filter"] == null) {
+        a[name+"_filter"] = s.filter(Snap.filter.blur(info.blur, info.blur));
+        a[name].attr({filter: a[name+"_filter"]});
+      }
+    }
+    if ((info.dest_blur != null) && (info.dest_blur != info.blur)) {
+      //Snap.animate(from, to, setter, duration, [easing], [callback]) 
+      Snap.animate( info.blur, info.dest_blur, function(value) {try {a[name+"_filter"].node.firstChild.attributes[0].value = value + ',' + value;} catch {};}, 1500, mina.linear );
+    }
+  } else if (info.t == "rect") {
+    if (a[name] == null) {
+      let svg_x = (info.x + 1.0) * current_screen_width / 960 * 1920 / 2;
+      let svg_y = (info.y + 1.0) * current_screen_height / 540 * 1080 / 2;
+      let svg_width = info.width * current_screen_width / 960 * 1920;
+      let svg_height = info.height * current_screen_height / 540 * 1080;
+      let svg_corner_radius = info.corner_radius * current_screen_height / 540 * 1080 / 2;
+      a[name] = s.rect(svg_x - svg_width/2, svg_y - svg_height/2, svg_width, svg_height, svg_corner_radius, svg_corner_radius);
+      a[name].attr({opacity: info.a});
+    }
+    if (info.colour != null) {
+      a[name].attr({'fill' : info.colour});
+    }
+    a[name].stop();
+    var bbox = a[name].getBBox(); //bounding box, get coords and centre
+    if (info.rot != null) {
+      a[name].attr({ transform: "r" + info.rot });
+    }
+    if ((info.dest_rot != null) && (info.dest_rot != info.rot)) {
+      a[name].animate({ transform: "r" + info.dest_rot + "," + bbox.cx/2 + ',' + bbox.cy/2 }, 3500, mina.elastic);
+    }
+    if ((info.dest_a != null) && (info.dest_a != info.a)) {
+      a[name].animate({ opacity: info.dest_a }, 2000);
+    }
+    if (info.dest_y != info.y) {
+      a[name].animate({ y: info.dest_y }, 12000);
+    }
+    if (info.dest_x != info.x) {
+      a[name].animate({ x: info.dest_x }, 12000);
+    }
+  } else if (info.t == "png") {
+    // Also happen to handle svg file very well:
+    if (a[name] == null) {
+      let svg_x = (info.x + 1.0) * 1920 / 2;
+      let svg_y = (info.y + 1.0) * 1080 / 2;
+      let svg_size = info.size * 1080 / 2;
+      a[name] = s.image(info.file, svg_x - svg_size/2, svg_y - svg_size/2, svg_size, svg_size)
+      a[name].attr({preserveAspectRatio: "xMinYMin meet"});
+      a[name].attr({opacity: info.a});
+    }
+    if (info.blur != null) {
+      if (a[name+"_filter"] == null) {
+        a[name+"_filter"] = s.filter(Snap.filter.blur(info.blur, info.blur));
+        a[name].attr({filter: a[name+"_filter"]});
+      }
+    }
+    a[name].stop();
+    var bbox = a[name].getBBox(); //bounding box, get coords and centre
+    if (info.rot != null) {
+      a[name].attr({ transform: "r" + info.rot });
+    }
+    if ((info.dest_rot != null) && (info.dest_rot != info.rot)) {
+      a[name].animate({ transform: "r" + info.dest_rot + "," + bbox.cx/2 + ',' + bbox.cy/2 }, 3500, mina.elastic);
+    }
+    if ((info.dest_a != null) && (info.dest_a != info.a)) {
+      a[name].animate({ opacity: info.dest_a }, 2000);
+    }
+    if (info.dest_y != info.y) {
+      let svg_y_dest = (info.dest_y + 1.0) * 1080 / 2 - info.size * 1080 / 2 /2;
+      a[name].animate({ y: svg_y_dest }, 12000);
+    }
+    if (info.dest_x != info.x) {
+      let svg_x_dest = (info.dest_x + 1.0) * 1920 / 2 - info.size * 1920 / 2 /2;
+      a[name].animate({ x: svg_x_dest }, 12000);
+    }
+    if ((info.dest_blur != null) && (info.dest_blur != info.blur)) {
+      //Snap.animate(from, to, setter, duration, [easing], [callback]) 
+      Snap.animate( info.blur, info.dest_blur, function(value) {try {a[name+"_filter"].node.firstChild.attributes[0].value = value + ',' + value;} catch {};}, 1500, mina.linear );
+    }
+  } else if (info.t == "video") {
+    // Make a new video element, and add to div:
+    let video_element = document.createElement("video");
+    video_element.setAttribute("id", name);
+    video_element.style.position = "absolute";
+    video_element.style.overflow = "hidden";
+    if (info.border != null) {
+      video_element.style.border=info.border;
+    }
+    if (info.box_shadow != null) {
+      video_element.style.boxShadow=info.box_shadow;
+    }
+
+    // Run a fullscreen video on top of everything:
+    let css_width = current_screen_width;
+    if (info.width != null) {
+      css_width = info.width * current_screen_width;
+      video_element.setAttribute("width", (css_width) + "px");
+      //video_element.setAttribute("width", (info.width * 100) + "%");
+    } else {
+      video_element.setAttribute("width", "auto");
+    }
+    let css_height = current_screen_height;
+    if (info.height != null) {
+      css_height = info.height * current_screen_height;
+      video_element.setAttribute("height", (css_height) + "px");
+//      video_element.setAttribute("height", (info.height * 100) + "%");
+    } else {
+      video_element.setAttribute("height", "auto");
+    }
+
+    let css_offset_y = 0;
+    let css_offset_x = 0;
+    if (info.y != null) {
+      css_offset_y += -css_height/2 + current_screen_height/2 + info.y * current_screen_height / 2;
+    }
+    if (info.x != null) {
+      css_offset_x += -css_width/2 + current_screen_width/2 + info.x * current_screen_width / 2;
+    }
+    // x, y
+    //video_element.style.transform = "translate(" + (info.x * 100) + "%, " + (info.y * 100) + "%)";
+    video_element.style.transform = "translate(" + css_offset_x + "px, " + css_offset_y + "px)";
+
+    if (info.border_radius != null) {
+      video_element.style.borderRadius = info.border_radius;
+    }
+
+
+    //video_element.style.height = (info.height)+"px";
+    //video_element.style.width = (info.width)+"px";
+
+//    video_element.style.verticalAlign="middle";
+//    video_element.style.align="middle";
+
+//    video_element.style.marginLeft="auto";
+//    video_element.style.marginRight="auto";
+
+//    video_element.style.top = "255px";
+//    video_element.style.left = "320px";
+//    video_element.style.marginTop="-50%";
+//    video_element.style.marginLeft="-50%";
+
+
+//    video_element.style.top = "50%";
+//    video_element.style.left = "50%";
+
+    //(top, right, bottom, left)
+    // Clip the video, crop it to fit the screen height, if it goes below the lower edge:
+    // Did work with video_element, but doesn't with video_element. Strange...
+    //(top, right, bottom, left)
+    //video_element.style.clip="rect(0px,"+current_screen_width+"px," + (current_screen_height-video_offset_y) + "px,0px)";
+    let clip_top = 0;
+    let clip_bottom = 0;
+    let clip_left = 0;
+    let clip_right = 0;
+    if (info.clip_top != null) {
+      clip_top = info.clip_top;
+    }
+    if (info.clip_bottom != null) {
+      clip_bottom = info.clip_bottom;
+    }
+    if (info.clip_left != null) {
+      clip_left = info.clip_left;
+    }
+    if (info.clip_right != null) {
+      clip_right = info.clip_right;
+    }
+    //(top, right, bottom, left)
+    //video_element.style.clip="rect("+clip_top+"px,"+clip_right+"px,"+clip_bottom+"px,"+clip_left+"px)";
+//    video_element.style.clip="rect(10px,40px,50px,10px);";
+    if ((clip_left != 0) || (clip_right != 0) || (clip_top != 0) || (clip_bottom != 0)) {
+      video_element.style.clip = "rect("+(clip_top * css_height)+"px,"+((1.0-clip_right)*css_width)+"px,"+((1.0-clip_bottom)*css_height)+"px,"+(clip_left * css_width)+"px)";
+    }
+    //video_element.style.display = "inline-block";
+    //video_element.style.overflow = "hidden";
+    //video_element.style.clip = "rect(0%,500px,0%,0%)";
+//    video_element.style.clip = "rect(0px,900px,100px,100px)";
+    //video_clip_div.style.clip = "rect(0px,900px,100px,100px)";
+
+    video_element.src = info.file;
+    video_element.controls = false;
+    video_element.muted = true;
+    video_element.playbackRate = info.rate;
+    video_element.style.opacity = info.a;
+//    video_element.style.opacity = 0.0;
+    //let source_url = document.createElement("source"); 
+    ////source_url.type = "video/mp4";
+    //source_url.src = info.file;
+    //video_element.appendChild(source_url);
+
+    //video_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {video_element.style.opacity = value;} catch {};}, 1000, mina.linear );
+    let video_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {video_element.style.opacity = value;} catch {};}, 1000, mina.linear );
+    video_element.currentTime = info.start_at;
+
+    if ((info.dest_y != info.y) || (info.dest_x != info.x)) {
+      let css_offset_y_dest = -css_height/2 + current_screen_height/2 + info.dest_y * current_screen_height / 2;
+      let css_offset_x_dest = -css_width/2 + current_screen_width/2 + info.dest_x * current_screen_width / 2;
+      // x, y
+      // Mina easing algorithms: https://codepen.io/mike-tempest/pen/myvbrw
+      let my_video2_animate = Snap.animate( 0.0, 1.0, function(value) {let x=css_offset_x * (1.0-value) + css_offset_x_dest * value; let y=css_offset_y * (1.0-value) + css_offset_y_dest * value; try {video_element.style.transform = "translate(" + x + "px, " + y + "px)";} catch {};}, 12000);
+    }
+
+
+    if (info.pause_at != null) {
+      // We'll need to add a video to keep track of the ending time:
+      videos_to_pause_at[name] = info.pause_at;
+      videos_to_pause[name] = video_element;
+    }
+
+    if (info.loop_at != null) {
+      // We'll need to add a video to keep track of the ending time:
+      videos_to_loop_at[name] = info.loop_at;
+      videos_to_loop[name] = video_element;
+    }
+
+    let video_div = document.getElementById('video_div');
+    video_div.appendChild(video_element);
+
+    video_element.play();
+  } else if (info.t == "chart") {
+    chart_holder.setAttribute("style","height:"+(info.height)+"px, width:"+(info.width)+"px, opacity:0.7");
+    chart_holder.style.height = (info.height)+"px";
+    chart_holder.style.width = (info.width)+"px";
+    chart_holder.style.opacity = info.a;
+    Chart.defaults.animation.duration = 3000;
+    let chart_ctx = document.getElementById("chart-area").getContext("2d");
+    if (window.my_chart!=null) {
+      window.my_chart.destroy();
+    }
+    chart_holder.style.transform = "translate(0px)";
+    window.my_chart = new Chart(chart_ctx, info.chart_data);
+    window.my_chart.resize();
+    let my_chart_animate = Snap.animate( 0.0, 1.0, function(value) {try {chart_holder.style.opacity = value;} catch {};}, 600, mina.linear );
+  } else if (info.t == "3d") {
+    load_3d_model(name, info);
+  }
+  infos[name] = info;
+  console.log(infos);
+}
+
+function goodbye_all_3d_objects () {
+  const keys = Object.keys(infos);
+  keys.forEach((name, index) => {
+    if ((infos[name] != null) && (infos[name].t == "3d")) {
+      scene.remove(all_3d_models[name]);
+      all_3d_models[name] = null;
+    }
+  });
+}
+
+function goodbye_videos_immediately () {
+  let video_div = document.getElementById('video_div');
+  video_div.innerHTML = "";
+}
+
+function goodbye_all () {
+  videos_to_pause = {};
+  videos_to_pause_at = {};
+  videos_to_loop = {};
+  videos_to_loop_at = {};
+  fade_dialog_glpos(0, 0);
+  const keys = Object.keys(infos);
+  keys.forEach((name, index) => {
+    goodbye(name);
+  });
+  console.log(a);
+}
+
+function goodbye (name) {
+  console.log("goodbye(" + name + ")");
+  //info = infos[name];
+  if ((infos[name] != null) && (infos[name].t == "video")) {
+    let video_animate = Snap.animate( infos[name].a, 0.0, function(value) {try {let v = document.getElementById(name); v.style.opacity = value;} catch {};}, 1000, mina.linear, function() {try{let v = document.getElementById(name); v.pause();v.src = "";v.load(); v.parentNode.removeChild(v)} catch{}; try {infos[name].remove();} catch {}; delete infos[name]; } );
+    try {
+      videos_to_loop[name];
+      videos_to_loop_at[name];
+    } catch {}
+    try {
+      videos_to_pause[name];
+      videos_to_pause_at[name];
+    } catch {}
+  } else if ((infos[name] != null) && (infos[name].t == "chart")) {
+    let my_chart_animate = Snap.animate( infos[name].a, 0.0, function(value) {try {chart_holder.style.opacity = value;} catch {};}, 500, mina.linear, function() {try{window.my_chart.destroy(); console.log("fading chart done");} catch{}; } );
+  } else if ((infos[name] != null) && (infos[name].t == "3d")) {
+    scene.remove(all_3d_models[name]);
+    all_3d_models[name] = null;
+    // How to remove 3d models from THREE.js correctly:
+    //call BufferGeometry.dispose().
+    //executing Material.dispose().
+    //calling Texture.dispose().
+  } else if (a[name] != null) {
+    try {
+      a[name].stop();
+    } catch {}
+    try {
+      if (infos[name].t == "png") {
+        a[name].animate({ opacity: 0.0 }, 500, function() {try {a[name].remove();} catch {}; delete a[name]; delete a[name+"_filter"];});
+      } else {
+        // text:
+        a[name].animate({ opacity: 0.0 }, 500, function() {try {a[name].remove();} catch {}; delete a[name];});
+      }
+    } catch {}
+  }
+}
+
+function goodbye_all_immediately () {
+  videos_to_pause = {};
+  videos_to_pause_at = {};
+  videos_to_loop = {};
+  videos_to_loop_at = {};
+  fade_dialog_glpos(0, 0);
+  const keys = Object.keys(infos);
+  keys.forEach((name, index) => {
+    goodbye_immediately(name);
+  });
+  console.log(a);
+}
+
+function goodbye_immediately (name) {
+  console.log("goodbye_immediately(" + name + ")");
+  if (a[name] != null) {
+    try {
+      a[name].stop();
+    } catch {}
+    try {
+      a[name].remove()
+    } catch {}
+    delete a[name];
+  }
+}
+
+// WebGL stuff -----------------------------------------------------------------------------
+
+function webgl_init () {
+  console.log("webgl_init");
+  // About pre-multiplied alphas:
+  // Three.js defaults to the canvas using premultipliedAlpha: true but defaults to materials outputting premultipliedAlpha: false.
+  // https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre
+  renderer = new THREE.WebGLRenderer({"canvas": tr3d, "antialias": false, "alpha": true, "premultipliedAlpha":true, "precision": "highp", "stencil": false, "powerPreference": "high-performance"});
+  // Use pixel resolution, not higher density display pixels:
+  //renderer.setPixelRatio(dpr);
+  //renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setPixelRatio(my_dpr);
+  renderer.setSize(w, h, false); // false prevents any style updates to the output canvas
+  renderer.setClearColor(0xe0e0e0, 1.0);
+  renderer.state.buffers.depth.setClear(0.0);
+  renderer.clear(true, true, true);
+  renderer.setClearColor(0x000000, 0.0);
+  renderer.clear(true, true, true);
+  scene = new THREE.Scene();
+
+  var camera_depth = 6.5;
+  camera_scale = new THREE.Vector4(0.5, 1.0, 1.0 / camera_depth, 1.0);
+  if (aspect_ratio > 1.0) {
+    // left, right, top, bottom, near, far
+    camera = new THREE.OrthographicCamera(-aspect_ratio, aspect_ratio, 1.0, -1.0, camera_depth, -camera_depth);
+    camera_scale.x = 1.0 / aspect_ratio;
+    camera_scale.y = 1.0;
+  } else {
+    camera = new THREE.OrthographicCamera(-1.0, 1.0, 1.0 / aspect_ratio, -1.0 / aspect_ratio, camera_depth, -camera_depth);
+    camera_scale.x = 1.0;
+    camera_scale.y = aspect_ratio;
+  }
+
+  camera.position.set(0, 0, 0);
+  camera.up = new THREE.Vector3(0, 1, 0);
+  camera.lookAt(new THREE.Vector3(0, 0, -10));
+
+  // update the camera
+  camera.aspect = aspect_ratio;
+  camera.left = -xmax;
+  camera.right = xmax;
+  camera.top = ymax;
+  camera.bottom = -ymax;
+  // For "fast" materials where the camera matrix isn't used:
+  camera_scale.x = 1.0 / xmax;
+  camera_scale.y = 1.0 / ymax;
+  // For "normal" materials:
+  camera.updateProjectionMatrix();
+
+  let light = new THREE.AmbientLight(0xffffff, 0.55);
+  light.name = "_light";
+  scene.add(light);
+
+  let directionalLight = new THREE.DirectionalLight( 0x9ac1ff, 0.6 );
+  directionalLight.position.set( 6, 2, 3 );
+  directionalLight.name = "_lightDir";
+  scene.add(directionalLight);
+
+  let directionalLight2 = new THREE.DirectionalLight( 0xfffbb5, 0.6 );
+  directionalLight2.position.set( -4, 3, -3 );
+  directionalLight2.name = "_lightDir2";
+  scene.add(directionalLight2);
+
+  webcam_texture = new THREE.VideoTexture(webcam_element);
+  webcam_texture.format = THREE.RGBFormat;
+  webcam_texture.minFilter = THREE.NearestFilter;
+  webcam_texture.magFilter = THREE.NearestFilter;
+
+  // Create the scene for iterating over the feedback "pen bitmap".
+  pencil_scene = new THREE.Scene();
+  // Create the texture that will store our results. We need to toggle the "from" and "to" textures:
+  feedback_texture = [];
+  for (let texture_no = 0; texture_no <= 1; texture_no++) {
+    feedback_texture[texture_no] = new THREE.WebGLRenderTarget( w, h, {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      wrapS: THREE.RepeatWrapping,
+      wrapT: THREE.RepeatWrapping,
+      format: THREE.RGBAFormat,
+      depthBuffer: false,
+      stencilBuffer: false});
+    // Clear the texture:
+    renderer.setClearColor(0x000000, 0.0);
+    renderer.render(pencil_scene, camera, feedback_texture[texture_no]);
+  }
+
+  // Setup the stuff to draw into the pencil_scene:
+  pencil_mat = new THREE.RawShaderMaterial({
+    "vertexShader": document.getElementById("vSh").textContent,
+    "fragmentShader": document.getElementById("fSh").textContent,
+    uniforms: {
+      threshold: { type: "v", value: threshold },
+      webcam: { type: "t", value: webcam_texture },
+      previous: { type: "t", value: feedback_texture[pencil_texture_source].texture }
+    },
+    "transparent": false,
+    side: THREE.FrontSide,
+    //side:THREE.DoubleSide,
+    "clipping": false,
+    "depthTest": false
+  });
+
+  let quad = new THREE.PlaneBufferGeometry(2.0, 2.0);
+  quad.deleteAttribute("normal");
+  let pencil_mesh = new THREE.Mesh(quad, pencil_mat);
+  pencil_scene.add(pencil_mesh);
+
+  // Setup the stuff to draw into the pencil_scene:
+  pencil_output_mat = new THREE.RawShaderMaterial({
+    "vertexShader": document.getElementById("vSh2").textContent,
+    "fragmentShader": document.getElementById("fSh2").textContent,
+    uniforms: {
+      webcam: { type: "t", value: webcam_texture },
+      pencil: { type: "t", value: feedback_texture[pencil_texture_dest].texture }
+    },
+    "transparent": true,
+    side: THREE.FrontSide,
+//    side:THREE.DoubleSide,
+    "clipping": false,
+    "depthTest": false
+  });
+  let quad5 = new THREE.PlaneBufferGeometry(2.0, 2.0);
+  quad5.deleteAttribute("normal");
+  let pencil_output_mesh = new THREE.Mesh(quad5, pencil_output_mat);
+  scene.add(pencil_output_mesh);
+
+  load_textures();
+
+  document.addEventListener("visibilitychange", on_visibility_change, false);
+  init_webgl_font();
+}
+
+
+function load_3d_model (name, info) {
+  console.log("### load 3d model");
+  if (all_3d_models[name] != null) {
+    console.log("Don't need to load this model again, it's already there.");
+    return;
+  }
+  const loader = new GLTFLoader();
+  loader.load(info.file, function (gltf) {
+    model_is_loaded(gltf, name, info);
+  }, undefined, function ( error ) {
+    console.error( error );
+  } );
+}
+
+
+function load_textures () {
+  const r = "3d/texture/cube/SaintLazarusChurch2/";
+  const loader = new THREE.CubeTextureLoader();
+  loader.setPath(r);
+  environment_texture = loader.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+  // The texture disappears when I try to do this:
+  //  environment_texture.encoding = THREE.sRGBEncoding;
+  //  environment_texture.mapping = THREE.CubeRefractionMapping;
+}
+
+
+function model_is_loaded (everything, name, info) {
+  console.log("model_is_loaded");
+  all_3d_models[name] = everything.scene;
+  console.log(everything);
+  const skull_texture = new THREE.TextureLoader().load( '3d/texture/skull.jpg' );
+  skull_texture.flipY = false;
+  skull_texture.mapping = THREE.CubeReflectionMapping; // or THREE.CubeRefractionMapping
+  let skull_material = new THREE.MeshPhongMaterial({
+    "color": 0xffe0c0,
+    "shininess": 0.8,
+    "specular": 0xffffff,
+    "map": skull_texture,
+    reflectivity:0.12,
+    opacity:1.0,
+//    refractionRatio:0.98,
+    transparent: true,
+    "envMap": environment_texture,
+    "depthFunc": THREE.GreaterDepth});
+  const material_env1 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap:environment_texture, reflectivity:0.9, refractionRatio: 0.98, "depthFunc": THREE.GreaterDepth, opacity:0.75});
+  all_3d_models[name].position.z = -2.0;
+  all_3d_models[name].position.x = info.x;
+  all_3d_models[name].position.y = info.y;
+  all_3d_models[name].rotation.x = info.rx; //-Math.PI * 0.5;
+  all_3d_models[name].rotation.z = info.rz; //-Math.PI * 0.4;
+  all_3d_models[name].scale.x = info.scale;
+  all_3d_models[name].scale.y = info.scale;
+  all_3d_models[name].scale.z = info.scale;
+  all_3d_models[name].children[0].material = material_env1;
+  all_3d_models[name].children[1].material = material_env1;
+  all_3d_models[name].children[2].material = material_env1;
+  all_3d_models[name].children[3].material = material_env1;
+  all_3d_models[name].children[4].material = skull_material;
+  scene.add(all_3d_models[name]);
+}
+
+
+function render_pencil_bitmap () {
+  if (nof_frames_of_erasing_left == 130) {
+    // We should switch shader to an erasing one:
+    pencil_mat.fragmentShader = document.getElementById("fSh_erase").textContent;
+    pencil_mat.needsUpdate = true;
+  }
+  // Make sure that input and output texture toggles:
+  pencil_mat.uniforms.threshold.value = threshold;
+  pencil_mat.uniforms.previous.value = feedback_texture[pencil_texture_source].texture;
+  renderer.setRenderTarget(feedback_texture[pencil_texture_dest]);
+  renderer.setClearColor(0x000000, 0.0); //#e0e0e0
+  renderer.render(pencil_scene, camera);
+  if (nof_frames_of_erasing_left > 0) {
+    nof_frames_of_erasing_left--;
+  }
+  if (nof_frames_of_erasing_left == 0) {
+    // We should switch shader to an decaying one:
+    pencil_mat.fragmentShader = document.getElementById("fSh").textContent;
+    pencil_mat.needsUpdate = true;
+  }
+}
+
+function render_all_3d_stuff () {
+  if ((current_cam_effect_mode != "writing") && (nof_frames_of_erasing_left == 0)) {
+    renderer.setRenderTarget(null);
+    renderer.clear();
+  } else {
+    pencil_output_mat.uniforms.pencil.value = feedback_texture[pencil_texture_dest].texture;
+    renderer.setRenderTarget(null);
+  }
+  renderer.setClearColor(0x000000, 0.0); //#e0e0e0
+  renderer.render(scene, camera);
+  // Swap source and destination for the next iteration:
+  let tmp = pencil_texture_source;
+  pencil_texture_source = pencil_texture_dest;
+  pencil_texture_dest = tmp;
+}
+
+
+// Adjusts the program behavior, based on whether the webpage is active or hidden
+function on_visibility_change () {
+  if (document.hidden) {
+    // Document is not in front anymore:
+    console.log("document hidden");
+    pause_rendering();
+  } else {
+    // Our tab got into view.
+    console.log("document visible");
+    resume_rendering();
+  }
+}
+
+let document_is_hidden = false;
+function pause_rendering () {
+  document_is_hidden = true;
+}
+function resume_rendering () {
+  document_is_hidden = false;
+}
+
+// Pencil threshold stuff -----------------------------------------------------------------------------
+
+function set_slider_backgrounds() {
+  slider_r.style="background:linear-gradient(90deg, rgb(0,"+(255*threshold.y)+","+(255*threshold.z)+"), rgb(255,"+(255*threshold.y)+","+(255*threshold.z)+"))";
+  slider_g.style="background:linear-gradient(90deg, rgb("+(255*threshold.x)+",0,"+(255*threshold.z)+"), rgb("+(255*threshold.x)+",255,"+(255*threshold.z)+"))";
+  slider_b.style="background:linear-gradient(90deg, rgb("+(255*threshold.x)+","+(255*threshold.y)+",0), rgb("+(255*threshold.x)+","+(255*threshold.y)+",255))";
+  threshold_colour_div.style="background:rgb("+(255*threshold.x)+","+(255*threshold.y)+","+(255*threshold.z)+")";
+}
+function update_r(value) {
+  slider_r.value = value;
+  threshold.x = value / 255.0;
+  r_value.innerHTML = value;
+  set_slider_backgrounds();
+}
+function update_g(value) {
+  slider_g.value = value;
+  threshold.y = value / 255.0;
+  g_value.innerHTML = value;
+  set_slider_backgrounds();
+}
+function update_b(value) {
+  slider_b.value = value;
+  threshold.z = value / 255.0;
+  b_value.innerHTML = value;
+  set_slider_backgrounds();
+}
+
+// WebGL font stuff -----------------------------------------------------------------------------
+
+//let tx_fontname = "/fonts/PetMe64.ttf";
+//let tx_fontname = "/fonts/Sanfrisco.ttf";
+let tx_fontname_0 = "/fonts/Blinker-SemiBold.ttf";
+let tx_fontname_1 = "/fonts/Athene.ttf";
+let tx_fontname_2 = "/fonts/Topaz_a500_v1.0.ttf";
+
+
+function init_webgl_font () {
+  // Load the font used for webgl text:
+  preloadFont(
+    {
+      font: tx_fontname_0,
+      characters: "abcdefghijklmnopqrstuvwxyzåäöABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ0123456789+?´`'*-_.:,;!\"#€%&/()="
+      //characters: "a"
+    },
+    () => {
+      console.log("tx_font preloaded");
+      font_is_loaded = true;
+    }
+  );
+  // Load the font used for webgl text:
+  preloadFont(
+    {
+      font: tx_fontname_1,
+      characters: "abcdefghijklmnopqrstuvwxyzåäöABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ0123456789+?´`'*-_.:,;!\"#€%&/()="
+      //characters: "a"
+    },
+    () => {
+      console.log("tx_font preloaded");
+      font_is_loaded = true;
+    }
+  );
+  // Load the font used for webgl text:
+  preloadFont(
+    {
+      font: tx_fontname_2,
+      characters: "abcdefghijklmnopqrstuvwxyzåäöABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ0123456789+?´`'*-_.:,;!\"#€%&/()="
+      //characters: "a"
+    },
+    () => {
+      console.log("tx_font preloaded");
+      font_is_loaded = true;
+    }
+  );
+
+  // Create a texture loader so we can load our image file
+  border_loader = new THREE.TextureLoader();
+  // Load an image file into a custom material
+  border_material = new THREE.MeshBasicMaterial({
+    map: border_loader.load('/media/texture/border.jpg'),
+    depthTest: false,
+    "depthFunc": THREE.GreaterDepth
+  });
+
+}
+
+let border_loader = null;
+let border_material = null;
+let dialog_mat;
+let dialog_mesh;
+let dialog_center_x = 0;
+let dialog_center_y = 0;
+let dialog_scene;
+let dialog_texture;
+let dialog_is_shown = 0;
+// Number of seconds until the dialog is allowed to be removed:
+let dialog_cooldown = 0.0;
+function init_dialog (text, x, y, font_size, dialog_type) {
+  // dialog_type: 1 = yellow flower
+  //              2 = green circle
+
+  // Convert from w/h coordinates:
+  //x = (x / w - 0.5) * 2.0 * xmax;
+  //y = -(y / h - 0.5) * 2.0 * ymax;
+  if (dialog_state > 0) {
+    // There is a dialog already. Let's get rid of it, immediately:
+    scene.remove(dialog_mesh);
+    dialog_state = 0;
+  }
+
+  if (dialog_state === 0) {
+    // Render something to display:
+    // Create a different scene to hold our text
+    dialog_scene = new THREE.Scene();
+    // Create the texture that will store our result
+    dialog_texture = new THREE.WebGLRenderTarget( w, h, {
+      minFilter: THREE.NearestFilter,
+      magFilter: THREE.NearestFilter,
+      format: THREE.RGBAFormat,
+      depthBuffer: false,
+      stencilBuffer: false});
+    // wrapS - default is ClampToEdgeWrapping. 
+    // wrapT - default is ClampToEdgeWrapping. 
+    // magFilter - default is LinearFilter. 
+    // minFilter - default is LinearFilter. 
+    // format - default is RGBAFormat. 
+    // type - default is UnsignedByteType. 
+    // anisotropy - default is 1. See Texture.anistropy
+    // encoding - default is LinearEncoding. 
+    // depthBuffer - default is true. Set this to false if you don't need it. 
+    // stencilBuffer - default
+
+    // Add text to the scene we're about to render:
+    //new_dtx(24, text);
+
+    //console.log("adding dialog text");
+    const dialog_text = new Text();
+    dialog_scene.add(dialog_text);
+    dialog_text.textAlign = "center";
+    dialog_text.anchorX = "center";
+    dialog_text.anchorY = "middle";
+    dialog_text.text = text;
+    dialog_text.fontSize = font_size;
+    if (dialog_type <= 1) {
+      dialog_text.outlineBlur = 0.04;
+      dialog_text.outlineColor = 0x000000;
+      dialog_text.outlineOffsetX = 0.017;
+      dialog_text.outlineOffsetY = 0.017;
+      dialog_text.outlineOpacity = 0.54;
+      dialog_text.outlineWidth = 0.006;
+    }
+    dialog_text.position.z = -6;
+    dialog_text.position.x = x * 0.4;
+    dialog_text.position.y = y * 0.4;
+    if (dialog_type === 0) {
+      dialog_text.color = 0xffffff;
+      dialog_text.font = tx_fontname_0;
+      dialog_text.fontSize = font_size;
+    } else if (dialog_type === 1) {
+      dialog_text.color = 0x306038;
+      dialog_text.font = tx_fontname_1;
+    } else {
+      dialog_text.color = 0x4070c0;
+      dialog_text.font = tx_fontname_2;
+    }
+
+    if (dialog_type === 2) {
+      // create a plane geometry for the image with a width of 10
+      // and a height that preserves the image's aspect ratio
+      var border_geometry = new THREE.PlaneGeometry(2.5, 2.5*.75);
+      // combine our image geometry and material into a mesh
+      var border_mesh = new THREE.Mesh(border_geometry, border_material);
+      // set the position of the image mesh in the x,y,z dimensions
+      border_mesh.position.set(0,0,0)
+      // add the image to the scene
+      dialog_scene.add(border_mesh);
+    }
+
+
+    // Update the rendering:
+
+    /*var dialog_text_material = new THREE.MeshLambertMaterial({
+        "color": 0xff6060,
+        "reflectivity": 0.0,
+        "envMap": null,
+        "depthFunc": THREE.GreaterDepth});*/
+    var dialog_text_material = new THREE.MeshBasicMaterial({
+      transparent: true,
+      side: THREE.FrontSide,
+      depthTest: false,
+      "depthFunc": THREE.GreaterDepth});
+      //dialog_text.material = dialog_text_material;
+      //dialog_text.material.opacity = 0.9;
+    dialog_text.sync(() => {
+        // code to execute after sync completes...
+        // var dialog_renderer = new THREE.WebGLRenderer({"antialias": true, "alpha": true, "precision": "mediump", "stencil": false, "powerPreference": "high-performance"});
+        // dialog_renderer.setPixelRatio(dpr);
+        // dialog_renderer.setSize(w, h);
+        // dialog_renderer.setClearColor(0xf8f8d0, 1.0); //#e0e0e0
+        // dialog_renderer.state.buffers.depth.setClear(0.0);
+        // dialog_renderer.clear(true, true, true);
+        // dialog_renderer.render(dialog_scene, camera, dialog_texture);
+
+        if (dialog_type === 0) {
+          renderer.setClearColor(0x2020a8, 1.0); //#e0e0e0
+        } else if (dialog_type === 1) {
+          renderer.setClearColor(0xf8f8d0, 1.0); //#e0e0e0
+        } else {
+          renderer.setClearColor(0x406040, 1.0);
+        }
+
+        renderer.setRenderTarget(dialog_texture);
+        renderer.render(dialog_scene, camera);
+        renderer.setClearColor(0x000000, 0.0); //#e0e0e0
+        renderer.setRenderTarget(null);
+
+        var nof_arms = Math.floor(Math.random()*10);
+        var twist = (Math.random()-0.5) * 10.0;
+        dialog_spin_speed = (Math.random()-0.5) * 0.03;
+        if (Math.abs(dialog_spin_speed < 0.005)) {
+          dialog_spin_speed += 0.02;
+        }
+        if (dialog_type === 1) {
+          if (Math.random() > 0.9) {
+            twist = twist * 3;
+          }
+          if (Math.random() > 0.9) {
+            nof_arms += 30;
+          }
+          if (Math.random() > 0.9) {
+            dialog_spin_speed *= 2;
+          }
+        } else {
+          dialog_spin_speed *= 0.4;
+          twist *= 0.4;
+          nof_arms = 0;
+        }
+        var vSh = "dialog_vertex_shader";
+        let fSh = "";
+        if (dialog_type == 0) {
+          fSh = "dialog_circle_fshader";
+        } else if (dialog_type == 1) {
+          fSh = "dialog_spinner_fshader";
+        } else {
+          fSh = "dialog_wave_fshader";
+        }
+        dialog_mat = new THREE.RawShaderMaterial({
+          "vertexShader": document.getElementById(vSh).textContent,
+          "fragmentShader": document.getElementById(fSh).textContent.replace(/%%%NOF_ARMS%%%/g, "" + nof_arms + ".0").replace(/%%%TWIST%%%/g, "" + twist),
+          uniforms: {
+            animate: { type: "f", value: 0.0 },
+            spin: { type: "f", value: 0.0 },
+            map: { type: "t", value: dialog_texture.texture }
+          },
+          "transparent": true,
+          "side": THREE.FrontSide,
+          "clipping": false,
+          "depthTest": false
+        });
+        let quad = new THREE.PlaneBufferGeometry(2.0, 2.0);
+        dialog_center_x = x;
+        dialog_center_y = y;
+        dialog_destx = x;
+        dialog_desty = y;
+        let scale = 1.0 + Math.sqrt(dialog_center_x * dialog_center_x + dialog_center_y * dialog_center_y);
+        let uv2 = new Float32Array(8);
+        uv2[0] = (-dialog_center_x - xmax) / scale;
+        uv2[1] = (-dialog_center_y + ymax) / scale;
+        uv2[2] = (-dialog_center_x + xmax) / scale;
+        uv2[3] = (-dialog_center_y + ymax) / scale;
+        uv2[4] = (-dialog_center_x - xmax) / scale;
+        uv2[5] = (-dialog_center_y - ymax) / scale;
+        uv2[6] = (-dialog_center_x + xmax) / scale;
+        uv2[7] = (-dialog_center_y - ymax) / scale;
+        var uv2_attr = new THREE.BufferAttribute(uv2, 2);
+        quad.setAttribute("uv2", uv2_attr);
+        quad.deleteAttribute("normal");
+        dialog_mesh = new THREE.Mesh(quad, dialog_mat);
+        //dialog_mesh.geometry.attributes.uv.array = Float32Array(8) = [0, 1, 1, 1, 0, 0, 1, 0]
+        dialog_animate = 0.01;
+        dialog_state = 2;
+        dialog_mesh.renderOrder = 1; // Render the dialog on top of everything
+        scene.add(dialog_mesh);
+        dialog_cooldown = 0.4;
+    });
+  }
+}
+
+let dialog_destx = 0.0;
+let dialog_desty = 0.0;
+let dialog_state = 0;
+let dialog_animate = 0.0;
+let dialog_spin = 0.0;
+let dialog_spin_speed = 0.0;
+
+function fade_dialog_glpos(x, y) {
+  if (dialog_state === 2) {
+    dialog_state = 1;
+  }
+  dialog_destx = x;
+  dialog_desty = y;
+}
+
+function fade_dialog (x, y) {
+  if (dialog_state === 2) {
+    dialog_state = 1;
+  }
+  dialog_destx = (x / w - 0.5) * 2.0 * xmax;
+  dialog_desty = -(y / h - 0.5) * 2.0 * ymax;
+}
+
+function animate_dialog() {
+  if (dialog_state > 0) {
+    // It's visible. Do something.
+    if (dialog_state === 2) {
+      // Starting to show the dialog:
+      var spd = 0.93;
+      dialog_animate = dialog_animate * spd + 1.2 * (1.0 - spd);
+    } else if (dialog_state === 1) {
+      // It's fading away:
+      var spd = 0.96;
+      dialog_animate = dialog_animate * spd;
+      if (dialog_animate <= 0.01) {
+        scene.remove(dialog_mesh);
+        dialog_state = 0;
+      }
+    }
+    if (dialog_destx !== dialog_center_x || dialog_desty !== dialog_center_y) {
+      dialog_center_x = dialog_destx;
+      dialog_center_y = dialog_desty;
+      var scale = 1.0 + Math.sqrt(dialog_center_x * dialog_center_x + dialog_center_y * dialog_center_y);
+      var uv2 = new Float32Array(8);
+      uv2[0] = (-dialog_center_x - xmax) / scale;
+      uv2[1] = (-dialog_center_y + ymax) / scale;
+      uv2[2] = (-dialog_center_x + xmax) / scale;
+      uv2[3] = (-dialog_center_y + ymax) / scale;
+      uv2[4] = (-dialog_center_x - xmax) / scale;
+      uv2[5] = (-dialog_center_y - ymax) / scale;
+      uv2[6] = (-dialog_center_x + xmax) / scale;
+      uv2[7] = (-dialog_center_y - ymax) / scale;
+      var uv2_attr = new THREE.BufferAttribute(uv2, 2);
+      dialog_mesh.geometry.deleteAttribute("uv2");
+      dialog_mesh.geometry.setAttribute("uv2", uv2_attr);
+    }
+    dialog_spin += dialog_spin_speed;
+    if (dialog_spin >= 1.0) {
+      dialog_spin -= 1.0;
+    } else if (dialog_spin < 0.0) {
+      dialog_spin += 1.0;
+    }
+    try {
+      dialog_mesh.material.uniforms.animate.value = dialog_animate;
+      dialog_mesh.material.uniforms.spin.value = dialog_spin;
+    } catch (ev) {}
+  }
+}
+
+
+// Chart stuff -----------------------------------------------------------------------------
+
+Chart.defaults.backgroundColor = "rgba(0, 0, 0, 0.0)";
+Chart.defaults.borderColor = "rgba(0, 0.0, 0, 1.0)";
+Chart.defaults.color = "#fff"; // Font color.
+Chart.defaults.font.family = "Arial";
+Chart.defaults.font.size = 40;
+Chart.defaults.font.weight = 400;
+Chart.defaults.plugins.legend.position = 'bottom';
+
+// Pac-Man chart
+let pacman_config = {
+  type: 'pie',
+  options: {
+    layout: {padding: 30},
+    maintainAspectRatio: true,
+    rotation: 135,
+    animation: { delay: 1200 }
+  },
+  data: {
+    datasets: [{
+      data: [75, 25],
+      borderWidth: 4,
+      backgroundColor: ["#ffff00", "rgba(0,0,0,0.35)"],
+      borderColor: "rgba(0,0,0,0.25)"
+    }],
+    labels: [
+      "Pac-Man",
+      "not Pac-Man"
+    ]
+  }
+};
+
+// Monte Carlo simulation stuff below
+let nof_histogram_bins = 21;
+let bin_min = -2.1;
+let bin_max = 2.1;
+let bin_width = (bin_max - bin_min) / nof_histogram_bins;
+let histogram_labels = [];
+let histogram_data = [];
+let mc_ideal = [];
+for (let bin_no = 0; bin_no < nof_histogram_bins; bin_no++) {
+  histogram_labels.push((bin_min + bin_width * (bin_no + 0.5)).toFixed(1));
+  histogram_data.push(0.0);
+  mc_ideal.push(std_normal_distribution(bin_min + bin_width * (bin_no + 0.5)), 0, 1.0);
+}
+
+let monte_carlo_config = {
+  type: 'bar',
+  data: {
+    labels: histogram_labels,
+    datasets: [{
+        label: "Theoretical distribution",
+        type: "line",
+        backgroundColor: "#ffffff",
+        borderColor: "#ffffff",
+        borderWidth: 5,
+        data: mc_ideal,
+        fill: false
+      }, {
+        label: "Monte Carlo-simulation N=10",
+        type: "bar",
+        backgroundColor: "rgba(160,160,255,0.85)",
+        borderColor: "rgba(160,160,255,1.0)",
+        borderWidth: 3,
+        data: histogram_data
+      }
+    ]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true,
+        display: true,
+        grid: { color: "rgba(0,0,0,0.25)"},
+        title: {
+          display: true,
+          text: 'Probability',
+        }
+      },
+      x: { grid: { color: "rgba(0,0,0,0.25)"}},
+    }
+  }
+};
+
+// This is the true probability distribution:
+function std_normal_distribution (x, A, sigma2) {
+  // Return the probability density function, pdf:
+  // A = mean
+  // sigma2 = variance = std_deviation^2
+  return Math.exp(-Math.pow((x - A),2) / (2*sigma2)) / (Math.sqrt(2 * sigma2 * Math.PI));
+}
+
+let histogram_dict = {};
+let current_nof_monte_carlo_simulation_runs = 1;
+let monte_carlo_max_nof_simulation_runs = 10000;
+let monte_carlo_data = [];
+let monte_carlo_data713 = [];
+let sigma2 = 1.0;
+let N = 100;
+let A = 1.0;
+let assignment = 714;
+
+function monte_carlo_update(nof_simulation_runs) {
+  // If we have too few simulations done, do more:
+  while (monte_carlo_data.length < nof_simulation_runs) {
+    // Make one Monte Carlo simulation run:
+    let x = [];
+    for (let no = 0; no <= N; no++) {
+      // Box-Muller transform to generate values in the range N(0,sigma^2=1)
+      x.push(sigma2 * Math.sqrt(-2 * Math.log(1 - Math.random()))
+             * Math.cos(2 * Math.PI * Math.random()));
+    }
+    if (assignment == 714) {
+      // Assignment 7.14 is about investigating if this has a normal distribution:
+      monte_carlo_data.push(math.mean(x) / (math.variance(x) / math.sqrt(N)));
+    } else {
+      // Assignment 7.13: is sample mean (=the MLE) a normal distribution:
+      monte_carlo_data.push(A + math.mean(x));
+    }
+  }
+  // We remake our histogram from scratch every update:
+  histogram_dict = {};
+  for (let bin_no = 0; bin_no < nof_histogram_bins; bin_no++) {
+    histogram_dict[bin_no] = 0;
+  }
+  if (assignment == 714) {
+    // Fill the histogram bins:
+    for (let no = 0; no <= nof_simulation_runs; no++) {
+      let bin_no = Math.floor((monte_carlo_data[no] - bin_min) / bin_width);
+      if ((bin_no >= 0) && (bin_no < nof_histogram_bins)) {
+        histogram_dict[bin_no] += 1 / nof_simulation_runs / bin_width;
+      }
+    }
+    // Update the normal distribution reference:
+    for (let bin_no = 0; bin_no < nof_histogram_bins; bin_no++) {
+      mc_ideal[bin_no] = std_normal_distribution(bin_min + bin_width * (bin_no + 0.5), A, sigma2);
+    }
+  } else {
+    // Assignment 713:
+    // Fill the histogram bins:
+    for (let no = 0; no <= nof_simulation_runs; no++) {
+      let bin_no = Math.floor((monte_carlo_data[no] - bin_min) / bin_width);
+      if ((bin_no >= 0) && (bin_no < nof_histogram_bins)) {
+        histogram_dict[bin_no] += 1 / nof_simulation_runs / bin_width;
+      }
+    }
+    // Update the normal distribution reference:
+    for (let bin_no = 0; bin_no < nof_histogram_bins; bin_no++) {
+      mc_ideal[bin_no] = std_normal_distribution(bin_min + bin_width * (bin_no + 0.5), A, sigma2 / N);
+    }
+  }
+
+  try {
+    window.my_chart.data.datasets[1].data = Object.keys(histogram_dict).map(function (key) { return histogram_dict[key]; });
+    window.my_chart.data.datasets[1].label = "Monte Carlo-simulation N=" + N + ", " + nof_simulation_runs + " runs";
+    window.my_chart.update();
+    let monte_slider_display = document.getElementById("monte_slider_display");
+    monte_slider_display.innerHTML = "<font color='#ffffff'>" + current_nof_monte_carlo_simulation_runs + "</font>";
+    let slider_monte = document.getElementById("slider_monte");
+    slider_monte.value = current_nof_monte_carlo_simulation_runs;
+  } catch {}
+}
+
+let monte_carlo_interval;
+function monte_carlo_interval_function() {
+  monte_carlo_update(current_nof_monte_carlo_simulation_runs);
+  current_nof_monte_carlo_simulation_runs = Math.min(monte_carlo_max_nof_simulation_runs, current_nof_monte_carlo_simulation_runs + 7);
+}
+
+// When changing the slider value on screen:
+function update_monte(value) {
+  current_nof_monte_carlo_simulation_runs = value;
+  monte_carlo_data = [];
+  let monte_slider_display = document.getElementById("monte_slider_display");
+  monte_slider_display.innerHTML = "<font color='#ffffff'>" + current_nof_monte_carlo_simulation_runs + "</font>";
+  // Stop automatic increase of simulation runs:
+  clearInterval(monte_carlo_interval);
+  monte_carlo_update(current_nof_monte_carlo_simulation_runs);
+}
+
+// When changing the slider value on screen:
+function update_monteN(value) {
+  N = value;
+  monte_carlo_data = [];
+  let monte_sliderN_display = document.getElementById("monte_sliderN_display");
+  monte_sliderN_display.innerHTML = "<font color='#ffffff'>" + N + "</font>";
+  monte_carlo_update(current_nof_monte_carlo_simulation_runs);
+}
+
+// When changing the slider value on screen:
+function update_monteA(value) {
+  A = parseFloat(value);
+  console.log("NEW A=" + A);
+  monte_carlo_data = [];
+  let monte_sliderA_display = document.getElementById("monte_sliderA_display");
+  monte_sliderA_display.innerHTML = "<font color='#ffffff'>" + A + "</font>";
+  monte_carlo_update(current_nof_monte_carlo_simulation_runs);
+}
+
+// When changing the slider value on screen:
+function update_monteSigma2(value) {
+  sigma2 = parseFloat(value);
+  console.log("NEW sigma2=" + sigma2);
+  monte_carlo_data = [];
+  let monte_sliderSigma2_display = document.getElementById("monte_sliderSigma2_display");
+  monte_sliderSigma2_display.innerHTML = "<font color='#ffffff'>" + sigma2 + "</font>";
+  monte_carlo_update(current_nof_monte_carlo_simulation_runs);
+}
+
+
+// The external notes window ------------------------------------------------------------------------
+
+notes_button.addEventListener('click', event => {
+  open_new_notes_window();
+});
+
+let notes_window = null;
+
+function open_new_notes_window ()
+{
+  // MBP 14: 3024 x 1964
+  notes_window = window.open("notes_window.html", "mywindow", "location=0,menubar=0,status=0,scrollbars=0,width=1800,height=1060");
+}
+
+document.getElementById('set_screen_size').addEventListener('click', event => {
+  set_screen_size(960, 540);
+  return false;
+});
+
+document.getElementById('full_screen').addEventListener('click', event => {
+  goFullscreen();
+  return false;
+});
+
+let current_screen_width = 960;
+let current_screen_height = 540;
+
+//goFullscreen is a one-way operation. Cannot go back to normal layout after this. Just reload the page instead.
+function set_screen_size (screen_width, screen_height) {
+  // Used for pixel placement of videos:
+  current_screen_width = screen_width;
+  current_screen_height = screen_height;
+  // element which needs to enter full-screen mode
+  var element = document.querySelector("#all");
+  element.style.width = screen_width + "px";
+  element.style.height = screen_height + "px";
+  video_div.style.width = screen_width + "px";
+  video_div.style.height = screen_height + "px";
+  //tr3d.width = screen_width;
+  //tr3d.height = screen_height;
+  tr3d.style.width = screen_width + "px";
+  tr3d.style.height = screen_height + "px";
+  //tr_div.width = screen_width + "px";
+  //tr_div.height = screen_height + "px";
+  tr_div.style.width = screen_width + "px";
+  tr_div.style.height = screen_height + "px";
+  svg_element.style.width = screen_width + "px";
+  svg_element.style.height = screen_height + "px";
+  webcam_element.style.width = screen_width + "px";
+  webcam_element.style.height = screen_height + "px";
+  sunburst_div.style.width = screen_width + "px";
+  sunburst_div.style.height = screen_height + "px";
+  snippet_element.style.width = screen_width + "px";
+  snippet_element.style.height = screen_height + "px";
+  replay_element.style.width = screen_width + "px";
+  replay_element.style.height = screen_height + "px";
+  chart_holder.style.width = screen_width + "px";
+  chart_holder.style.height = screen_height + "px";
+  //my_notes.style.display = "none";
+  //my_notes.style.height = "0px";
+}
+
+function goFullscreen () {
+  // make the element go to full-screen mode:
+  // May not work with multiple monitors?
+  var element = document.querySelector("#all");
+  element.requestFullscreen()
+    .then(function() {
+      // element has entered fullscreen mode successfully
+      set_screen_size(screen.width, screen.height);
+    })
+    .catch(function(error) {
+      // element could not enter fullscreen mode
+    });
+  console.log("screen.height=", screen.height);
+  console.log("screen.width=", screen.width);
+  goto(0);
+}
+
+// The slideshow -----------------------------------------------------------------------------
+
+let slideshow_enabled = false;
+let seconds_until_trigger_next_image = 0.1;
+let next_image_no = 1;
+
+function animate_slideshow (delta_time) {
+  if (slideshow_enabled != true) {
+    return;
+  }
+  // delta_time is NaN sometimes:
+  if (delta_time > 0) {
+    seconds_until_trigger_next_image -= delta_time / 1000;
+  }
+  console.log(seconds_until_trigger_next_image);
+  if (seconds_until_trigger_next_image < 0) {
+    hello("slide_"+next_image_no, {t:"png", file:"images/ai/slideshow/slide_"+next_image_no+".png", x:1.0, dest_x:-0.7, y:0.2, size:1.8, a:0.0, dest_a:1.0, blur:0});
+    next_image_no += 1;
+    if (next_image_no > 38) {
+      next_image_no = 1;
+    }
+    seconds_until_trigger_next_image = 5.0;
+  }
+}
+
+function toggle_auto_progress () {
+  if (auto_progress == true) {
+    auto_progress = false;
+    auto_progress_element.checked = false;
+  } else {
+    auto_progress = true;
+    auto_progress_element.checked = true;
+  }
+}
+
+
+// Cables visualization stuff. ---------------------------------------------------------------------
+// See https://https://cables.gl for more information 
+
+// To add a new cables scene:
+// Make sure that it has a transparent background (Click on MainLoop in cables GUI, and uncheck "clear" and "clear_alpha")
+// Export as ZIP with multiple js files.
+// Add any "new" cables scripts at row 40-60 in this file.
+//<script type="text/javascript" src="cables/cables.min.js">
+//<script type="text/javascript" src="cables/particles/js/ops.js">
+// do a hello_cables("my_scene")
+
+var getJSON = function(url, callback, cable_name) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.responseType = 'json';
+  xhr.onload = function() {
+    var status = xhr.status;
+    if (status === 200) {
+      callback(null, xhr.response, cable_name);
+    } else {
+      callback(status, xhr.response, cable_name);
+    }
+  };
+  xhr.send();
+};
+
+function goodbye_cables () {
+  try {
+    let cables_div = document.getElementById("cables");
+    Snap.animate( 1.0, 0.0, function(value) {try {cables_div.style.opacity = value;} catch{}}, 800, mina.linear, function() {try{CABLES.patch.dispose();} catch {}} );
+    //CABLES.patch.dispose();
+  } catch {}
+}
+
+function hello_cables (cable_name) {
+  function patchInitialized(patch) {
+    // You can now access the patch object (patch), register variable watchers and so on
+    //console.log("CABLES:");
+    //console.log(CABLES);
+    let cables_div = document.getElementById("cables");
+    let cables_canvas = document.getElementById("glcanvas");
+    //console.log("cables_div:");
+    //console.log(cables_div);
+    //console.log("cables_canvas:");
+    //console.log(cables_canvas);
+    cables_div.style.opacity=0.0;
+    Snap.animate( 0.0, 1.0, function(value) {try {cables_div.style.opacity = value;} catch{}}, 800, mina.linear );
+  }
+
+  function patchFinishedLoading(patch) {
+    // The patch is ready now, all assets have been loaded
+  }
+
+  let cable_json = getJSON("cables/" + cable_name + "/js/" + cable_name + ".json", function(err, data) {
+    if (err !== null) {
+      alert('Something went wrong when getting cables json: ' + err);
+    } else {
+      console.log("Got the JSON:");
+      console.log(data);
+      let name = data.name.replaceAll(" ", "_");
+      console.log(name);
+      CABLES.patch = new CABLES.Patch({
+        patch: data,
+        "prefixAssetPath": "cables/"+name+"/",
+        "assetPath": "cables/"+name+"/assets/",
+        "jsPath": "cables/"+name+"/js/",
+        "glCanvasId": "glcanvas",
+        "glCanvasResizeToWindow": false,
+        "glCanvasResizeToParent": true,
+        "onPatchLoaded": patchInitialized,
+        "onFinishedLoading": patchFinishedLoading,
+        "canvas":{"alpha":true,"premultipliedAlpha":false} // make canvas transparent
+      });
+    }
+  });
+}
+
+// The start of it all -----------------------------------------------------------------------------
+
+function init () {
+  webgl_init();
+  webcam_init();
+  document.addEventListener('keydown', on_key_down);
+  auto_progress_element.addEventListener('click', (e) => {
+    auto_progress = auto_progress_element.checked;
+  });
+
+// Update the current slider value (each time you drag the slider handle):
+  slider_r.oninput = function() {update_r(this.value)}
+  slider_g.oninput = function() {update_g(this.value)}
+  slider_b.oninput = function() {update_b(this.value)}
+  update_r(248);
+  update_g(248);
+  update_b(248);
+//  set_screen_size(960, 540);
+  goto(0);
+  animate();
+}
+
+// Slides -----------------------------------------------------------------------------
+//
+// All slides adhere to this structure:
+// if (!w) { notes = "Whatever I need to see on the screen to be able to tell my story.\n-> What's on the next slide";
+//   Cleanup from slide above when going forward
+//   The new stuff
+//   Cleanup from slide below when going backward
+// }  // Name of this slide
+
+//  if (!--w) { notes = "\n-> ";
+//  }  // 
+
+
+// For audience cam:
+// 2 slides before, do
+//    stop_audience_cam();
+// 1 slide before do:
+//    start_audience_cam();
+// Then on the slide:
+//    audiencecam_element.style.opacity = 0.0;
+//    audiencecam_element.style.display = "inline-block";
+//    Snap.animate( 0.0, 1.0, function(value) {try {audiencecam_element.style.opacity = value;} catch {};}, 1000, mina.linear );
+// After slide:
+//    Snap.animate( 1.0, 0.0, function(value) {try {audiencecam_element.style.opacity = value;} catch {};}, 1000, mina.linear );
+// Then:
+//    stop_audience_cam();
+//    audiencecam_element.style.display = "none";
+
+
+
+// hello() options for "3d"
+// hello("brain", {t:"3d", file:"/3d_models/brain_v04.glb", x:-1.0, y:-0.55, scale:0.12, rx:-Math.PI * 0.4, rz:-Math.PI * 0.25});
+// x : -1.77 is to the far left. +1.77 is to the far right. 0.0 is the center.
+// y : -1.0 is to the top. +1.0 is at the bottom. 0.0 is the center.
+// scale: 1.0 is original scale
+// rx: rotation in radians
+// ry: rotation in radians
+
+
+// When this function returns true, abort any kind of iterative jump.
+function show_slide_no (dst_slide, direction) {
+  let w = dst_slide;
+  let notes = "";
+  duration = 10.0;
+  let my_border = "1.5px solid #000000";
+  let my_box_shadow = "14px 14px 15px 0px rgba(0, 0, 0, .35)"; // offset-x | offset-y | blur-radius | spread-radius | color
+
+// Use this to "start" at a certain slide number:
+//  w = w + 1;
+
+  w++;
+
+
+// Coordinate system: 0,0 is in the middle of the screen.
+// x:-1.0 to 1.0     the start coordinate is the lower left corner of the text
+// y:-1.0 to 1.0
+
+
+// #§# Start of slides:
+
+  if (!--w) { duration=0.1; notes="Init ->";
+    goodbye_videos_immediately();
+    goodbye_all_immediately();
+    goodbye_cables();
+  }  // init. This is always slide number 0. The rest are auto-incrementing.
+
+
+  if (!--w) { duration=113.0; notes="-> pacman eating";
+    hello("bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#ff80ff"});
+    hello("firsttext", {t:"text", text:["HELLO","NOISEPOINT"], align:"middle", x:0.0, y:-0.2, line_height:"0.9em", colour:"#ffffff", fontsize:260, font:"Arial", fontweight:800, a:0.0, dest_a:1.0, rot:-10});
+  }  //
+
+
+  // PACMAN
+  if (!--w) { duration=3.0; notes="-> pacman eating";
+    goodbye_all();
+    Chart.defaults.font.size = 40;
+    hello("pacman", {t:"chart", chart_data:pacman_config, width:540, height:540, a:1.0});
+  }  // Pacman
+
+  if (!--w) { duration=5.0; notes="->";
+    Chart.defaults.animation.duration = 700;
+    let dot_1 = document.createElement('div');
+    dot_1.setAttribute('id', 'dot_1');
+    dot_1.setAttribute('opacity', 1.0);
+    document.body.appendChild(dot_1);
+    //Snap.animate( 0, 1.0, function(value) {try {dot_1.style.opacity = value;} catch {};}, 500, mina.linear );
+    Snap.animate( 0, 45, function(value) {try {dot_1.style.height = value + "px"; dot_1.style.top = (200-(value/2)) + "px";} catch {};}, 1500, mina.elastic );
+    Snap.animate( 0, 45, function(value) {try {dot_1.style.width = value + "px"; dot_1.style.left = (620-(value/2)) + "px";} catch {};}, 1900, mina.elastic );
+
+    let dot_2 = document.createElement('div');
+    dot_2.setAttribute('id', 'dot_2');
+    dot_2.setAttribute('opacity', 1.0);
+    document.body.appendChild(dot_2);
+    //Snap.animate( 0, 1.0, function(value) {try {dot_2.style.opacity = value;} catch {};}, 800, mina.linear );
+    Snap.animate( 0, 45, function(value) {try {dot_2.style.height = value + "px"; dot_2.style.top = (200-(value/2)) + "px";} catch {};}, 2500, mina.elastic );
+    Snap.animate( 0, 45, function(value) {try {dot_2.style.width = value + "px"; dot_2.style.left = (820-(value/2)) + "px";} catch {};}, 3200, mina.elastic );
+    try {
+      window.my_chart.data.datasets[0].data = [98, 2];
+      window.my_chart.options.rotation = 135 - 40;
+      window.my_chart.options.animation.delay = 0;
+      window.my_chart.update();
+      setTimeout(function(){ window.my_chart.data.datasets[0].data = [75,25]; window.my_chart.options.rotation = 135; window.my_chart.update(); }, 600);
+      setTimeout(function(){ window.my_chart.data.datasets[0].data = [98, 2]; window.my_chart.options.rotation = 135-40; window.my_chart.update(); }, 1200);
+      setTimeout(function(){ window.my_chart.data.datasets[0].data = [75,25]; window.my_chart.options.rotation = 135; window.my_chart.update(); }, 1800);
+      setTimeout(function(){ window.my_chart.data.datasets[0].data = [98, 2]; window.my_chart.options.rotation = 135-40; window.my_chart.update(); }, 2400);
+      setTimeout(function(){ window.my_chart.data.datasets[0].data = [75,25]; window.my_chart.options.rotation = 135; window.my_chart.update(); }, 3000);
+      Snap.animate( 0, 950, function(value) {try {chart_holder.style.transform = "translate("+ (value) + "px";} catch {};}, 4000, mina.linear );
+    } catch {}
+    setTimeout(function(){ dot_1.parentNode.removeChild(dot_1); }, 1800);
+    setTimeout(function(){ dot_2.parentNode.removeChild(dot_2); }, 2800);
+    goodbye("my_signal_path");
+  }  // Pacman eating
+
+  if (!--w) { duration=0.1; notes="";
+    goodbye("pacman");
+  }  // 
+
+
+// MonteCarlo sim
+  if (!--w) { duration=2.0; notes="-> Run Monte Carlo sim";
+    goodbye_all();
+    hello("my_solution713", {t:"png", file:"media/image/png_image2.png", x:0, y:0.6, size:3.0, a:0.0, dest_a:0.8, blur:10, dest_blur:0});
+    try {
+      monte_slider_div.parentNode.removeChild(monte_slider_div);
+    } catch {}
+    try {
+      monte_sliderN_div.parentNode.removeChild(monte_sliderN_div);
+    } catch {}
+    try {
+      monte_sliderSigma2_div.parentNode.removeChild(monte_sliderSigma2_div);
+    } catch {}
+    try {
+      monte_sliderA_div.parentNode.removeChild(monte_sliderA_div);
+    } catch {}
+    clearInterval(monte_carlo_interval);
+  }  // my solution 7.13
+
+  if (!--w) { duration=4.0; notes="->";
+    goodbye("my_solution713");
+    current_nof_monte_carlo_simulation_runs = 1;
+    monte_carlo_data = [];
+    assignment = 713;
+    N = 5;
+    sigma2 = 1.4;
+    A = 1.0;
+    Chart.defaults.font.size = 20;
+    hello("monte_carlo", {t:"chart", chart_data:monte_carlo_config, width:850, height:560, a:0.8});
+    monte_carlo_interval = setInterval(monte_carlo_interval_function, 25);
+    monte_slider_div = document.createElement('div');
+    monte_slider_div.setAttribute('id', "monte_slider_div");
+    monte_slider_div.setAttribute('opacity', 1.0);
+    monte_slider_div.innerHTML = '<font color="#ffffff"">#Sim:</font> <input type="range" min="1" max="10000" value="1" id="slider_monte" style="width:800px"><span id="monte_slider_display">1</span>';
+    document.body.appendChild(monte_slider_div);
+    Snap.animate( 0, 1.0, function(value) {try {monte_slider_div.style.opacity = value;} catch {};}, 2000, mina.linear );
+    slider_monte.oninput = function() {update_monte(this.value)};
+    monte_sliderN_div = document.createElement('div');
+    monte_sliderN_div.setAttribute('id', "monte_sliderN_div");
+    monte_sliderN_div.setAttribute('opacity', 1.0);
+    monte_sliderN_div.innerHTML = '<font color="#ffffff"">#N:</font> <input type="range" min="1" max="500" value="5" id="slider_monteN" style="width:800px"><span id="monte_sliderN_display"><font color="#ffffff">5</font></span>';
+    document.body.appendChild(monte_sliderN_div);
+    Snap.animate( 0, 1.0, function(value) {try {monte_sliderN_div.style.opacity = value;} catch {};}, 1500, mina.linear );
+    slider_monteN.oninput = function() {update_monteN(this.value)};
+    monte_sliderA_div = document.createElement('div');
+    monte_sliderA_div.setAttribute('id', "monte_sliderA_div");
+    monte_sliderA_div.setAttribute('opacity', 1.0);
+    monte_sliderA_div.innerHTML = '<font color="#ffffff"">#A:</font> <input type="range" min="-2.2" max="2.0" step="0.01" value="1" id="slider_monteA" style="width:800px"><span id="monte_sliderA_display"><font color="#ffffff">1.0</font></span>';
+    document.body.appendChild(monte_sliderA_div);
+    Snap.animate( 0, 1.0, function(value) {try {monte_sliderA_div.style.opacity = value;} catch {};}, 500, mina.linear );
+    slider_monteA.oninput = function() {update_monteA(this.value)};
+    monte_sliderSigma2_div = document.createElement('div');
+    monte_sliderSigma2_div.setAttribute('id', "monte_sliderSigma2_div");
+    monte_sliderSigma2_div.setAttribute('opacity', 1.0);
+    monte_sliderSigma2_div.innerHTML = '<font color="#ffffff"">#Sigma2:</font> <input type="range" min="0.01" max="2" step="0.01" value="1.4" id="slider_monteSigma2" style="width:800px"><span id="monte_sliderSigma2_display"><font color="#ffffff">1.4</font></span>';
+    document.body.appendChild(monte_sliderSigma2_div);
+    Snap.animate( 0, 1.0, function(value) {try {monte_sliderSigma2_div.style.opacity = value;} catch {};}, 1000, mina.linear );
+    slider_monteSigma2.oninput = function() {update_monteSigma2(this.value)};
+    Chart.defaults.animation.duration = 1000;
+  }
+
+  if (!--w) { duration=1.0; notes="End chart simulation";
+    goodbye_all();
+    try {
+      monte_slider_div.parentNode.removeChild(monte_slider_div);
+    } catch {}
+    try {
+      monte_sliderN_div.parentNode.removeChild(monte_sliderN_div);
+    } catch {}
+    try {
+      monte_sliderSigma2_div.parentNode.removeChild(monte_sliderSigma2_div);
+    } catch {}
+    try {
+      monte_sliderA_div.parentNode.removeChild(monte_sliderA_div);
+    } catch {}
+    clearInterval(monte_carlo_interval);
+  }  // Monte carlo 2
+
+
+// Make a video loop at a certain time:
+  if (!--w) { duration=1.0; notes="Video loop_at + animate";
+    goodbye_all();
+    hello("video1", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
+  }  //
+  if (!--w) { duration=3.0; notes="Video animate position + width";
+    Snap.animate( 1.0, 0.25, function(value) {try {let v=document.getElementById('video1'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
+  }  //
+
+  if (!--w) { duration=1.0; notes="Video2";
+    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
+  }  //
+  if (!--w) { duration=3.0; notes="Video animate corners";
+    Snap.animate( 1.0, 0.45, function(value) {try {let v=document.getElementById('video2'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
+    Snap.animate( 0.0, 1.0, function(value) {try {let v=document.getElementById('video2'); v.style.transform = "translate("+(0+0.5*value) + "px,"+(0+0.5*value)+"px)";} catch {};}, 2000, mina.linear );
+    Snap.animate( 0.0, 135.0, function(value) {try {let v=document.getElementById('video2'); v.style.borderRadius = value+"px";} catch {};}, 2000, mina.linear );
+  }  //
+
+  // Animate position of image:
+  if (!--w) { duration=1.0; notes="Animate position of SVG image";
+    goodbye_all();
+    hello("flow_bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.1, colour:"#808080", a:0.0, dest_a:1.0});
+    hello("my_flowchart", {t:"png", file:"media/image/graph/pexexp1_flow_explanation_simplified3_transparent.png", x:0.4, y:0.0, size:1.8, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+  }  // 
+  if (!--w) { duration=1.0; notes="->";
+    try {
+      a["my_flowchart"].animate({ transform: 't-780,0' }, 2000, mina.elastic);
+    } catch {}
+    goodbye("my_overview");
+  }  // flowchart left
+
+
+
+  if (!--w) { duration=0.1; notes="Turn off sunburst";
+    sunburst_div.style.display = "none";
+  }  // 
+  if (!--w) { duration=2.0; notes="";
+    goodbye_videos_immediately();
+    goodbye_all();
+    hello("my_thanks", {t:"text", text:"Thanks for listening!", align:"middle", x:0, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, dest_a:1.0, a:0.0});
+    hello("my_topic", {t:"text", text:"What song am I thinking of?", align:"middle", x:-0.94, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0, rot:-90});
+    hello("my_name", {t:"text", text:"Your Name", x:0.94, y:0.6, align:"right", colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0});
+    hello("my_name2", {t:"text", text:"Department of Perfectly Fine Plants", x:0.94, y:0.75, align:"right", colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0});
+    hello("my_name3", {t:"text", text:"Your University", x:0.94, y:0.9, align:"right", colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0});
+    hello("logo", {t:"png", file:"media/logotypes/the_logo.png", x:0.85, y:-0.38, size:0.32, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+    sunburst_div.style.display = "inline";
+  }  // The end
+  if (!--w) { duration=0.1; notes="Turn off sunburst";
+    sunburst_div.style.display = "none";
+  }  // 
+
+
+  if (!--w) { duration=1.0; notes="Audio boom";
+    goodbye_videos_immediately();
+    goodbye_all();
+    if (direction == 1) {
+      // Only trigger when going "forward" in the slides:
+      camera_shake = 1.0;
+      audio_muzak.pause();
+      audio_boom.currentTime = 0.0;
+      audio_boom.play();
+    }
+    hello("my_title", {t:"text", text:"Why don't I have one already?", align:"middle", x:0, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, dest_a:0.8, a:1.0});
+  }  // Title
+
+
+  // Commodore 64 screen:
+  if (!--w) { duration=1.0; notes="";
+    goodbye_all();
+//23456789012345678901234567890123456789
+    let big_fat_table = `
+ SOME PROBLEMS WE'LL NEED TO SOLVE
+          BEFORE WE CAN GO FULL CYBORG:
+ 
+Degeneration of electrodes in the body.
+ 
+Heat dissipation inside brain max 20mW.
+ 
+Understanding brain signals better.
+ 
+Wires into the brain make damage,
+  because of different density.
+ 
+Risks of infections.
+ 
+Brain stimulation needs to train humans
+  to understand the new stimuli.
+ 
+Charging batteries without heating up.
+ 
+Cultural issues: Why would I trust
+ any company with my innermost secrets?`;
+    let big_fat_array = big_fat_table.split("\n");
+    hello("cyborg_bg2", {t:"rect", x:-0.35, y:0.0, width:0.70, height:0.85, colour:"#6C5EB5", a:0.0, dest_a:0.6});
+    hello("cyborg_bg", {t:"rect", x:-0.35, y:0.0, width:0.58, height:0.63, colour:"#352879", a:0.0, dest_a:0.8});
+    hello("cyborg", {t:"text", text:big_fat_array, x:-0.93, y:-0.58, align:"left", colour:"#6C5EB5", line_height:"1.0em", fontsize:27.84, font:"PetMe64", fontweight:100, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+  }  //
+
+
+  if (!--w) { duration=1.0; notes="<span style='color:#80ff80'>FACT:</span> Cows that sees green fields and nice weather in VR produces more milk. -> next";
+    goodbye_all();
+    hello("cow70", {t:"png", file:"media/image/cow_00084.png", x:0.34, dest_x:0.89, y:0.0, size:2.4, dest_size:4.0, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+    hello("bci70text", {t:"text", text:["MORE","MILK"], align:"middle", x:-0.68, y:0.0, line_height:"0.9em", colour:"#ffff80", fontsize:260, font:"Arial", fontweight:800, a:0.0, dest_a:1.0, rot:-90});
+  }  // 
+
+
+  // Lots of text example:
+  if (!--w) { duration=1.0; notes="1960-2020 -> vocabulary";
+    goodbye_all();
+    hello("bg1", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.15, colour:"#404080", a:0.0, dest_a:1.0});
+    let big_fat_table = `
+One
+Two
+Three
+Four
+Five
+6
+ 
+Eight
+Nine
+Ten
+11
+12
+13
+Fourteen, oh yes, fourteen
+15
+16
+17
+`;
+    let big_fat_array = big_fat_table.split("\n");
+    //hello("table_bg", {t:"rect", x:0.13, y:0.2, width:0.65, height:0.8, corner_radius:0.1, colour:"#000000", a:0.0, dest_a:0.65});
+    hello("table", {t:"text", text:big_fat_array, x:-0.5, y:-0.95, align:"middle", colour:"#ffffff", line_height:"1.0em", fontsize:60, font:"Arial", fontweight:800, a:0.0, dest_a:1.0,blur:10, dest_blur:0});
+  }  // 
+  if (!--w) { duration=1.0; notes="";
+    let big_fat_table2 = `
+1
+2
+3
+4
+ 
+6
+7
+8
+9
+10
+ 
+12
+13
+Doppler ultrasonography
+15
+16
+Seventeen, and that's the last
+`;
+    let big_fat_array2 = big_fat_table2.split("\n");
+    //hello("table_bg", {t:"rect", x:0.13, y:0.2, width:0.65, height:0.8, corner_radius:0.1, colour:"#000000", a:0.0, dest_a:0.65});
+    hello("table2", {t:"text", text:big_fat_array2, x:0.5, y:-0.95, align:"middle", colour:"#ffffff", line_height:"1.0em", fontsize:60, font:"Arial", fontweight:800, a:0.0, dest_a:1.0,blur:10, dest_blur:0});
+  }  // 
+
+  if (!--w) { duration=1.0; notes="";
+//    init_dialog ("Brain Computer\nInterface\nin 90 seconds", 0.0, 0.0, 0.20, 0);
+//    init_dialog ("Research done 1960-2023\nand some keywords.\nThanks for watching!", 0.0, 0.0, 0.16, 0);
+    init_dialog ("Thanks for reading!", 0.0, 0.0, 0.16, 0);
+  }  // Paper
+  if (!--w) { duration=2.0; notes="-> ";
+    fade_dialog_glpos(0,0);
+  }  // Paper
+
+// hello() options for "video"
+// height: 1.0 is whole screen
+// width: 1.0 is whole screen
+// clip_top
+// clip_bottom
+// clip_right
+// clip_left    = part of video to crop: 0.50 means remove half of the video on screen. Note that height and width must be correct to use.
+//                Clipping doesn't work well with changing the width/height of the video either.
+//                Don't use with rounded corners, or border
+// border_radius = rounded corners: 0.5 is a circle.
+// border:  "1px solid #000000"
+// x = displacement in x
+// y = displacement in y
+// a = initial opacity
+// dest_a = opacity when faded
+// pause_at: time when to freeze the image and pause the video
+// loop_at: time when to loop the video
+
+  if (!--w) { duration=1.0; notes="3x3 videos";
+    goodbye_all()
+    hello("bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.15, colour:"#404040", a:0.0, dest_a:1.0});
+    let nof_cols = 3;
+    let nof_rows = 3;
+    let video_no = 0;
+    for (let row = 0; row < nof_rows; row++) {
+      for (let col = 0; col < nof_cols; col++) {
+        let v_height = 1.0/nof_rows;
+        let v_width = 1.0/nof_cols;
+// n=1    x = 0.0
+// n=2    x = -0.5, 0.5
+// n=3    x = -0.5, 0.0, 0.5
+        let v_x = (0.5 + col) * v_width * 2 - 1.0;
+        let v_y = (0.5 + row) * v_height * 2 - 1.0;
+        hello("q" + video_no, {t:"video", file:"media/video/brain_video.mov", x:v_x, y:v_y, width:v_width, height:v_height, rate:1.0, a:0.0, dest_a:1.0, start_at:69.6});
+        video_no++;
+      }
+    }
+  }  // title
+
+  if (!--w) { duration=6.0; notes="Cables Point_Cloud_Text";
+    hello_cables("Point_Cloud_Text");
+  }  // 
+  if (!--w) { duration=1.0; notes="fade cables";
+    goodbye_cables();
+    goodbye_all();
+  }  //
+
+
+  if (!--w) { duration=1.0; notes="2x2 videos";
+    goodbye_all()
+    hello("bg2", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.15, colour:"#404040", a:0.0, dest_a:1.0});
+    let nof_cols = 2;
+    let nof_rows = 2;
+    let video_no = 0;
+    for (let row = 0; row < nof_rows; row++) {
+      for (let col = 0; col < nof_cols; col++) {
+        let v_height = 1.0/nof_rows;
+        let v_width = 1.0/nof_cols;
+// n=1    x = 0.0
+// n=2    x = -0.5, 0.5
+// n=3    x = -0.5, 0.0, 0.5
+        let v_x = (0.5 + col) * v_width * 2 - 1.0;
+        let v_y = (0.5 + row) * v_height * 2 - 1.0;
+        hello("p" + video_no, {t:"video", file:"media/video/brain_video.mov", x:v_x, y:v_y, width:v_width, height:v_height, rate:1.0, a:0.0, dest_a:1.0, start_at:69.6});
+        video_no++;
+      }
+    }
+  }  // title
+
+  if (!--w) { duration=1.0; notes="4x4 videos";
+    goodbye_all()
+    hello("bg3", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.15, colour:"#404040", a:0.0, dest_a:1.0});
+    let nof_cols = 4;
+    let nof_rows = 4;
+    let video_no = 0;
+    for (let row = 0; row < nof_rows; row++) {
+      for (let col = 0; col < nof_cols; col++) {
+        let v_height = 1.0/nof_rows;
+        let v_width = 1.0/nof_cols;
+// n=1    x = 0.0
+// n=2    x = -0.5, 0.5
+// n=3    x = -0.5, 0.0, 0.5
+        let v_x = (0.5 + col) * v_width * 2 - 1.0;
+        let v_y = (0.5 + row) * v_height * 2 - 1.0;
+        hello("e" + video_no, {t:"video", file:"media/video/brain_video.mov", x:v_x, y:v_y, width:v_width, height:v_height, rate:1.0, a:0.0, dest_a:1.0, start_at:69.6});
+        video_no++;
+      }
+    }
+  }  // title
+
+  if (!--w) { duration=1.0; notes="5x5 videos, clipped";
+    hello("bg5", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.15, colour:"#404040", a:0.0, dest_a:1.0});
+    let clip_left = [0.5,0.25,0,0,0];
+    let clip_right = [0,0,0,0.25,.5];
+    let clip_top = [0.5,0.25,0,0,0];
+    let clip_bottom = [0,0,0,0.25,.5];
+    goodbye_all()
+    let nof_cols = 5;
+    let nof_rows = 5;
+    let video_no = 0;
+    for (let row = 0; row < nof_rows; row++) {
+      for (let col = 0; col < nof_cols; col++) {
+        let v_height = 1.0/nof_rows;
+        let v_width = 1.0/nof_cols;
+// n=1    x = 0.0
+// n=2    x = -0.5, 0.5
+// n=3    x = -0.5, 0.0, 0.5
+        let v_x = (0.5 + col) * v_width * 2 - 1.0;
+        let v_y = (0.5 + row) * v_height * 2 - 1.0;
+        hello("i" + video_no, {t:"video", file:"media/video/ipad_screencast.mov", clip_left:clip_left[col], clip_right:clip_right[col], clip_top:clip_top[row], clip_bottom:clip_bottom[row], x:v_x, y:v_y, width:v_width*0.8, height:v_height*0.8, rate:1.0, a:0.0, dest_a:1.0, start_at:1.3, loop_at:4.0});
+        video_no++;
+      }
+    }
+  }  // title
+
+// Make a video loop at a certain time:
+  if (!--w) { duration=1.0; notes="Video loop_at";
+    goodbye_all();
+    hello("video1", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
+  }  //
+
+// Make a video "stop" at a certain time:
+  if (!--w) { notes = "Video pause_at";
+    goodbye_all();
+    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.0, pause_at:3.2});
+  }  //
+
+
+  if (!--w) { duration=1.0; notes="Video coordinates";
+    goodbye_all();
+    hello("video1", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:1.0, x:0.0, y:0.0,   a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
+    hello("video2", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:1.1, x:-1.0, y:0.0,  a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
+    hello("video3", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:1.2, x:1.0, y:0.0,   a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
+    hello("video4", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:0.4, x:-1.0, y:-1.0, a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
+    hello("video5", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:0.5, x:1.0, y:1.0,   a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
+    hello("video6", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:0.6, x:-1.0, y:1.0,  a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
+    hello("video7", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:0.7, x:1.0, y:-1.0,  a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
+    hello("video8", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:0.8, x:0.0, y:-1.0,  a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
+    hello("video9", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:0.9, x:0.0, y:1.0,   a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
+  }  // init. This is always slide number 0. The rest are auto-incrementing.
+
+  if (!--w) { duration=1.0; notes="PNG sizes";
+    goodbye_all();
+    hello("png1", {t:"png", file:"media/image/png_image.png", size:0.5, x:0.0, y:0.0,   a:0.0, dest_a:1.0});
+    hello("png2", {t:"png", file:"media/image/wide_png_image.png", size:0.5, x:-0.5, y:0.0,  a:0.0, dest_a:1.0});
+    hello("png3", {t:"png", file:"media/image/wide_png_image.png", size:0.5, x:0.5, y:0.0,   a:0.0, dest_a:1.0});
+    hello("png4", {t:"png", file:"media/image/png_image.png", size:0.5, x:-0.5, y:-0.5, a:0.0, dest_a:1.0});
+    hello("png5", {t:"png", file:"media/image/wide_png_image.png", size:0.5, x:0.5, y:0.5,   a:0.0, dest_a:1.0});
+    hello("png6", {t:"png", file:"media/image/png_image.png", size:0.5, x:-0.5, y:0.5,  a:0.0, dest_a:1.0});
+    hello("png7", {t:"png", file:"media/image/png_image2.png", size:0.5, x:0.5, y:-0.5,  a:0.0, dest_a:1.0});
+    hello("png8", {t:"png", file:"media/image/png_image2.png", size:0.5, x:0.0, y:-0.5,  a:0.0, dest_a:1.0});
+    hello("png9", {t:"png", file:"media/image/png_image.png", size:0.5, x:0.0, y:0.5,   a:0.0, dest_a:1.0});
+  }  // init. This is always slide number 0. The rest are auto-incrementing.
+
+  if (!--w) { duration=1.0; notes="SVG coordinates";
+    goodbye_all();
+    hello("svg1", {t:"png", file:"media/image/svg_image.svg", size:0.5, x:0.0, y:0.0,   a:0.0, dest_a:1.0});
+    hello("svg2", {t:"png", file:"media/image/svg_image2.svg",  size:0.5, x:-1.0, y:0.0,  a:0.0, dest_a:1.0});
+    hello("svg3", {t:"png", file:"media/image/svg_image2.svg", size:0.5, x:1.0, y:0.0,   a:0.0, dest_a:1.0});
+    hello("svg4", {t:"png", file:"media/image/svg_image.svg",  size:0.5, x:-1.0, y:-1.0, a:0.0, dest_a:1.0});
+    hello("svg5", {t:"png", file:"media/image/svg_image.svg", size:0.5, x:1.0, y:1.0,   a:0.0, dest_a:1.0});
+    hello("svg6", {t:"png", file:"media/image/svg_image.svg",  size:0.5, x:-1.0, y:1.0,  a:0.0, dest_a:1.0});
+    hello("svg7", {t:"png", file:"media/image/svg_image.svg", size:0.5, x:1.0, y:-1.0,  a:0.0, dest_a:1.0});
+    hello("svg8", {t:"png", file:"media/image/svg_image2.svg",  size:0.5, x:0.0, y:-1.0,  a:0.0, dest_a:1.0});
+    hello("svg9", {t:"png", file:"media/image/svg_image2.svg", size:0.5, x:0.0, y:1.0,   a:0.0, dest_a:1.0});
+  }  // init. This is always slide number 0. The rest are auto-incrementing.
+
+  if (!--w) { duration=1.0; notes="PNG coordinates";
+    goodbye_all();
+    //hello("paper1", {t:"png", file:"clear_by_mind/ifac_paper_1.png", x:-0.35, y:1.0, size:2.9, a:0.0, dest_a:0.8, blur:10, dest_blur:0, rot:-20, dest_rot:-5});
+    //hello("suspect5", {t:"png", file:"clear_by_mind/crooks/crooks_v04_p34.svg", x:1.5, dest_x:0.58, y:0.22, size:1.1, a:0.0, dest_a:0.8, blur:10, dest_blur:0});
+    hello("png1", {t:"png", file:"media/image/png_image.png", size:0.5, x:0.0, y:0.0,   a:0.0, dest_a:1.0});
+    hello("png2", {t:"png", file:"media/image/png_image.png", size:0.5, x:-1.0, y:0.0,  a:0.0, dest_a:1.0});
+    hello("png3", {t:"png", file:"media/image/png_image.png", size:0.5, x:1.0, y:0.0,   a:0.0, dest_a:1.0});
+    hello("png4", {t:"png", file:"media/image/png_image.png", size:0.5, x:-1.0, y:-1.0, a:0.0, dest_a:1.0});
+    hello("png5", {t:"png", file:"media/image/png_image.png", size:0.5, x:1.0, y:1.0,   a:0.0, dest_a:1.0});
+    hello("png6", {t:"png", file:"media/image/png_image.png", size:0.5, x:-1.0, y:1.0,  a:0.0, dest_a:1.0});
+    hello("png7", {t:"png", file:"media/image/png_image.png", size:0.5, x:1.0, y:-1.0,  a:0.0, dest_a:1.0});
+    hello("png8", {t:"png", file:"media/image/png_image.png", size:0.5, x:0.0, y:-1.0,  a:0.0, dest_a:1.0});
+    hello("png9", {t:"png", file:"media/image/png_image.png", size:0.5, x:0.0, y:1.0,   a:0.0, dest_a:1.0});
+  }  // init. This is always slide number 0. The rest are auto-incrementing.
+
+  if (!--w) { duration=1.0; notes="Rect coordinates";
+    goodbye_all();
+    hello("bg1", {t:"rect", x:0.0, y:0.0,   colour:"#ff8080", width:0.1, height:0.1, corner_radius:0.1, a:0.0, dest_a:1.0});
+    hello("bg2", {t:"rect", x:-1.0, y:0.0,  colour:"#8080ff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
+    hello("bg3", {t:"rect", x:1.0, y:0.0,   colour:"#ffffff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
+    hello("bg4", {t:"rect", x:-1.0, y:-1.0, colour:"#ffffff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
+    hello("bg5", {t:"rect", x:1.0, y:1.0,   colour:"#ffffff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
+    hello("bg6", {t:"rect", x:-1.0, y:1.0,  colour:"#ffffff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
+    hello("bg7", {t:"rect", x:1.0, y:-1.0,  colour:"#ffffff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
+    hello("bg8", {t:"rect", x:0.0, y:-1.0,  colour:"#ffffff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
+    hello("bg9", {t:"rect", x:0.0, y:1.0,   colour:"#ffffff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
+  }  // init. This is always slide number 0. The rest are auto-incrementing.
+
+  if (!--w) { duration=1.0; notes="Text coordinates";
+    goodbye_all();
+    hello("bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.15, colour:"#404040", a:0.0, dest_a:1.0});
+    hello("t1", {t:"text", text:"x=0,y=0", x:0.0, y:0.0, align:"middle", colour:"#ff8080", fontsize:40, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
+    hello("t2", {t:"text", text:"x=-1.0,y=0", x:-1.0, y:0.0, align:"left", colour:"#8080ff", fontsize:100, font:"Helvetica", fontweight:800, a:0.0, dest_a:0.8});
+    hello("t3", {t:"text", text:"x=+1.0,y=0", x:1.0, y:0.0, align:"right", colour:"#ffffff", fontsize:40, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
+    hello("t4", {t:"text", text:"x=-1.0,y=-1.0", x:-1.0, y:-1.0, align:"left", colour:"#ffffff", fontsize:40, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
+    hello("t5", {t:"text", text:"x=+1.0,y=1.0", x:1.0, y:1.0, align:"right", colour:"#ffffff", fontsize:40, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
+    hello("t6", {t:"text", text:"x=-1.0,y=1.0", x:-1.0, y:1.0, align:"left", colour:"#ffffff", fontsize:40, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
+    hello("t7", {t:"text", text:"x=+1.0,y=-1.0", x:1.0, y:-1.0, align:"right", colour:"#ffffff", fontsize:40, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
+    hello("t8", {t:"text", text:"x=0,y=-1.0", x:0.0, y:-1.0, align:"middle", colour:"#ffffff", fontsize:40, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
+    hello("t9", {t:"text", text:"x=0,y=1.0", x:0.0, y:1.0, align:"middle", colour:"#ffffff", fontsize:100, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
+  }  // init. This is always slide number 0. The rest are auto-incrementing.
+
+
+  if (!--w) { duration=1.0; notes="Dialog test 0";
+    goodbye_videos_immediately();
+    goodbye_all();
+    goodbye_cables();
+    init_dialog ("An interesting\nfact or two", 0.0, 0.0, 0.20, 0);
+  }  //
+  if (!--w) { duration=1.0; notes="Dialog fade";
+    fade_dialog_glpos(0,0);
+  }  //
+
+  if (!--w) { duration=1.0; notes="Dialog test 1";
+    goodbye_all();
+    init_dialog ("Another important\nnotice goes here", 1.0, 0.0, 0.20, 1);
+  }  //
+  if (!--w) { duration=1.0; notes="Dialog fade 1";
+    fade_dialog_glpos(1.0,0);
+  }  //
+
+  if (!--w) { duration=1.0; notes="Dialog test 2";
+    goodbye_all();
+    init_dialog ("[1992]\n\nHaier, R.J., Siegel, B.V., Jr.,\nMacLachlan, A., Soderling,\nE., Lottenberg, S. & Buchsbaum, M. S:\n\nRegional glucose metabolic changes\nafter learning a complex\nvisuospatial/motor task:\na positron emission tomographic study.\n\nBrain Research, 570, 134—143.", 0.0, 0.0, 0.09, 2);
+  }  //
+  if (!--w) { duration=1.0; notes="Dialog fade 2";
+    fade_dialog_glpos(0,1.0);
+  }  //
+
+
+  if (!--w) { duration=1.0; notes="->";
+    hello("ptitle_bg", {t:"rect", x:-0.40, y:-0.15, width:0.55, height:0.6, corner_radius:0.1, colour:"#000000", a:0.0, dest_a:0.45});
+    hello("ptitle", {t:"text", text:["The important title","in 90 seconds"], x:-0.9, y:-0.55, align:"left", colour:"#ffffff", fontsize:120, font:"Arial", fontweight:100, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+    hello("my_name2", {t:"text", text:"Your Name, hacker", x:-0.9, y:0.9, align:"left", colour:"#ffffff", fontsize:100, font:"Arial", fontweight:100, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+    //hello("profile1", {t:"png", file:"images/people/Martin-Gemborn-Nilsson.png", x:-0.45, y:0.2, size:0.5, a:0.0, dest_a:1.0});
+  }
+
+
+  //if (!--w) { duration=1.0; notes="<span style='color:#8080ff'>BCI Performance:</span> 3 factors. A comfortable and convenient device. -> Reliability";
+  if (!--w) { duration=2.0; notes="The skull -> brain";
+    try {
+      let info = infos["cbm3"];
+      info.a = 1.0;
+      info.dest_a = 0.0;
+      let video_element = document.getElementById("cbm1");
+      let video_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {video_element.style.opacity = value;} catch {};}, 400, mina.linear );
+    } catch {}
+    goodbye_all();
+    //hello("bci3text", {t:"text", text:["BCI","Performance"], align:"middle", line_height:"0.9em", x:0.0, y:-0.2, colour:"#ffffff", fontsize:230, font:"Arial", fontweight:800, dest_a:1.0, a:0.0});
+    hello("brain", {t:"3d", file:"/3d/brain_v04.glb", x:0.0, y:-0.55, scale:0.12, rx:-Math.PI * 0.4, rz:-Math.PI * 0.25});
+  }  // 
+
+  if (!--w) { duration=5.0; notes="5W for keeping it alive, 15W for signalling, folded to maximize the reacheable area for the support network, 86000 millions of neurons -> Sensor locations";
+    Snap.animate( -0.55, -0.2, function(value) {try {all_3d_models["brain"].position.y = value;} catch {};}, 3000, mina.elastic );
+    Snap.animate( 0.12, 0.3, function(value) {try {all_3d_models["brain"].scale.x = value; all_3d_models["brain"].scale.y = value; all_3d_models["brain"].scale.z = value;} catch {};}, 3000, mina.elastic );
+    Snap.animate(1.0, 0.0, function(value) {try {all_3d_models["brain"].children[4].material.opacity = value;} catch {};}, 4000, mina.linear);
+  }  // in_brain
+
+  if (!--w) { duration=7.0; notes="Brain is 3d. We can measure the surface 'cortical'. Highly complex. Highly connected. This demo is described in our paper. -> showing graphs";
+    console.log(all_3d_models["brain"]);
+    Snap.animate( -0.2, -0.4, function(value) {try {all_3d_models["brain"].position.y = value;} catch {};}, 5000, mina.linear );
+    Snap.animate( 0.0, 2.5, function(value) {try {all_3d_models["brain"].children[1].position.x = value;} catch {};}, 5000, mina.linear );
+    Snap.animate( 0.0, -2.5, function(value) {try {all_3d_models["brain"].children[3].position.x = value;} catch {};}, 5000, mina.linear );
+    Snap.animate( 0.0, 1.5, function(value) {try {all_3d_models["brain"].children[0].position.y = value;} catch {};}, 5000, mina.linear );
+  }  // expand_brain
+
+  if (!--w) { duration=8.0; notes="";
+    hello_cables("Sine_scroller");
+  }  // 
+  if (!--w) { duration=1.0; notes="";
+    goodbye_all();
+    goodbye_cables();
+  }  //
+
+
+  if (!--w) { duration=1.0; notes="Restart";
+    goodbye_all();
+    // Restart the whole thing:
+    current_slide = -1;
+    // Make sure to not iteratively step any further:
+    return true;
+  }  // 
+
+
+  console.log(notes)
+  if (notes.indexOf("->") >= 0) {
+    // Yes, there is a -> in the notes. Let's make it white:
+    notes = notes.replace("->","<br><span style='color:#ff0000'>-></span><span style='color:#ffffff'>");
+    notes += "</span>";
+    console.log(notes)
+  }
+  my_notes.innerHTML = "<p>" + notes + "</p>";
+  if (notes_window != null) {
+    // Send the notes to an external window as well:
+    notes_window.postMessage(notes, "*");
+  }
+
+  current_slide = dst_slide;
+}
+
+
+init();
+
+</script></body></html>

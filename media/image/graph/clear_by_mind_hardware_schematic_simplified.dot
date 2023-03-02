@@ -1,0 +1,46 @@
+# This description is hand written.
+# Showing the hardware setup in the Clear by Mind project
+
+# Colors:
+# Sand:  #DCC98B #FDF2D0
+# Blue:  #8DA4CB #DDE8FA
+# Green: #A0BF92 #D9E7D6
+
+digraph {
+  bgcolor="transparent"
+  #splines=line;
+
+  subgraph cluster_0 {
+    label="LAPTOP";
+    labelloc="b";
+    style="rounded,filled";
+    color="#FDF2D0";
+    client;
+    admin;
+    engine;
+    storage;
+  }
+
+  client [label="Client GUI\nJavascript\nHTML" shape=box style="rounded,filled" color="#A0BF92" fillcolor="#D9E7D6"];
+  admin [label="Admin GUI\nJavascript\nHTML" shape=box style="rounded,filled" color="#A0BF92" fillcolor="#D9E7D6"];
+  engine [label="Engine\nPython" shape=box style="rounded,filled" color="#A0BF92" fillcolor="#D9E7D6"];
+  calculator [label="Calculate\nPython\nTimeflux" shape=box style="rounded,filled" color="#A0BF92" fillcolor="#D9E7D6"];
+  eeg_device [label="EEG\ndevice" style="rounded,filled" color="#8DA4CB" fillcolor="#DDE8FA"];
+  storage [shape=box label="Storage" shape=box style="filled" color="#000000" fillcolor="#ffffff"];
+  client_display [label="Client\nDisplay" style="rounded,filled" color="#8DA4CB" fillcolor="#DDE8FA"];
+  admin_display [label="Admin\nDisplay" style="rounded,filled" color="#8DA4CB" fillcolor="#DDE8FA"];
+  admin_mouse [label="Mouse\nKeyboard" style="rounded,filled" color="#8DA4CB" fillcolor="#DDE8FA"];
+
+  engine -> client [dir=both];
+  engine -> admin [dir=both];
+  engine -> storage;
+  calculator -> engine [dir=both];
+  eeg_device -> engine;
+  eeg_device -> calculator;
+  client -> client_display;
+  admin -> admin_display;
+  admin_mouse -> admin;
+
+  { rank=min; eeg_device; calculator; admin_mouse }
+//  { rank=max; B; D; Y; }
+}

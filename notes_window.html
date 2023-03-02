@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Pex Tufvesson</title>
+<style>
+html, body {margin: 0 0; overflow: hidden; background-color: #000000; font-size: 6vw;}
+#notes {width: 100%; height: 100%}
+#notes {line-height: 6vw; color: #ffd0c0; font-family: "Arial"; -webkit-font-smoothing: antialiased;}
+</style>
+</head><body>
+<div class="notes" id="notes" style="text-align: left"><p></p></div>
+<button onclick="goFullscreen(); return false">-> Full screen</button>
+<script>
+'use strict';
+const my_notes = document.getElementById("notes");
+
+function goFullscreen() {
+  // element which needs to enter full-screen mode
+  var element = document.querySelector("#notes");
+  // make the element go to full-screen mode
+  element.requestFullscreen()
+    .then(function() {
+      // element has entered fullscreen mode successfully
+    })
+    .catch(function(error) {
+      // element could not enter fullscreen mode
+    });
+}
+
+function init () {
+  my_notes.innerHTML = "...";
+
+  window.addEventListener("message", (event) => {
+    console.log("got!");
+    console.log(event);
+    //if (event.origin !== "https://local.livet.se:8580")
+    //  return;
+    my_notes.innerHTML = event.data;
+  }, false);
+}
+
+init();
+</script></body></html>
