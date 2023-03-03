@@ -144,13 +144,19 @@ https://www.kjell.com/se/produkter/ljud-bild/pa-ljud-underhallning/mikrofoner-ti
 ### DSLR
 I use a Panasonic Lumix GH5, with a 12-60mm four thirds lens, 2.8-4.0 aperture.
 
+### Clicker
+A bluetooth remote control often with an USB-dongle, that will press right arrow/left arrow from a distance. With this, you are free to use hand gestures and be seen with an upper body/full body perspective, which looks way nicer than having a webcam filming your face and especially your nose from underneath. You're not pretty in that default webcam closeup angle.
+
 ### Getting DLSR camera video into your laptop
 https://www.elgato.com/sv/cam-link-4k
 All DLSR-to-laptop-solutions that I've tested coming from the camera manufacturer doesn't work reliably (Stuttering, frame drops, etc).
 Use the HDMI output of the camera, and use a dedicated adapter for HDMI to USB 3.0 or USB-C.
 
+### A really high table
+Put your laptop really high up, with the webcam at eye level to give the viewers a natural angle to see you when you're doing your presentation standing up. I use a iron board with a stool on top of it, and then two yoga cork blocks under the laptop to get the correct height, when using the in-built laptop webcam as camera.
+
 ### External webcam
-I would recommend something like Elgato Facecam 1080p60. No microphone.
+I would recommend something like Elgato Facecam 1080p60, which is a webcam without a microphone. You don't need another microphone, since you're using a lavalier mic anyway.
 
 ### External cam by using an external iOS device with a MacOS laptop
 Use "Camo" fro iOS app store if you have an USB-C cable to connect it, or
