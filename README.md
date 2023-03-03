@@ -33,8 +33,7 @@ Sorted from most important to least important:
 --- now your online viewers can hear you properly
 * a $70 clicker, to be able to freely walk around while doing the presentation. Please use a lavalier microphone when you go away from your computer.
 
---- now you can show yourself together with your material as well
-
+--- now you can talk from a distance to the camera, and be free to present with hand gestures and upper body/full body perspective.
 * $150 Video light setup
 
 --- if you'd like to get a better quality video
