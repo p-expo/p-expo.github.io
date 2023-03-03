@@ -40,7 +40,7 @@ Sorted from most important to least important:
 * HTML/CSS
 
 --- if you'd like to personalize the static look of the presentation
-Javascript coding
+* Javascript coding
 
 --- if you'd like to personalize the movements, fading, graphs or 
 * WebGL shader coding
