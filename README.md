@@ -31,6 +31,10 @@ Sorted from most important to least important:
 * a $30 lavalier microphone
 
 --- now your online viewers can hear you properly
+* a $70 clicker, to be able to freely walk around while doing the presentation. Please use a lavalier microphone when you go away from your computer.
+
+--- now you can show yourself together with your material as well
+
 * $150 Video light setup
 
 --- if you'd like to get a better quality video
@@ -87,6 +91,14 @@ For this, I use Open Broadcaster Software "OBS studio". https://obsproject.com
 Through OBS, the "virtual webcam" can stream your presentation to Zoom/Microsoft Teams or similar.
 
 
+### Keyboard shortcuts
+They are listed in the webpage under the presentation:
+
+* Press right arrow to advance to the next slide
+* Press left arrow to advance to go back
+* Press shift+1 to start recording a snippet of your incoming webcam. Press Shift+1 again to stop recording. Press 1 to replay that recorded snippet. Similar recording for keys 1-9. Snippet "8" only replays on one half of the screen. Snippet "9" replays on the other side of the screen.
+* Press Escape to go to the first slide
+
 These software modules are used:
 
 ### ThreeJS https://threejs.org
@@ -107,6 +119,9 @@ I use Reaper to edit audio. Kind of difficult to learn, since it's a full-blown 
 ### mathjs https://mathjs.org
 
 ### snap svg https://snapsvg.io
+
+### cables.gl https://cables.gl/
+For creating 3d visualization effects without coding WebGL shaders or using Three.js. With cables.gl you can create visualization by drag-and-drop of boxes, with for instance hand-tracking, 3d objects, face tracking and geometry shaders.
 
 ### fonts
 There are some fonts included that you can use. I will find their license files soon.
