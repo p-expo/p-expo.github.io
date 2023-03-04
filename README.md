@@ -1,6 +1,5 @@
 
 ### Noisepoint
-Pex Mahoney Tufvesson
 
 These files are for creating powerpoint-like presentations using a text editor.
 The main reason for doing this is that it enables you to freely mix:
@@ -189,4 +188,4 @@ SOFTWARE.
 
 
 ### Anything else?
-Nope. Have a noise night! / Pex
+Nope. Have a noise night! / Pex Mahoney Tufvesson
