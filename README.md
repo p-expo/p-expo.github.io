@@ -6,7 +6,7 @@ The main reason for doing this is that it enables you to freely mix:
 
 Text, images, videos, webcams, external cameras, audio, 3d-models, WebGL shaders, animated charts, javascript, etc.
 
-...and you can use any text-based tools like git for collaborating and version control.
+...and you can use any text-based tools like git for collaboration and version control.
 
 
 ### Where do I run this?
