@@ -1,5 +1,5 @@
 
-### Noisepoint
+### Pexpo
 
 These files are for creating powerpoint-like presentations using a text editor.
 The main reason for doing this is that it enables you to freely mix:
@@ -20,7 +20,7 @@ Sorted from most important to least important:
 * textfile editing
 * generating a self-signed certificate and installing http-server as described in this README file
 
---- everything above this line is enough to create presentation using Noisepoint
+--- everything above this line is enough to create presentation using Pexpo
 * running OBS studio
 
 --- if you want to record or stream your presentation
@@ -65,22 +65,22 @@ This is a linux packet manager software running in userland. With brew, I instal
 
 Add a single row into your /etc/hosts file:
 
-    127.0.0.1 local.noisepoint.se
+    127.0.0.1 local.pexpo.se
 
 You'll need to create your own signed certificate:
 
     brew install mkcert
     mkcert -install
-    mkcert local.noisepoint.se
+    mkcert local.pexpo.se
 
-Go into the /noisepoint folder, and start serving the files:
+Go into the /pexpo folder, and start serving the files:
 
-    cd noisepoint
-    http-server -p 8580 -S -C /Users/pex/phd/js/cert/local.noisepoint.se.pem -K /Users/pex/phd/js/cert/local.noisepoint.se-key.pem
+    cd pexpo
+    http-server -p 8580 -S -C /Users/pex/phd/js/cert/local.pexpo.se.pem -K /Users/pex/phd/js/cert/local.pexpo.se-key.pem
 
 Now open this URL in Chrome:
 
-    https://local.noisepoint.se:8580/
+    https://local.pexpo.se:8580/
 
 
 ### Streaming your presentation webpage to an online audience
@@ -163,7 +163,7 @@ Use "Camo" fro iOS app store if you have an USB-C cable to connect it, or
 
 
 ### License?
-Noisepoint is released using this MIT license:
+Pexpo is released using this MIT license:
 MIT License
 
 Copyright (c) 2023 Pex Tufvesson
