@@ -1,5 +1,5 @@
 
-### Pexpo
+### P-expo
 
 These files are for creating powerpoint-like presentations using a text editor.
 The main reason for doing this is that it enables you to freely mix:
