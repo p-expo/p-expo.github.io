@@ -11,7 +11,7 @@ Text, images, videos, webcams, external cameras, audio, 3d-models, WebGL shaders
 
 ### Where do I run this?
 It's not a program. It's not an app. It's a webpage, and you'll do changes to the sourcecode of that webpage.
-Copy the file "template.html" to a new filename like "230302_presentation.html".
+Copy the file "index.html" to a new filename like "240327_presentation.html".
 You view that file locally in Chrome. You make changes to the file. You reload the webpage in Chrome. Iterate.
 
 
