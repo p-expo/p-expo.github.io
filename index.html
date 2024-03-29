@@ -35,6 +35,10 @@ html, body {margin:0 0; overflow:hidden; background:#000; color:#ccc}
 #cables {position:absolute;left:0px;top:0px;width:960px;height:540px;z-index:9;display:block;overflow:hidden;outline:0}
 #logo1 {position:absolute;left:875px;top:40px;width:960px;height:540px;z-index:999;display:block;overflow:hidden;outline:0;opacity:0.5}
 #logo2 {position:absolute;left:855px;top:130px;width:960px;height:540px;z-index:999;display:block;overflow:hidden;outline:0;opacity:0.5}
+math-field{border:0;background:none}
+math-field:focus-within{outline:2px solid #808080;border-radius:4px;background:rgba(200,200,200,.3);}
+math-field::part(virtual-keyboard-toggle){display:none;}
+math-field::part(menu-toggle){display:none;}
 /* disable on touch highlights of html elements, especially on mobile! */
 * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;}
 </style>
@@ -51,7 +55,20 @@ html, body {margin:0 0; overflow:hidden; background:#000; color:#ccc}
 <script type="text/javascript" src="cables/Point_Cloud_Text/js/ops.js"></script>
 <script type="text/javascript" src="cables/Sine_scroller/js/ops.js"></script>
 <script type="text/javascript" src="cables/vargetset.js"></script>
+<!--<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>-->
 
+<script type="text/javascript">
+window.MathJax = {
+  startup: {
+    ready: () => {
+      MathJax.config.chtml.fontURL = "js/mathjax_fonts";
+      MathJax.config.chtml.font.options.fontURL = "js/mathjax_fonts";
+      MathJax.startup.defaultReady();
+    }
+  }
+}
+</script>
+<script id="MathJax-script" async src="js/tex-mml-chtml.js"></script>
 </head><body>
 <div class="all" id="all">
  <div class="clip" id="clip">
@@ -1229,6 +1246,11 @@ function hello (name, info) {
 
     let html_div = document.getElementById('html_div');
     html_div.appendChild(div_element);
+
+    // Check if we need to typeset any math formulas:
+    if (info.html.indexOf("\\[") !== -1) {
+      MathJax.typeset();
+    }
 
 
 
@@ -2738,6 +2760,13 @@ function show_slide_no (dst_slide, direction) {
     hello("bg", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#ff80ff"});
     hello("b_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">HELLO<br>P-EXPO</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
   }
+
+  if (!--w) { duration=0.1; notes="Displaying LaTeX equations ->";
+    goodbye_all();
+    hello("x_html0", {t:"html", html:`\\[x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}\\]`, x:0.0, y:0.0, width:1.0, height:1.0});
+    hello("x_html1", {t:"html", html:`<div style="font-size:200%;">\\[u(t)=K\\left[e(t)+\\frac{1}{T_i}\\,\\int\\limits^t\\,e(\\tau)\\,d\\tau\\,+ T_d \\frac{de(t) }{ dt}\\right]=P+I+D\\]</div>`, x:0.0, y:-0.5, width:1.0, height:1.0});
+  }
+
 
   if (!--w) { duration=0.1; notes="Here are 9 HTML elements: text, png, transparent png, jpg, transparent svg ->";
     goodbye_all();
