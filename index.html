@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8">
-<title>Noisepoint presentation</title>
+<title>P-expo Presentation</title>
 <style>
 html, body {margin:0 0; overflow:hidden; background:#000; color:#ccc}
 #all {margin:0 0; width:960px; height:540px; border:0px;}
@@ -2736,25 +2736,24 @@ function show_slide_no (dst_slide, direction) {
     goodbye_all_immediately();
     goodbye_cables();
     hello("bg", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#ff80ff"});
-    hello("b_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center">HELLO<br>P-EXPO</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
-//    hello("firsttext", {t:"text", text:["HELLO","P-EXPO"], align:"middle", x:0.0, y:-0.2, line_height:"0.9em", colour:"#ffffff", fontsize:260, font:"Arial", fontweight:800, a:0.0, dest_a:1.0, rot:-10});
+    hello("b_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">HELLO<br>P-EXPO</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
   }
 
-  if (!--w) { duration=0.1; notes="Here are 9 HTML elements ->";
+  if (!--w) { duration=0.1; notes="Here are 9 HTML elements: text, png, transparent png, jpg, transparent svg ->";
     goodbye_all();
     hello("bg0", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#8080ff40"});
-    hello("a_html0", {t:"html", html:`Hello world!`, x:0.0, y:0.0, width:0.33, height:0.33});
+    hello("a_html0", {t:"html", html:`Hello world!`, x:0.0, y:0.0, width:0.33, height:0.33, rot:-10});
     hello("a_html1", {t:"html", html:`<div style="width:100%;height:100%;background:#ffffff80;color:#000000">Hello world bottom left corner!</div>`, x:-0.667, y:-0.667, width:0.33, height:0.33});
     hello("a_html2", {t:"html", html:`<img src="media/image/jpg_image.jpg" height=100%>`, x:-0.667, y:0, width:0.33, height:0.33});
-    hello("a_html3", {t:"html", html:`<img src="media/image/cow_00084.png" height=100%>`, x:-0.667, y:0.667, width:0.33, height:0.33});
-    hello("a_html4", {t:"html", html:`<img src="media/image/transparent_image.png" height=100%>`, x:0, y:0.667, width:0.33, height:0.33});
+    hello("a_html3", {t:"html", html:`<img src="media/image/png_image_square.png" height=100%>`, x:-0.667, y:0.667, width:0.33, height:0.33});
+    hello("a_html4", {t:"html", html:`<img src="media/image/png_image_transparent.png" height=100%>`, x:0, y:0.667, width:0.33, height:0.33});
     hello("a_html5", {t:"html", html:`<img src="media/image/svg_image.svg" width=100%>`, x:0.667, y:0.667, width:0.33, height:0.33});
-    hello("a_html6", {t:"html", html:`<img src="media/image/wide_png_image.png" height=100%>`, x:0.667, y:0.0, width:0.33, height:0.33, a:0.0, dest_a:0.5});
+    hello("a_html6", {t:"html", html:`<img src="media/image/png_image_wide.png" height=100%>`, x:0.667, y:0.0, width:0.33, height:0.33, a:0.0, dest_a:0.5});
     hello("a_html7", {t:"html", html:`<img src="media/image/graph/clear_by_mind_hardware_schematic_simplified.png" height=100%>`, x:0.667, y:-0.667, width:0.33, height:0.33, a:0.0, dest_a:1.0});
     hello("a_html8", {t:"html", html:`<img src="media/image/graph/pexexp1_flow_explanation_simplified3_transparent.png" height=100%>`, x:0.0, y:-0.667, width:0.33, height:0.33, a:0.0, dest_a:1.0});
   }
 
-  if (!--w) { duration=0.1; notes="Showing an external web page ->";
+  if (!--w) { duration=0.1; notes="Showing an external web page<br>https://lu-pze.github.io ->";
     goodbye_all();
     // Beware that at the time of your presentation your
     // internet connection MAY BE REALLY BAD.
@@ -2853,7 +2852,7 @@ function show_slide_no (dst_slide, direction) {
   if (!--w) { duration=2.0; notes="-> Run Monte Carlo sim";
     goodbye("pacman");
     goodbye_all();
-    hello("my_solution713", {t:"png", file:"media/image/png_image2.png", x:0, y:0.6, size:3.0, a:0.0, dest_a:0.8, blur:10, dest_blur:0});
+    hello("my_solution713", {t:"png", file:"media/image/png_image_js_code.png", x:0, y:0.6, size:3.0, a:0.0, dest_a:0.8, blur:10, dest_blur:0});
     try {
       monte_slider_div.parentNode.removeChild(monte_slider_div);
     } catch {}
@@ -3240,27 +3239,27 @@ Seventeen, and that's the last
   if (!--w) { duration=1.0; notes="PNG sizes";
     goodbye_all();
     hello("png1", {t:"png", file:"media/image/png_image.png", size:0.5, x:0.0, y:0.0,   a:0.0, dest_a:1.0});
-    hello("png2", {t:"png", file:"media/image/wide_png_image.png", size:0.5, x:-0.5, y:0.0,  a:0.0, dest_a:1.0});
-    hello("png3", {t:"png", file:"media/image/wide_png_image.png", size:0.5, x:0.5, y:0.0,   a:0.0, dest_a:1.0});
+    hello("png2", {t:"png", file:"media/image/png_image_wide.png", size:0.5, x:-0.5, y:0.0,  a:0.0, dest_a:1.0});
+    hello("png3", {t:"png", file:"media/image/png_image_wide.png", size:0.5, x:0.5, y:0.0,   a:0.0, dest_a:1.0});
     hello("png4", {t:"png", file:"media/image/png_image.png", size:0.5, x:-0.5, y:-0.5, a:0.0, dest_a:1.0});
-    hello("png5", {t:"png", file:"media/image/wide_png_image.png", size:0.5, x:0.5, y:0.5,   a:0.0, dest_a:1.0});
+    hello("png5", {t:"png", file:"media/image/png_image_wide.png", size:0.5, x:0.5, y:0.5,   a:0.0, dest_a:1.0});
     hello("png6", {t:"png", file:"media/image/png_image.png", size:0.5, x:-0.5, y:0.5,  a:0.0, dest_a:1.0});
-    hello("png7", {t:"png", file:"media/image/png_image2.png", size:0.5, x:0.5, y:-0.5,  a:0.0, dest_a:1.0});
-    hello("png8", {t:"png", file:"media/image/png_image2.png", size:0.5, x:0.0, y:-0.5,  a:0.0, dest_a:1.0});
+    hello("png7", {t:"png", file:"media/image/png_image_js_code.png", size:0.5, x:0.5, y:-0.5,  a:0.0, dest_a:1.0});
+    hello("png8", {t:"png", file:"media/image/png_image_js_code.png", size:0.5, x:0.0, y:-0.5,  a:0.0, dest_a:1.0});
     hello("png9", {t:"png", file:"media/image/png_image.png", size:0.5, x:0.0, y:0.5,   a:0.0, dest_a:1.0});
   }  // init. This is always slide number 0. The rest are auto-incrementing.
 
   if (!--w) { duration=1.0; notes="SVG coordinates";
     goodbye_all();
     hello("svg1", {t:"png", file:"media/image/svg_image.svg", size:0.5, x:0.0, y:0.0,   a:0.0, dest_a:1.0});
-    hello("svg2", {t:"png", file:"media/image/svg_image2.svg",  size:0.5, x:-1.0, y:0.0,  a:0.0, dest_a:1.0});
-    hello("svg3", {t:"png", file:"media/image/svg_image2.svg", size:0.5, x:1.0, y:0.0,   a:0.0, dest_a:1.0});
+    hello("svg2", {t:"png", file:"media/image/svg_image.svg",  size:0.5, x:-1.0, y:0.0,  a:0.0, dest_a:1.0});
+    hello("svg3", {t:"png", file:"media/image/svg_image.svg", size:0.5, x:1.0, y:0.0,   a:0.0, dest_a:1.0});
     hello("svg4", {t:"png", file:"media/image/svg_image.svg",  size:0.5, x:-1.0, y:-1.0, a:0.0, dest_a:1.0});
     hello("svg5", {t:"png", file:"media/image/svg_image.svg", size:0.5, x:1.0, y:1.0,   a:0.0, dest_a:1.0});
     hello("svg6", {t:"png", file:"media/image/svg_image.svg",  size:0.5, x:-1.0, y:1.0,  a:0.0, dest_a:1.0});
     hello("svg7", {t:"png", file:"media/image/svg_image.svg", size:0.5, x:1.0, y:-1.0,  a:0.0, dest_a:1.0});
-    hello("svg8", {t:"png", file:"media/image/svg_image2.svg",  size:0.5, x:0.0, y:-1.0,  a:0.0, dest_a:1.0});
-    hello("svg9", {t:"png", file:"media/image/svg_image2.svg", size:0.5, x:0.0, y:1.0,   a:0.0, dest_a:1.0});
+    hello("svg8", {t:"png", file:"media/image/svg_image.svg",  size:0.5, x:0.0, y:-1.0,  a:0.0, dest_a:1.0});
+    hello("svg9", {t:"png", file:"media/image/svg_image.svg", size:0.5, x:0.0, y:1.0,   a:0.0, dest_a:1.0});
   }  // init. This is always slide number 0. The rest are auto-incrementing.
 
   if (!--w) { duration=1.0; notes="PNG coordinates";
