@@ -9,6 +9,7 @@ html, body {margin:0 0; overflow:hidden; background:#000; color:#ccc}
 #webcam_element {width: 960px; height: 540px; background-color: #000; transform: scaleX(-1); z-index:3}
 #audiencecam_element {position: absolute; top:0px; left:350px;width: 610px; height: 343.125px; background-color: #666; transform: scaleX(-1); z-index:4; display: none}
 #video_div {display: block; position: absolute; overflow: hidden; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; z-index: 5}
+#html_div {display: block; position: absolute; overflow: hidden; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; z-index: 5}
 #snippet_element {display: inline-block; position: absolute; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; transform: scaleX(-1); z-index: 3.5}
 #replay_element {display: inline-block; position: absolute; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; transform: scaleX(-1); z-index: 3.1}
 #notes {width: 960px; height: 250px; line-height: 250px; background-color: #000000; font-size: 300%; z-index: 19}
@@ -59,6 +60,7 @@ html, body {margin:0 0; overflow:hidden; background:#000; color:#ccc}
   <video id="replay_element" autoplay playsinline></video>
   <video id="snippet_element" autoplay playsinline></video>
   <video id="audiencecam_element" autoplay playsinline muted></video>
+  <div id="html_div"></div>
   <div id="video_div"></div>
   <div id="chart_holder"><center><canvas id="chart-area" /></center></div>
   <svg id="svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMinYMin meet"></svg>
@@ -251,6 +253,8 @@ import {preloadFont} from "./js/troika-three-text.esm.js";
 // Create the dynamic SVG image:
 let s = Snap("#svg");
 let logo = null;
+let default_opacity_fade_in_time;
+let default_opacity_fade_out_time;
 
 // Global variables, how could we live without them? ----------------------------------------------------------------------------
 
@@ -548,9 +552,6 @@ function webcam_init () {
   });
   navigator.mediaDevices.enumerateDevices().then(add_devices_to_selector);
   navigator.mediaDevices.enumerateDevices().then(add_devices_to_audiencecam_selector);
-
-  // Start the default webcam
-  //start_default_webcam();
 }
 
 //-----------------------------------------------------------------------------
@@ -574,6 +575,7 @@ function animate (newtime) {
   then = newtime;
 //  console.log("time_between_frames = " + time_between_frames);
 
+  if (current_slide==0) goto_next();
   if (auto_progress == true) {
     let old_duration = duration;
     // time_between_frames might be NaN at start
@@ -1147,7 +1149,95 @@ function hello (name, info) {
   if (info.dest_rot == null) info.dest_rot = info.rot;
   if (info.dest_blur == null) info.dest_blur = info.blur;
   if (info.line_height == null) info.line_height = "1.2em";
-  if (info.t == "text") {
+
+
+
+
+
+
+
+
+  if (info.t == "html") {
+    // Make a new html element, and add to div:
+    let div_element = document.createElement("div");
+    div_element.id=name;
+    div_element.style.position = "absolute";
+    div_element.style.overflow = "hidden";
+    if (info.border != null) {
+      div_element.style.border=info.border;
+    }
+    if (info.box_shadow != null) {
+      div_element.style.boxShadow=info.box_shadow;
+    }
+
+    div_element.innerHTML=info.html;
+
+    // Making sure that html content gets centered:
+    div_element.style.display="flex";
+    div_element.style.alignItems="center"; // vertically
+    div_element.style.justifyContent="center"; // horizontally
+
+    let css_width = current_screen_width;
+    if (info.width != null) {
+      css_width = info.width * current_screen_width;
+      div_element.style.width = css_width + "px";
+    } else {
+      div_element.style.width = "auto";
+    }
+    let css_height = current_screen_height;
+    if (info.height != null) {
+      css_height = info.height * current_screen_height;
+      div_element.style.height = css_height + "px";
+    } else {
+      div_element.style.height = "auto";
+    }
+
+    let css_offset_y = 0;
+    let css_offset_x = 0;
+    if (info.y != null) {
+      css_offset_y += -css_height/2 + current_screen_height/2 + info.y * current_screen_height / 2;
+    }
+    if (info.x != null) {
+      css_offset_x += -css_width/2 + current_screen_width/2 + info.x * current_screen_width / 2;
+    }
+    // x, y
+    div_element.style.transform = "translate(" + css_offset_x + "px, " + css_offset_y + "px)";
+    if (info.border_radius != null) {
+      div_element.style.borderRadius = info.border_radius;
+    }
+
+    // This is the default fade-in:
+    if (info.a == undefined) {
+      info.a=0.0;
+      info.dest_a=1.0;
+    }
+
+    let div_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {div_element.style.opacity = value;} catch {};}, 1000*default_opacity_fade_in_time, mina.linear );
+    info.a = info.dest_a;
+    if ((info.dest_y != info.y) || (info.dest_x != info.x)) {
+      let css_offset_y_dest = -css_height/2 + current_screen_height/2 + info.dest_y * current_screen_height / 2;
+      let css_offset_x_dest = -css_width/2 + current_screen_width/2 + info.dest_x * current_screen_width / 2;
+      // x, y
+      // Mina easing algorithms: https://codepen.io/mike-tempest/pen/myvbrw
+      let my_video2_animate = Snap.animate( 0.0, 1.0, function(value) {let x=css_offset_x * (1.0-value) + css_offset_x_dest * value; let y=css_offset_y * (1.0-value) + css_offset_y_dest * value; try {div_element.style.transform = "translate(" + x + "px, " + y + "px)";} catch {};}, 12000);
+    }
+
+    let html_div = document.getElementById('html_div');
+    html_div.appendChild(div_element);
+
+
+
+
+
+
+
+
+
+
+
+
+
+  } else if (info.t == "text") {
     if (a[name] == null) {
       let svg_x = (info.x + 1.0) * 1920 / 2;
       let svg_y = (info.y + 1.0) * 1080 / 2;
@@ -1454,7 +1544,7 @@ function goodbye (name) {
   console.log("goodbye(" + name + ")");
   //info = infos[name];
   if ((infos[name] != null) && (infos[name].t == "video")) {
-    let video_animate = Snap.animate( infos[name].a, 0.0, function(value) {try {let v = document.getElementById(name); v.style.opacity = value;} catch {};}, 1000, mina.linear, function() {try{let v = document.getElementById(name); v.pause();v.src = "";v.load(); v.parentNode.removeChild(v)} catch{}; try {infos[name].remove();} catch {}; delete infos[name]; } );
+    let video_animate = Snap.animate( infos[name].a, 0.0, function(value) {try {let v = document.getElementById(name); v.style.opacity = value;} catch {};}, 1000*default_opacity_fade_out_time, mina.linear, function() {try{let v = document.getElementById(name); v.pause();v.src = "";v.load(); v.parentNode.removeChild(v)} catch{}; try {infos[name].remove();} catch {}; delete infos[name]; } );
     try {
       videos_to_loop[name];
       videos_to_loop_at[name];
@@ -1463,6 +1553,8 @@ function goodbye (name) {
       videos_to_pause[name];
       videos_to_pause_at[name];
     } catch {}
+  } else if ((infos[name] != null) && (infos[name].t == "html")) {
+    let html_animate = Snap.animate( infos[name].a, 0.0, function(value) {try {let v = document.getElementById(name); v.style.opacity = value; console.log(value);} catch {};}, 1000*default_opacity_fade_out_time, mina.linear, function() {try{let v = document.getElementById(name); v.parentNode.removeChild(v)} catch{}; try {infos[name].remove();} catch {}; delete infos[name]; console.log("del"); } );
   } else if ((infos[name] != null) && (infos[name].t == "chart")) {
     let my_chart_animate = Snap.animate( infos[name].a, 0.0, function(value) {try {chart_holder.style.opacity = value;} catch {};}, 500, mina.linear, function() {try{window.my_chart.destroy(); console.log("fading chart done");} catch{}; } );
   } else if ((infos[name] != null) && (infos[name].t == "3d")) {
@@ -2588,7 +2680,6 @@ function init () {
 // rx: rotation in radians
 // ry: rotation in radians
 
-
 // When this function returns true, abort any kind of iterative jump.
 function show_slide_no (dst_slide, direction) {
   let w = dst_slide;
@@ -2610,16 +2701,53 @@ function show_slide_no (dst_slide, direction) {
 
 // #§# Start of slides:
 
+  // 
+  // Basic configuration of p-expo is done here:
+  // 
+  if (!--w) { duration=0.0; notes="";
+    // This is where you initialize elements that you want as default:
+    //start_default_webcam(); // <- Remove // if you want the webcam on at start
+    auto_progress = false; // Set to true if you want auto progress in your project
+    default_opacity_fade_in_time = 1.0; // Default time it takes for elements to appear
+    default_opacity_fade_out_time = 0.5; // Default time it takes for elements to disappear
+  }
+
   if (!--w) { duration=0.1; notes="Init ->";
     goodbye_videos_immediately();
     goodbye_all_immediately();
     goodbye_cables();
-  }  // init. This is always slide number 0. The rest are auto-incrementing.
+    hello("bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#ff80ff40"});
+    hello("html", {t:"html", html:`Hello world!`, x:0.0, y:0.0, width:1.0, height:1.0});
+    hello("html1", {t:"html", html:`Hello world L!`, x:-0.5, y:0.0, width:1.0, height:1.0});
+    hello("html2", {t:"html", html:`Hello world D!`, x:0.0, y:0.5, width:1.0, height:1.0});
+    hello("html3", {t:"html", html:`Hello world UL!`, x:-0.5, y:-0.5, width:1.0, height:1.0});
+    hello("html4", {t:"html", html:`Hello world top left corner!`, x:-1.0, y:-1.0, width:1.0, height:1.0});
+    hello("html5", {t:"html", html:`<div style="width:100%;height:100%;background:#20502080">Hello world bottom left corner!</div>`, x:-0.75, y:0.75, width:0.25, height:0.25});
+  }
+
+  if (!--w) { duration=0.1; notes="Many html elements ->";
+    goodbye_all();
+    hello("bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#ff80ff40"});
+    let nof_cols = 4;
+    let nof_rows = 4;
+    let element_no = 0;
+    for (let row = 0; row < nof_rows; row++) {
+      for (let col = 0; col < nof_cols; col++) {
+        let v_height = 1.0/nof_rows;
+        let v_width = 1.0/nof_cols;
+        let v_x = (0.5 + col) * v_width * 2 - 1.0;
+        let v_y = (0.5 + row) * v_height * 2 - 1.0;
+        hello("h"+element_no, {t:"html", html:`<div style="background:#20802080">Hello world!<br>Yet</div>`, x:v_x, y:v_y, width:v_width, height:v_height, a:0.0, dest_a:1.0});
+        element_no++;
+      }
+    }
+  }
 
 
   if (!--w) { duration=113.0; notes="-> pacman eating";
+    goodbye_all();
     hello("bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#ff80ff"});
-    hello("firsttext", {t:"text", text:["HELLO","NOISEPOINT"], align:"middle", x:0.0, y:-0.2, line_height:"0.9em", colour:"#ffffff", fontsize:260, font:"Arial", fontweight:800, a:0.0, dest_a:1.0, rot:-10});
+    hello("firsttext", {t:"text", text:["HELLO","P-EXPO"], align:"middle", x:0.0, y:-0.2, line_height:"0.9em", colour:"#ffffff", fontsize:260, font:"Arial", fontweight:800, a:0.0, dest_a:1.0, rot:-10});
   }  //
 
 
@@ -2664,13 +2792,9 @@ function show_slide_no (dst_slide, direction) {
     goodbye("my_signal_path");
   }  // Pacman eating
 
-  if (!--w) { duration=0.1; notes="";
-    goodbye("pacman");
-  }  // 
-
-
 // MonteCarlo sim
   if (!--w) { duration=2.0; notes="-> Run Monte Carlo sim";
+    goodbye("pacman");
     goodbye_all();
     hello("my_solution713", {t:"png", file:"media/image/png_image2.png", x:0, y:0.6, size:3.0, a:0.0, dest_a:0.8, blur:10, dest_blur:0});
     try {
