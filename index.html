@@ -1179,14 +1179,14 @@ function hello (name, info) {
 
     let css_width = current_screen_width;
     if (info.width != null) {
-      css_width = info.width * current_screen_width;
+      css_width = info.width/2 * current_screen_width;
       div_element.style.width = css_width + "px";
     } else {
       div_element.style.width = "auto";
     }
     let css_height = current_screen_height;
     if (info.height != null) {
-      css_height = info.height * current_screen_height;
+      css_height = info.height/2 * current_screen_height;
       div_element.style.height = css_height + "px";
     } else {
       div_element.style.height = "auto";
@@ -1283,12 +1283,13 @@ function hello (name, info) {
       //Snap.animate(from, to, setter, duration, [easing], [callback]) 
       Snap.animate( info.blur, info.dest_blur, function(value) {try {a[name+"_filter"].node.firstChild.attributes[0].value = value + ',' + value;} catch {};}, 1500, mina.linear );
     }
+
   } else if (info.t == "rect") {
     if (a[name] == null) {
       let svg_x = (info.x + 1.0) * current_screen_width / 960 * 1920 / 2;
       let svg_y = (info.y + 1.0) * current_screen_height / 540 * 1080 / 2;
-      let svg_width = info.width * current_screen_width / 960 * 1920;
-      let svg_height = info.height * current_screen_height / 540 * 1080;
+      let svg_width = info.width/2 * current_screen_width / 960 * 1920;
+      let svg_height = info.height/2 * current_screen_height / 540 * 1080;
       let svg_corner_radius = info.corner_radius * current_screen_height / 540 * 1080 / 2;
       a[name] = s.rect(svg_x - svg_width/2, svg_y - svg_height/2, svg_width, svg_height, svg_corner_radius, svg_corner_radius);
       a[name].attr({opacity: info.a});
@@ -1313,6 +1314,7 @@ function hello (name, info) {
     if (info.dest_x != info.x) {
       a[name].animate({ x: info.dest_x }, 12000);
     }
+
   } else if (info.t == "png") {
     // Also happen to handle svg file very well:
     if (a[name] == null) {
@@ -2698,6 +2700,9 @@ function show_slide_no (dst_slide, direction) {
 // x:-1.0 to 1.0     the start coordinate is the lower left corner of the text
 // y:-1.0 to 1.0
 
+// width:  2.0 is the whole screen width
+// height: 2.0 is the whole screen height
+
 
 // #§# Start of slides:
 
@@ -2716,28 +2721,28 @@ function show_slide_no (dst_slide, direction) {
     goodbye_videos_immediately();
     goodbye_all_immediately();
     goodbye_cables();
-    hello("bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#ff80ff40"});
-    hello("html", {t:"html", html:`Hello world!`, x:0.0, y:0.0, width:1.0, height:1.0});
-    hello("html1", {t:"html", html:`Hello world L!`, x:-0.5, y:0.0, width:1.0, height:1.0});
-    hello("html2", {t:"html", html:`Hello world D!`, x:0.0, y:0.5, width:1.0, height:1.0});
-    hello("html3", {t:"html", html:`Hello world UL!`, x:-0.5, y:-0.5, width:1.0, height:1.0});
-    hello("html4", {t:"html", html:`Hello world top left corner!`, x:-1.0, y:-1.0, width:1.0, height:1.0});
+    hello("bg", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#ff80ff40"});
+    hello("html", {t:"html", html:`Hello world!`, x:0.0, y:0.0, width:2.0, height:2.0});
+    hello("html1", {t:"html", html:`Hello world L!`, x:-0.5, y:0.0, width:2.0, height:2.0});
+    hello("html2", {t:"html", html:`Hello world D!`, x:0.0, y:0.5, width:2.0, height:2.0});
+    hello("html3", {t:"html", html:`Hello world UL!`, x:-0.5, y:-0.5, width:2.0, height:2.0});
+    hello("html4", {t:"html", html:`Hello world top left corner!`, x:-1.0, y:-1.0, width:2.0, height:2.0});
     hello("html5", {t:"html", html:`<div style="width:100%;height:100%;background:#20502080">Hello world bottom left corner!</div>`, x:-0.75, y:0.75, width:0.25, height:0.25});
   }
 
   if (!--w) { duration=0.1; notes="Many html elements ->";
     goodbye_all();
-    hello("bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#ff80ff40"});
     let nof_cols = 4;
     let nof_rows = 4;
+    let height = 2.0/nof_rows;
+    let width = 2.0/nof_cols;
     let element_no = 0;
     for (let row = 0; row < nof_rows; row++) {
       for (let col = 0; col < nof_cols; col++) {
-        let v_height = 1.0/nof_rows;
-        let v_width = 1.0/nof_cols;
-        let v_x = (0.5 + col) * v_width * 2 - 1.0;
-        let v_y = (0.5 + row) * v_height * 2 - 1.0;
-        hello("h"+element_no, {t:"html", html:`<div style="background:#20802080">Hello world!<br>Yet</div>`, x:v_x, y:v_y, width:v_width, height:v_height, a:0.0, dest_a:1.0});
+        let x = width*(col+0.5) - 1.0;
+        let y = height*(row+0.5) - 1.0;
+//        hello("h"+element_no, {t:"html", html:`<div style="background:#20802080">Hello world!<br>Yet</div>`, x:x, y:y, width:width, height:height, a:0.0, dest_a:1.0});
+        if (element_no != 10) hello("h"+element_no, {t:"html", html:`<img src="media/image/jpg_image.jpg" height=100%>`, x:x, y:y, width:width, height:height, a:0.0, dest_a:1.0});
         element_no++;
       }
     }
@@ -2746,7 +2751,7 @@ function show_slide_no (dst_slide, direction) {
 
   if (!--w) { duration=113.0; notes="-> pacman eating";
     goodbye_all();
-    hello("bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#ff80ff"});
+    hello("bg", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#ff80ff"});
     hello("firsttext", {t:"text", text:["HELLO","P-EXPO"], align:"middle", x:0.0, y:-0.2, line_height:"0.9em", colour:"#ffffff", fontsize:260, font:"Arial", fontweight:800, a:0.0, dest_a:1.0, rot:-10});
   }  //
 
