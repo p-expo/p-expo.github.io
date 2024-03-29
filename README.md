@@ -8,12 +8,12 @@ Text, images, videos, webcams, external cameras, audio, 3d-models, WebGL shaders
 
 ...and you can use any text-based tools like git for collaboration and version control.
 
+See P-expo in action here: https://p-expo.github.io
 
 ### Where do I run this?
 It's not a program. It's not an app. It's a webpage, and you'll do changes to the sourcecode of that webpage.
 Copy the file "index.html" to a new filename like "240327_presentation.html".
 You view that file locally in Chrome. You make changes to the file. You reload the webpage in Chrome. Iterate.
-
 
 ### What skills do I need to use this?
 Sorted from most important to least important:
