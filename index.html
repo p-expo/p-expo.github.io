@@ -56,7 +56,6 @@ math-field::part(menu-toggle){display:none;}
 <script type="text/javascript" src="cables/Sine_scroller/js/ops.js"></script>
 <script type="text/javascript" src="cables/vargetset.js"></script>
 <!--<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>-->
-
 <script type="text/javascript">
 window.MathJax = {
   startup: {
@@ -69,6 +68,8 @@ window.MathJax = {
 }
 </script>
 <script id="MathJax-script" async src="js/tex-mml-chtml.js"></script>
+<script src="js/showdown.min.js"></script>
+
 </head><body>
 <div class="all" id="all">
  <div class="clip" id="clip">
@@ -1167,12 +1168,12 @@ function hello (name, info) {
   if (info.dest_blur == null) info.dest_blur = info.blur;
   if (info.line_height == null) info.line_height = "1.2em";
 
-
-
-
-
-
-
+  if (info.t == "markdown") {
+    // Convert the markdown into html using showdown.js
+    var converter = new showdown.Converter();
+    info.html = converter.makeHtml(info.markdown);
+    info.t="html";
+  }
 
   if (info.t == "html") {
     // Make a new html element, and add to div:
@@ -1187,10 +1188,13 @@ function hello (name, info) {
       div_element.style.boxShadow=info.box_shadow;
     }
 
+    // We only want the element itself centered, so wrap it into an inner div:
+    //div_element.innerHTML='<div>' + info.html + '</div>';
     div_element.innerHTML=info.html;
 
     // Making sure that html content gets centered:
     div_element.style.display="flex";
+//    div_element.style.flexDirection="row"; /* or row-reverse, column, or column-reverse */
     div_element.style.alignItems="center"; // vertically
     div_element.style.justifyContent="center"; // horizontally
 
@@ -2757,7 +2761,7 @@ function show_slide_no (dst_slide, direction) {
     default_opacity_fade_out_time = 0.5; // Default time it takes for elements to disappear
   }
 
-  if (!--w) { duration=0.1; notes="Hello -> Very brief introduction";
+  if (!--w) { duration=0.1; notes="Hello -> Brief introduction";
     goodbye_videos_immediately();
     goodbye_all_immediately();
     goodbye_cables();
@@ -2780,7 +2784,7 @@ function show_slide_no (dst_slide, direction) {
     goodbye_all();
     hello("bg3", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#404020e0"});
     hello("c_html", {t:"html", html:`<div style="font-size:170%;text-align:center">
-          Make your own presentation from the template at<br>
+          Make your own presentation from this template at<br>
           https://github.com/p-expo/p-expo.github.io<br><br>
           The next slide will start your webcam.</div>`, x:0.25, y:0.0, width:0.7, height:1.0});
     hello("d_html", {t:"html", html:`<img src="media/image/png_image_square.png" height=100% style="border-radius:50px">`, x:-0.65, y:0.0, width:0.5, height:0.5});
@@ -2796,9 +2800,51 @@ function show_slide_no (dst_slide, direction) {
           </div>`, x:0.0, y:0.0, width:0.65, height:1.0});
   }
 
+
+
+  if (!--w) { duration=0.1; notes="Text written using html ->";
+    goodbye_all();
+    hello("bg6", {t:"rect", x:0.0, y:0.0, width:0.9, height:0.9, colour:"#00000080", corner_radius:0.2});
+    hello("a_html", {t:"html", html:`
+<h1>Text formatting</h1>
+<p>You need to learn <em>some</em> way of formatting <strong>text</strong>. This is html.</p>
+<h2>Sub header</h2>
+<p>In P-expo, you can use html for anything:</p>
+<ul>
+<li>lists</li>
+<li><i>emphasis</i></li>
+</ul>
+<p><img src="media/image/jpg_image.jpg" alt="Vokalas" title="Vokalas" width="100px"></p>
+          `, x:0.0, y:0.0, width:0.9, height:0.9});
+  }
+
+
+  if (!--w) { duration=0.1; notes="Text written using markdown ->";
+    goodbye_all();
+    hello("bg7", {t:"rect", x:0.0, y:0.0, width:0.9, height:0.9, colour:"#00000080", corner_radius:0.2});
+    hello("a_md", {t:"markdown", markdown:`
+# Text formatting
+
+You need to learn *some* way of formatting **text**. This is markdown.
+
+## Sub header
+
+In P-expo, you can use markdown for:
+*   lists
+*   _emphasis_
+
+<img src="media/image/jpg_image.jpg" width="100px">
+          `, x:0.0, y:0.0, width:0.9, height:0.9});
+    // As the markdown syntax don't standardize how to scale images, we are forced
+    // to fall back to the html syntax to scale it
+    // Adding it with the native markdown syntax
+    //     ![alt text](/path/to/img.jpg "Title")
+    // works as long as you don't need to set the size of the image.
+  }
+
   if (!--w) { duration=0.1; notes="Displaying LaTeX equations ->";
     goodbye_all();
-    hello("bg5", {t:"rect", x:0.0, y:-0.6, width:0.9, height:0.35, colour:"#00000080", corner_radius:0.2});
+    hello("bg8", {t:"rect", x:0.0, y:-0.6, width:0.9, height:0.35, colour:"#00000080", corner_radius:0.2});
     hello("x_html0", {t:"html", html:`<div style="font-size:400%;">\\[x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}\\]</div>`, x:0.0, y:-0.6, width:0.9, height:0.5});
   }
 
