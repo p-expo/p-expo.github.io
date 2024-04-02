@@ -1171,7 +1171,7 @@ function hello (name, info) {
   if (info.t == "markdown") {
     // Convert the markdown into html using showdown.js
     var converter = new showdown.Converter();
-    info.html = converter.makeHtml(info.markdown);
+    info.html = "<div>" + converter.makeHtml(info.markdown) + "</div>";
     info.t="html";
   }
 
@@ -2804,8 +2804,9 @@ function show_slide_no (dst_slide, direction) {
 
   if (!--w) { duration=0.1; notes="Text written using html ->";
     goodbye_all();
-    hello("bg6", {t:"rect", x:0.0, y:0.0, width:0.9, height:0.9, colour:"#00000080", corner_radius:0.2});
+    hello("bg6", {t:"rect", x:-0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
     hello("a_html", {t:"html", html:`
+<div>
 <h1>Text formatting</h1>
 <p>You need to learn <em>some</em> way of formatting <strong>text</strong>. This is html.</p>
 <h2>Sub header</h2>
@@ -2814,14 +2815,14 @@ function show_slide_no (dst_slide, direction) {
 <li>lists</li>
 <li><i>emphasis</i></li>
 </ul>
-<p><img src="media/image/jpg_image.jpg" alt="Vokalas" title="Vokalas" width="100px"></p>
-          `, x:0.0, y:0.0, width:0.9, height:0.9});
+<p><img src="media/image/jpg_image.jpg" alt="Vokalas" title="Vokalas" width="100px"></p></div>
+          `, x:-0.4, y:0.0, width:0.4, height:0.9});
   }
 
 
   if (!--w) { duration=0.1; notes="Text written using markdown ->";
     goodbye_all();
-    hello("bg7", {t:"rect", x:0.0, y:0.0, width:0.9, height:0.9, colour:"#00000080", corner_radius:0.2});
+    hello("bg7", {t:"rect", x:-0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
     hello("a_md", {t:"markdown", markdown:`
 # Text formatting
 
@@ -2834,7 +2835,7 @@ In P-expo, you can use markdown for:
 *   _emphasis_
 
 <img src="media/image/jpg_image.jpg" width="100px">
-          `, x:0.0, y:0.0, width:0.9, height:0.9});
+          `, x:-0.4, y:0.0, width:0.4, height:0.9});
     // As the markdown syntax don't standardize how to scale images, we are forced
     // to fall back to the html syntax to scale it
     // Adding it with the native markdown syntax
