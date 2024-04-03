@@ -2817,7 +2817,7 @@ function show_slide_no (dst_slide, direction) {
   if (!--w) { duration=0.1; notes="Text written using html ->";
     goodbye_all();
     hello("bg6", {t:"rect", x:-0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
-    hello("d_html", {t:"html", html:`
+    hello("f_html", {t:"html", html:`
 <div>
 <h1>Text formatting</h1>
 <p>You need to learn <i>some</i> way of formatting <b>text</b>. This is html.</p>
@@ -2834,17 +2834,12 @@ function show_slide_no (dst_slide, direction) {
 
 
   if (!--w) { duration=1.0; notes="Dialog test 0";
-    goodbye_videos_immediately();
-    goodbye_all();
-    goodbye_cables();
-    init_dialog ("An interesting\nfact or two", 0.0, 0.0, 0.20, 0);
-  }  //
-  if (!--w) { duration=1.0; notes="Dialog fade";
-    fade_dialog_glpos(0,0);
+    init_dialog ("Grab the attention\nwith dialogs", 0.0, 0.0, 0.20, 0);
   }  //
 
 
   if (!--w) { duration=0.1; notes="Text written using markdown ->";
+    fade_dialog_glpos(0,0);
     goodbye_all();
     hello("bg7", {t:"rect", x:0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
     hello("d_md", {t:"markdown", markdown:`
@@ -2867,17 +2862,13 @@ In P-expo, you can use markdown for:
     // works as long as you don't need to set the size of the image.
   }
 
-
   if (!--w) { duration=1.0; notes="Dialog test 1";
-    goodbye_all();
     init_dialog("Everything\nis going to be\nall right", 0.0, 0.0, 0.20, 1);
-  }  //
-  if (!--w) { duration=1.0; notes="Dialog fade 1";
-    fade_dialog_glpos(0.0,0);
   }  //
 
 
   if (!--w) { duration=0.1; notes="A few examples of displaying text, png, transparent png, jpg, transparent svg ->";
+    fade_dialog_glpos(0.0,0);
     goodbye_all();
     hello("bg0", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#8080ff40"});
     hello("a_html1", {t:"html", html:`<div style="width:100%;height:100%;background:#ffffff80;color:#000000">Hello world bottom left corner!</div>`, x:-0.667, y:-0.667, width:0.33, height:0.33});
@@ -2906,15 +2897,12 @@ In P-expo, you can use markdown for:
 
 
   if (!--w) { duration=1.0; notes="Dialog test 2";
-    goodbye_all();
     init_dialog("[1992]\n\nHaier, R.J., Siegel, B.V., Jr.,\nMacLachlan, A., Soderling,\nE., Lottenberg, S. & Buchsbaum, M. S:\n\nRegional glucose metabolic changes\nafter learning a complex\nvisuospatial/motor task:\na positron emission tomographic study.\n\nBrain Research, 570, 134—143.", 0.0, 0.0, 0.09, 2);
-  }  //
-  if (!--w) { duration=1.0; notes="Dialog fade 2";
-    fade_dialog_glpos(0,1.0);
   }  //
 
 
   if (!--w) { duration=0.1; notes="Displaying LaTeX equations ->";
+    fade_dialog_glpos(0,1.0);
     goodbye_all();
     hello("bg8", {t:"rect", x:0.2, y:-0.6, width:0.75, height:0.35, colour:"#00000080", corner_radius:0.2});
     hello("my_topic", {t:"text", text:"The solution", align:"middle", x:-0.94, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0, rot:-90});
@@ -3069,7 +3057,7 @@ In P-expo, you can use markdown for:
     Chart.defaults.animation.duration = 1000;
   }
 
-  if (!--w) { duration=1.0; notes="End chart simulation -> showing video";
+  if (!--w) { duration=1.0; notes="Ending chart simulation ->";
     goodbye_all();
     try {
       monte_slider_div.parentNode.removeChild(monte_slider_div);
@@ -3106,14 +3094,14 @@ In P-expo, you can use markdown for:
 // Make a video loop at a certain time:
   if (!--w) { duration=1.0; notes="Video that loops ->";
     goodbye_all();
-    hello("video1", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
+    hello("video1", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
   }  //
   if (!--w) { duration=3.0; notes="Video animate position + width";
     Snap.animate( 1.0, 0.25, function(value) {try {let v=document.getElementById('video1'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
   }  //
 
   if (!--w) { duration=1.0; notes="Video2";
-    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
+    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
   }  //
   if (!--w) { duration=3.0; notes="Video animate corners";
     Snap.animate( 1.0, 0.45, function(value) {try {let v=document.getElementById('video2'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
@@ -3159,28 +3147,30 @@ In P-expo, you can use markdown for:
   if (!--w) { duration=1.0; notes="";
     goodbye_all();
 //23456789012345678901234567890123456789
-    let big_fat_table = `
- SOME PROBLEMS WE'LL NEED TO SOLVE
-          BEFORE WE CAN GO FULL CYBORG:
+    let big_fat_table = `By the sea, beneath the sky so wide,
+Students gather, their dreams abide.
+In the salty breeze, their minds unfurl,
+Yearning for the pearls of the world.
  
-Degeneration of electrodes in the body.
+The waves whisper of knowledge untold,
+While under the sun's warm hold.
+But in their hearts, a longing grows,
+For lectures, what the future bestows.
  
-Heat dissipation inside brain max 20mW.
+They gaze the horizon, lost in thought,
+Wish for lessons that can't be bought.
+Oh, to be back in those hallowed halls,
+Where learning echoes through the walls.
  
-Understanding brain signals better.
+Each ripple, each tide, a gentle plea,
+To the classroom, to feel truly free.
+For in education, they find their light,
+Guiding them through the night.
  
-Wires into the brain make damage,
-  because of different density.
- 
-Risks of infections.
- 
-Brain stimulation needs to train humans
-  to understand the new stimuli.
- 
-Charging batteries without heating up.
- 
-Cultural issues: Why would I trust
- any company with my innermost secrets?`;
+So let them dream by the gentle roar,
+equations solved & knowledge to explore.
+For soon they return where they belong,
+the classroom, where dreams are strong.`;
     let big_fat_array = big_fat_table.split("\n");
     hello("cyborg_bg2", {t:"rect", x:-0.35, y:0.0, width:0.70, height:0.85, colour:"#6C5EB5", a:0.0, dest_a:0.6});
     hello("cyborg_bg", {t:"rect", x:-0.35, y:0.0, width:0.58, height:0.63, colour:"#352879", a:0.0, dest_a:0.8});
@@ -3372,13 +3362,13 @@ Seventeen, and that's the last
 // Make a video loop at a certain time:
   if (!--w) { duration=1.0; notes="Video loop_at";
     goodbye_all();
-    hello("video1", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
+    hello("video1", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
   }  //
 
 // Make a video "stop" at a certain time:
   if (!--w) { notes = "Video pause_at";
     goodbye_all();
-    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.0, pause_at:3.2});
+    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.0, pause_at:3.2});
   }  //
 
 
