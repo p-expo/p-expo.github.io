@@ -2556,7 +2556,9 @@ function set_screen_size (screen_width, screen_height) {
   //my_notes.style.height = "0px";
   // Now choose the default font-size of the document.
   // When in non-fullscreen, it should be 16px.
-  let new_font_size = 16 * (screen_width / 960 + screen_height/540) / 2.0;
+  let new_font_size_width = 16 * screen_width/960;
+  let new_font_size_height = 16 * screen_height/540;
+  let new_font_size = Math.min(new_font_size_width,new_font_size_height);
   const body = document.body;
   const html = document.documentElement;
   body.style.fontSize = new_font_size+"px";
@@ -2832,7 +2834,7 @@ function show_slide_no (dst_slide, direction) {
     hello("c_html", {t:"html", html:`<div style="font-size:170%;text-align:center">
           Make your own presentation from this template at<br>
           https://github.com/p-expo/p-expo.github.io<br><br>
-          The next slide will start your webcam.</div>`, x:0.25, y:0.0, width:0.7, height:1.0});
+          The next slide will start your webcam.</div>`, x:0.3, y:0.0, width:0.6, height:1.0});
     hello("d_html", {t:"html", html:`<img src="media/image/png_image_square.png" height=100% style="border-radius:50px">`, x:-0.65, y:0.0, width:0.5, height:0.5});
   }
 
