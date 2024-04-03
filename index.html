@@ -566,7 +566,7 @@ function start_default_webcam () {
   }
 }
 
-function webcam_init () {
+function init_webcam () {
   // Grab a list of all available cams connected right now:
   webcam_select.addEventListener('change', event => {
     console.log("onchange webcam");
@@ -1670,8 +1670,8 @@ function goodbye_immediately (name) {
 
 // WebGL stuff -----------------------------------------------------------------------------
 
-function webgl_init () {
-  console.log("webgl_init");
+function init_webgl () {
+  console.log("init_webgl");
   // About pre-multiplied alphas:
   // Three.js defaults to the canvas using premultipliedAlpha: true but defaults to materials outputting premultipliedAlpha: false.
   // https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre
@@ -2038,8 +2038,8 @@ function init_dialog (text, x, y, font_size, dialog_type) {
     dialog_scene = new THREE.Scene();
     // Create the texture that will store our result
     dialog_texture = new THREE.WebGLRenderTarget( w, h, {
-      minFilter: THREE.NearestFilter,
-      magFilter: THREE.NearestFilter,
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
       format: THREE.RGBAFormat,
       depthBuffer: false,
       stencilBuffer: false});
@@ -2699,8 +2699,8 @@ function hello_cables (cable_name) {
 // The start of it all -----------------------------------------------------------------------------
 
 function init () {
-  webgl_init();
-  webcam_init();
+  init_webgl();
+  init_webcam();
   document.addEventListener('keydown', on_key_down);
   auto_progress_element.addEventListener('click', (e) => {
     auto_progress = auto_progress_element.checked;
