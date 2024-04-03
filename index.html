@@ -1168,6 +1168,11 @@ function hello (name, info) {
   if (info.dest_rot == null) info.dest_rot = info.rot;
   if (info.dest_blur == null) info.dest_blur = info.blur;
   if (info.line_height == null) info.line_height = "1.2em";
+  // This is the default fade-in:
+  if (info.a == undefined) {
+    info.a=0.0;
+    info.dest_a=1.0;
+  }
 
   if (info.t == "markdown") {
     // Convert the markdown into html using showdown.js
@@ -1231,12 +1236,6 @@ function hello (name, info) {
     div_element.style.transform = "translate(" + css_offset_x + "px, " + css_offset_y + "px)" + rotate_string;
     if (info.border_radius != null) {
       div_element.style.borderRadius = info.border_radius;
-    }
-
-    // This is the default fade-in:
-    if (info.a == undefined) {
-      info.a=0.0;
-      info.dest_a=1.0;
     }
 
     let div_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {div_element.style.opacity = value;} catch {};}, 1000*default_opacity_fade_in_time, mina.linear );
@@ -1340,7 +1339,7 @@ function hello (name, info) {
       a[name].animate({ transform: "r" + info.dest_rot + "," + bbox.cx/2 + ',' + bbox.cy/2 }, 3500, mina.elastic);
     }
     if ((info.dest_a != null) && (info.dest_a != info.a)) {
-      a[name].animate({ opacity: info.dest_a }, 2000);
+      a[name].animate({ opacity: info.dest_a }, 500);
     }
     if (info.dest_y != info.y) {
       a[name].animate({ y: info.dest_y }, 12000);
@@ -2892,38 +2891,6 @@ In P-expo, you can use markdown for:
     hello("b_html0", {t:"html", html:`<iframe src="https://lu-pze.github.io" title="Just a webpage" width="100%" height="100%"></iframe>`, x:0.0, y:0.0, width:0.95, height:0.9, a:0.0, dest_a:0.9});
   }
 
-  if (!--w) { duration=0.1; notes="Showing a pdf file ->";
-    goodbye_all();
-    // Examples of picking parts of a pdf to view:
-    //http://example.com/doc.pdf#Chapter5
-    //http://example.com/doc.pdf#page=5
-    //http://example.com/doc.pdf#page=3&zoom=200,250,100
-    //http://example.com/doc.pdf#zoom=100
-    //http://example.com/doc.pdf#page=72&view=fitH,100
-    //Disable and Hide Toolbar in PDF Web Viewer:
-    //<embed src="files/Brochure.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" width="100%" height="600px" />
-    hello("c_html0", {t:"html", html:`<embed src="media/image/matplotlib.pdf#page=1&view=fitH&toolbar=0&navpanes=0&scrollbar=0" width="45%" height="100%">`, x:0.5, y:-0.4, width:1.0, height:0.55, a:0.0, dest_a:1.0});
-  }
-
-
-  if (!--w) { duration=0.1; notes="Many html elements ->";
-    goodbye_all();
-    let nof_cols = 4;
-    let nof_rows = 4;
-    let height = 1.0/nof_rows;
-    let width = 1.0/nof_cols;
-    let element_no = 0;
-    for (let row = 0; row < nof_rows; row++) {
-      for (let col = 0; col < nof_cols; col++) {
-        let x = 2*width*(col+0.5) - 1.0;
-        let y = 2*height*(row+0.5) - 1.0;
-//        hello("h"+element_no, {t:"html", html:`<div style="background:#20802080">Hello world!<br>Yet</div>`, x:x, y:y, width:width, height:height, a:0.0, dest_a:1.0});
-        if (element_no != 9) hello("h"+element_no, {t:"html", html:`<img src="media/image/jpg_image.jpg" height=100%>`, x:x, y:y, width:width, height:height, a:0.0, dest_a:1.0});
-        element_no++;
-      }
-    }
-  }
-
 
   // PACMAN
   if (!--w) { duration=3.0; notes="Showing a pie chart -> pacman eating";
@@ -2965,6 +2932,39 @@ In P-expo, you can use markdown for:
     setTimeout(function(){ dot_2.parentNode.removeChild(dot_2); }, 2800);
     goodbye("my_signal_path");
   }  // Pacman eating
+
+  if (!--w) { duration=0.1; notes="Showing a pdf file ->";
+    goodbye_all();
+    // Examples of picking parts of a pdf to view:
+    //http://example.com/doc.pdf#Chapter5
+    //http://example.com/doc.pdf#page=5
+    //http://example.com/doc.pdf#page=3&zoom=200,250,100
+    //http://example.com/doc.pdf#zoom=100
+    //http://example.com/doc.pdf#page=72&view=fitH,100
+    //Disable and Hide Toolbar in PDF Web Viewer:
+    //<embed src="files/Brochure.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" width="100%" height="600px" />
+    hello("c_html0", {t:"html", html:`<embed src="media/image/matplotlib.pdf#page=1&view=fitH&toolbar=0&navpanes=0&scrollbar=0" width="45%" height="100%">`, x:0.5, y:-0.4, width:1.0, height:0.55, a:0.0, dest_a:1.0});
+  }
+
+
+  if (!--w) { duration=0.1; notes="Many html elements ->";
+    goodbye_all();
+    let nof_cols = 4;
+    let nof_rows = 4;
+    let height = 1.0/nof_rows;
+    let width = 1.0/nof_cols;
+    let element_no = 0;
+    for (let row = 0; row < nof_rows; row++) {
+      for (let col = 0; col < nof_cols; col++) {
+        let x = 2*width*(col+0.5) - 1.0;
+        let y = 2*height*(row+0.5) - 1.0;
+//        hello("h"+element_no, {t:"html", html:`<div style="background:#20802080">Hello world!<br>Yet</div>`, x:x, y:y, width:width, height:height, a:0.0, dest_a:1.0});
+        if (element_no != 9) hello("h"+element_no, {t:"html", html:`<img src="media/image/jpg_image.jpg" height=100%>`, x:x, y:y, width:width, height:height, a:0.0, dest_a:1.0});
+        element_no++;
+      }
+    }
+  }
+
 
 // MonteCarlo sim
   if (!--w) { duration=2.0; notes="Showing code for a Monte Carlo simulation -> Run Monte Carlo sim";
@@ -3046,6 +3046,21 @@ In P-expo, you can use markdown for:
   }  // Monte carlo cleanup done
 
 
+  // Animate position of image:
+  if (!--w) { duration=1.0; notes="Animate position of SVG image";
+    goodbye_all();
+    hello("flow_bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.1, colour:"#ffffff50", a:0.0, dest_a:1.0});
+    hello("my_flowchart", {t:"png", file:"media/image/graph/pexexp1_flow_explanation_simplified3_transparent.png", x:0.4, y:0.0, size:1.8, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+  }  // 
+  if (!--w) { duration=1.0; notes="->";
+    try {
+      a["my_flowchart"].animate({ transform: 't-780,0' }, 2000, mina.elastic);
+    } catch {}
+    goodbye("my_overview");
+  }  // flowchart left
+
+
+
 // Make a video loop at a certain time:
   if (!--w) { duration=1.0; notes="Video that loops ->";
     goodbye_all();
@@ -3063,20 +3078,6 @@ In P-expo, you can use markdown for:
     Snap.animate( 0.0, 1.0, function(value) {try {let v=document.getElementById('video2'); v.style.transform = "translate("+(0+0.5*value) + "px,"+(0+0.5*value)+"px)";} catch {};}, 2000, mina.linear );
     Snap.animate( 0.0, 135.0, function(value) {try {let v=document.getElementById('video2'); v.style.borderRadius = value+"px";} catch {};}, 2000, mina.linear );
   }  //
-
-  // Animate position of image:
-  if (!--w) { duration=1.0; notes="Animate position of SVG image";
-    goodbye_all();
-    hello("flow_bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.1, colour:"#808080", a:0.0, dest_a:1.0});
-    hello("my_flowchart", {t:"png", file:"media/image/graph/pexexp1_flow_explanation_simplified3_transparent.png", x:0.4, y:0.0, size:1.8, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
-  }  // 
-  if (!--w) { duration=1.0; notes="->";
-    try {
-      a["my_flowchart"].animate({ transform: 't-780,0' }, 2000, mina.elastic);
-    } catch {}
-    goodbye("my_overview");
-  }  // flowchart left
-
 
 
   if (!--w) { duration=0.1; notes="Turn off sunburst";
