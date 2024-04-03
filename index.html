@@ -2867,6 +2867,35 @@ In P-expo, you can use markdown for:
   }  //
 
 
+  // 3d object with animations:
+  if (!--w) { duration=2.0; notes="The skull -> brain";
+    try {
+      let info = infos["cbm3"];
+      info.a = 1.0;
+      info.dest_a = 0.0;
+      let video_element = document.getElementById("cbm1");
+      let video_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {video_element.style.opacity = value;} catch {};}, 400, mina.linear );
+    } catch {}
+    goodbye_all();
+    //hello("bci3text", {t:"text", text:["BCI","Performance"], align:"middle", line_height:"0.9em", x:0.0, y:-0.2, colour:"#ffffff", fontsize:230, font:"Arial", fontweight:800, dest_a:1.0, a:0.0});
+    hello("brain", {t:"3d", file:"/3d/brain_v04.glb", x:0.0, y:-0.55, scale:0.12, rx:-Math.PI * 0.4, rz:-Math.PI * 0.25});
+  }  // 
+
+  if (!--w) { duration=5.0; notes="5W for keeping it alive, 15W for signalling, folded to maximize the reacheable area for the support network, 86000 millions of neurons -> Sensor locations";
+    Snap.animate( -0.55, -0.2, function(value) {try {all_3d_models["brain"].position.y = value;} catch {};}, 3000, mina.elastic );
+    Snap.animate( 0.12, 0.3, function(value) {try {all_3d_models["brain"].scale.x = value; all_3d_models["brain"].scale.y = value; all_3d_models["brain"].scale.z = value;} catch {};}, 3000, mina.elastic );
+    Snap.animate(1.0, 0.0, function(value) {try {all_3d_models["brain"].children[4].material.opacity = value;} catch {};}, 4000, mina.linear);
+  }  // in_brain
+
+  if (!--w) { duration=7.0; notes="Brain is 3d. We can measure the surface 'cortical'. Highly complex. Highly connected. ->";
+    console.log(all_3d_models["brain"]);
+    Snap.animate( -0.2, -0.4, function(value) {try {all_3d_models["brain"].position.y = value;} catch {};}, 5000, mina.linear );
+    Snap.animate( 0.0, 2.5, function(value) {try {all_3d_models["brain"].children[1].position.x = value;} catch {};}, 5000, mina.linear );
+    Snap.animate( 0.0, -2.5, function(value) {try {all_3d_models["brain"].children[3].position.x = value;} catch {};}, 5000, mina.linear );
+    Snap.animate( 0.0, 1.5, function(value) {try {all_3d_models["brain"].children[0].position.y = value;} catch {};}, 5000, mina.linear );
+  }  // expand_brain
+
+
   if (!--w) { duration=0.1; notes="A few examples of displaying text, png, transparent png, jpg, transparent svg ->";
     fade_dialog_glpos(0.0,0);
     goodbye_all();
@@ -3361,18 +3390,6 @@ Seventeen, and that's the last
     }
   }  // title
 
-// Make a video loop at a certain time:
-  if (!--w) { duration=1.0; notes="Video loop_at";
-    goodbye_all();
-    hello("video1", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
-  }  //
-
-// Make a video "stop" at a certain time:
-  if (!--w) { notes = "Video pause_at";
-    goodbye_all();
-    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.0, pause_at:3.2});
-  }  //
-
 
   if (!--w) { duration=1.0; notes="Video coordinates";
     goodbye_all();
@@ -3385,7 +3402,7 @@ Seventeen, and that's the last
     hello("video7", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:0.7, x:1.0, y:-1.0,  a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
     hello("video8", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:0.8, x:0.0, y:-1.0,  a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
     hello("video9", {t:"video", file:"media/video/brain2_video.mp4", width:0.15, height:0.15, rate:0.9, x:0.0, y:1.0,   a:0.0, dest_a:1.0, start_at:0.0, loop_at:6.0});
-  }  // init. This is always slide number 0. The rest are auto-incrementing.
+  }
 
   if (!--w) { duration=1.0; notes="PNG sizes";
     goodbye_all();
@@ -3398,7 +3415,7 @@ Seventeen, and that's the last
     hello("png7", {t:"png", file:"media/image/png_image_js_code.png", size:0.5, x:0.5, y:-0.5,  a:0.0, dest_a:1.0});
     hello("png8", {t:"png", file:"media/image/png_image_js_code.png", size:0.5, x:0.0, y:-0.5,  a:0.0, dest_a:1.0});
     hello("png9", {t:"png", file:"media/image/png_image.png", size:0.5, x:0.0, y:0.5,   a:0.0, dest_a:1.0});
-  }  // init. This is always slide number 0. The rest are auto-incrementing.
+  }
 
   if (!--w) { duration=1.0; notes="SVG coordinates";
     goodbye_all();
@@ -3411,7 +3428,7 @@ Seventeen, and that's the last
     hello("svg7", {t:"png", file:"media/image/svg_image.svg", size:0.5, x:1.0, y:-1.0,  a:0.0, dest_a:1.0});
     hello("svg8", {t:"png", file:"media/image/svg_image.svg",  size:0.5, x:0.0, y:-1.0,  a:0.0, dest_a:1.0});
     hello("svg9", {t:"png", file:"media/image/svg_image.svg", size:0.5, x:0.0, y:1.0,   a:0.0, dest_a:1.0});
-  }  // init. This is always slide number 0. The rest are auto-incrementing.
+  }
 
   if (!--w) { duration=1.0; notes="PNG coordinates";
     goodbye_all();
@@ -3426,7 +3443,7 @@ Seventeen, and that's the last
     hello("png7", {t:"png", file:"media/image/png_image.png", size:0.5, x:1.0, y:-1.0,  a:0.0, dest_a:1.0});
     hello("png8", {t:"png", file:"media/image/png_image.png", size:0.5, x:0.0, y:-1.0,  a:0.0, dest_a:1.0});
     hello("png9", {t:"png", file:"media/image/png_image.png", size:0.5, x:0.0, y:1.0,   a:0.0, dest_a:1.0});
-  }  // init. This is always slide number 0. The rest are auto-incrementing.
+  }
 
   if (!--w) { duration=1.0; notes="Rect coordinates";
     goodbye_all();
@@ -3439,7 +3456,7 @@ Seventeen, and that's the last
     hello("bg7", {t:"rect", x:1.0, y:-1.0,  colour:"#ffffff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
     hello("bg8", {t:"rect", x:0.0, y:-1.0,  colour:"#ffffff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
     hello("bg9", {t:"rect", x:0.0, y:1.0,   colour:"#ffffff", width:0.1, height:0.1, corner_radius:0.0, a:0.0, dest_a:1.0});
-  }  // init. This is always slide number 0. The rest are auto-incrementing.
+  }
 
   if (!--w) { duration=1.0; notes="Text coordinates";
     goodbye_all();
@@ -3453,7 +3470,7 @@ Seventeen, and that's the last
     hello("t7", {t:"text", text:"x=+1.0,y=-1.0", x:1.0, y:-1.0, align:"right", colour:"#ffffff", fontsize:40, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
     hello("t8", {t:"text", text:"x=0,y=-1.0", x:0.0, y:-1.0, align:"middle", colour:"#ffffff", fontsize:40, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
     hello("t9", {t:"text", text:"x=0,y=1.0", x:0.0, y:1.0, align:"middle", colour:"#ffffff", fontsize:100, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
-  }  // init. This is always slide number 0. The rest are auto-incrementing.
+  }
 
 
 
@@ -3464,34 +3481,6 @@ Seventeen, and that's the last
     //hello("profile1", {t:"png", file:"images/people/Martin-Gemborn-Nilsson.png", x:-0.45, y:0.2, size:0.5, a:0.0, dest_a:1.0});
   }
 
-
-  //if (!--w) { duration=1.0; notes="<span style='color:#8080ff'>BCI Performance:</span> 3 factors. A comfortable and convenient device. -> Reliability";
-  if (!--w) { duration=2.0; notes="The skull -> brain";
-    try {
-      let info = infos["cbm3"];
-      info.a = 1.0;
-      info.dest_a = 0.0;
-      let video_element = document.getElementById("cbm1");
-      let video_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {video_element.style.opacity = value;} catch {};}, 400, mina.linear );
-    } catch {}
-    goodbye_all();
-    //hello("bci3text", {t:"text", text:["BCI","Performance"], align:"middle", line_height:"0.9em", x:0.0, y:-0.2, colour:"#ffffff", fontsize:230, font:"Arial", fontweight:800, dest_a:1.0, a:0.0});
-    hello("brain", {t:"3d", file:"/3d/brain_v04.glb", x:0.0, y:-0.55, scale:0.12, rx:-Math.PI * 0.4, rz:-Math.PI * 0.25});
-  }  // 
-
-  if (!--w) { duration=5.0; notes="5W for keeping it alive, 15W for signalling, folded to maximize the reacheable area for the support network, 86000 millions of neurons -> Sensor locations";
-    Snap.animate( -0.55, -0.2, function(value) {try {all_3d_models["brain"].position.y = value;} catch {};}, 3000, mina.elastic );
-    Snap.animate( 0.12, 0.3, function(value) {try {all_3d_models["brain"].scale.x = value; all_3d_models["brain"].scale.y = value; all_3d_models["brain"].scale.z = value;} catch {};}, 3000, mina.elastic );
-    Snap.animate(1.0, 0.0, function(value) {try {all_3d_models["brain"].children[4].material.opacity = value;} catch {};}, 4000, mina.linear);
-  }  // in_brain
-
-  if (!--w) { duration=7.0; notes="Brain is 3d. We can measure the surface 'cortical'. Highly complex. Highly connected. This demo is described in our paper. -> showing graphs";
-    console.log(all_3d_models["brain"]);
-    Snap.animate( -0.2, -0.4, function(value) {try {all_3d_models["brain"].position.y = value;} catch {};}, 5000, mina.linear );
-    Snap.animate( 0.0, 2.5, function(value) {try {all_3d_models["brain"].children[1].position.x = value;} catch {};}, 5000, mina.linear );
-    Snap.animate( 0.0, -2.5, function(value) {try {all_3d_models["brain"].children[3].position.x = value;} catch {};}, 5000, mina.linear );
-    Snap.animate( 0.0, 1.5, function(value) {try {all_3d_models["brain"].children[0].position.y = value;} catch {};}, 5000, mina.linear );
-  }  // expand_brain
 
   if (!--w) { duration=8.0; notes="";
     hello_cables("Sine_scroller");
@@ -3526,6 +3515,7 @@ Seventeen, and that's the last
 
   current_slide = dst_slide;
   slide_no_span.innerHTML=current_slide;
+  return false; // <- Allow to iteratively step further.
 }
 
 
