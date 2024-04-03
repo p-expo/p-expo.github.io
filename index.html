@@ -2,7 +2,7 @@
 <html><head><meta charset="utf-8">
 <title>P-expo Presentation</title>
 <style>
-html, body {margin:0 0; overflow:hidden; background:#000; color:#ccc}
+html,body {margin:0 0;overflow:hidden;background:#000;color:#ccc;font-size:16px}
 #all {margin:0 0; width:960px; height:540px; border:0px;}
 #clip {width:100%; height:100%; clip-path:inset(0% 0% 0% 0%)}
 #all svg {display:inline-block; position:absolute; top:0; left:0; margin:0px 0px; width:960px; height:540px;}
@@ -2518,7 +2518,8 @@ document.getElementById('full_screen').addEventListener('click', event => {
 let current_screen_width = 960;
 let current_screen_height = 540;
 
-//goFullscreen is a one-way operation. Cannot go back to normal layout after this. Just reload the page instead.
+// goFullscreen is a one-way operation. Cannot go back to normal layout after this.
+// Just reload the page instead.
 function set_screen_size (screen_width, screen_height) {
   // Used for pixel placement of videos:
   current_screen_width = screen_width;
@@ -2553,6 +2554,13 @@ function set_screen_size (screen_width, screen_height) {
   html_div.style.height = screen_height + "px";
   //my_notes.style.display = "none";
   //my_notes.style.height = "0px";
+  // Now choose the default font-size of the document.
+  // When in non-fullscreen, it should be 16px.
+  let new_font_size = 16 * (screen_width / 960 + screen_height/540) / 2.0;
+  const body = document.body;
+  const html = document.documentElement;
+  body.style.fontSize = new_font_size+"px";
+  html.style.fontSize = new_font_size+"px";
 }
 
 function goFullscreen () {
@@ -2776,6 +2784,13 @@ function show_slide_no (dst_slide, direction) {
 // x:-0.5, y:   0, width:0.5, height:1.0   means the left half of the screen
 // x:   0, y: 0.5, width:1.0, height:0.5   means the top half of the screen
 // x:   0, y:-0.5, width:1.0, height:0.5   means the bottom half of the screen
+
+// Font sizes. Please use font sizes that are related to html and body base font size.
+// This is set to 16px when in windowed mode. In fullscreen mode, this font size
+// is adjusted to match the size when in windowed mode. So, please use:
+//   font-size: 200%  // double size
+// or
+//   font-size: 2em   // also double size
 
 
 // #§# Start of slides:
