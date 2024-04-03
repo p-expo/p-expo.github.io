@@ -318,6 +318,7 @@ const b_value = document.getElementById("b_value");
 const threshold_colour_div = document.getElementById("threshold_colour");
 const clip_div=document.getElementById("clip");
 const slide_no_span=document.getElementById("slide_no");
+const html_div = document.getElementById('html_div');
 // An associative array with all SVG objects that are visible right now:
 let a = {}
 // The collected info about all objects:
@@ -1264,7 +1265,6 @@ function hello (name, info) {
       let my_video2_animate = Snap.animate( 0.0, 1.0, function(value) {let x=css_offset_x * (1.0-value) + css_offset_x_dest * value; let y=css_offset_y * (1.0-value) + css_offset_y_dest * value; try {div_element.style.transform = "translate(" + x + "px, " + y + "px)";} catch {};}, 12000);
     }
 
-    let html_div = document.getElementById('html_div');
     html_div.appendChild(div_element);
 
     // Check if we need to typeset any math formulas:
@@ -2549,6 +2549,8 @@ function set_screen_size (screen_width, screen_height) {
   replay_element.style.height = screen_height + "px";
   chart_holder.style.width = screen_width + "px";
   chart_holder.style.height = screen_height + "px";
+  html_div.style.width = screen_width + "px";
+  html_div.style.height = screen_height + "px";
   //my_notes.style.display = "none";
   //my_notes.style.height = "0px";
 }
@@ -2567,7 +2569,10 @@ function goFullscreen () {
     });
   console.log("screen.height=", screen.height);
   console.log("screen.width=", screen.width);
-  goto(0);
+  goodbye_all_immediately();
+  // Add a 100ms pause to let the browser window reflow.
+  // Then, add all elements of the current slide back again:
+  setTimeout(() => {show_slide_no(current_slide, 1);}, 100);
 }
 
 // The slideshow -----------------------------------------------------------------------------
