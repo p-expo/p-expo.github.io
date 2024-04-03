@@ -1462,33 +1462,33 @@ function hello (name, info) {
     // Did work with video_element, but doesn't with video_element. Strange...
     //(top, right, bottom, left)
     //video_element.style.clip="rect(0px,"+current_screen_width+"px," + (current_screen_height-video_offset_y) + "px,0px)";
-    let clip_top = 0;
-    let clip_bottom = 0;
-    let clip_left = 0;
-    let clip_right = 0;
-    if (info.clip_top != null) {
-      clip_top = info.clip_top;
+    let crop_top = 0;
+    let crop_bottom = 0;
+    let crop_left = 0;
+    let crop_right = 0;
+    if (info.crop_top != null) {
+      crop_top = info.crop_top;
     }
-    if (info.clip_bottom != null) {
-      clip_bottom = info.clip_bottom;
+    if (info.crop_bottom != null) {
+      crop_bottom = info.crop_bottom;
     }
-    if (info.clip_left != null) {
-      clip_left = info.clip_left;
+    if (info.crop_left != null) {
+      crop_left = info.crop_left;
     }
-    if (info.clip_right != null) {
-      clip_right = info.clip_right;
+    if (info.crop_right != null) {
+      crop_right = info.crop_right;
     }
     //(top, right, bottom, left)
-    //video_element.style.clip="rect("+clip_top+"px,"+clip_right+"px,"+clip_bottom+"px,"+clip_left+"px)";
+    //video_element.style.clip="rect("+crop_top+"px,"+crop_right+"px,"+crop_bottom+"px,"+crop_left+"px)";
 //    video_element.style.clip="rect(10px,40px,50px,10px);";
-    if ((clip_left != 0) || (clip_right != 0) || (clip_top != 0) || (clip_bottom != 0)) {
-      video_element.style.clip = "rect("+(clip_top * css_height)+"px,"+((1.0-clip_right)*css_width)+"px,"+((1.0-clip_bottom)*css_height)+"px,"+(clip_left * css_width)+"px)";
+    if ((crop_left != 0) || (crop_right != 0) || (crop_top != 0) || (crop_bottom != 0)) {
+      video_element.style.clip = "rect("+(crop_top * css_height)+"px,"+((1.0-crop_right)*css_width)+"px,"+((1.0-crop_bottom)*css_height)+"px,"+(crop_left * css_width)+"px)";
     }
     //video_element.style.display = "inline-block";
     //video_element.style.overflow = "hidden";
     //video_element.style.clip = "rect(0%,500px,0%,0%)";
 //    video_element.style.clip = "rect(0px,900px,100px,100px)";
-    //video_clip_div.style.clip = "rect(0px,900px,100px,100px)";
+    //video_crop_div.style.clip = "rect(0px,900px,100px,100px)";
 
     video_element.src = info.file;
     video_element.controls = false;
@@ -1942,7 +1942,7 @@ function update_b(value) {
 //let tx_fontname = "/fonts/Sanfrisco.ttf";
 let tx_fontname_0 = "/fonts/Blinker-SemiBold.ttf";
 let tx_fontname_1 = "/fonts/Athene.ttf";
-let tx_fontname_2 = "/fonts/Topaz_a500_v1.0.ttf";
+let tx_fontname_2 = "/fonts/TopazPlus_a500_v1.0.ttf";
 
 
 function init_webgl_font () {
@@ -2067,7 +2067,7 @@ function init_dialog (text, x, y, font_size, dialog_type) {
       dialog_text.font = tx_fontname_0;
       dialog_text.fontSize = font_size;
     } else if (dialog_type === 1) {
-      dialog_text.color = 0x306038;
+      dialog_text.color = 0xffffff;
       dialog_text.font = tx_fontname_1;
     } else {
       dialog_text.color = 0x4070c0;
@@ -2114,7 +2114,7 @@ function init_dialog (text, x, y, font_size, dialog_type) {
         if (dialog_type === 0) {
           renderer.setClearColor(0x2020a8, 1.0); //#e0e0e0
         } else if (dialog_type === 1) {
-          renderer.setClearColor(0xf8f8d0, 1.0); //#e0e0e0
+          renderer.setClearColor(0xe8e860, 1.0); //#e0e0e0
         } else {
           renderer.setClearColor(0x406040, 1.0);
         }
@@ -2704,12 +2704,13 @@ function init () {
 //  }  // 
 
 
-// For audience cam:
+// For audience cam, you will need to initialize the camera a second before you want to show it.
+// They can be painfully slow in getting up and running, so prepare it a few slides ahead:
 // 2 slides before, do
 //    stop_audience_cam();
 // 1 slide before do:
 //    start_audience_cam();
-// Then on the slide:
+// Then on the slide you want the camera to be seen:
 //    audiencecam_element.style.opacity = 0.0;
 //    audiencecam_element.style.display = "inline-block";
 //    Snap.animate( 0.0, 1.0, function(value) {try {audiencecam_element.style.opacity = value;} catch {};}, 1000, mina.linear );
@@ -2748,6 +2749,14 @@ function show_slide_no (dst_slide, direction) {
 // y:-1.0 to 1.0    y=-1 is the bottom of the screen. y=1 is the top of the screen.
 // width:  1.0 is the whole screen width.
 // height: 1.0 is the whole screen height.
+
+// Examples:
+// x:   0, y:   0, width:1.0, height:1.0   means fullscreen
+// x:   0, y:   0, width:0.5, height:0.5   means a rectangle in the middle of the screen
+// x: 0.5, y:   0, width:0.5, height:1.0   means the right half of the screen
+// x:-0.5, y:   0, width:0.5, height:1.0   means the left half of the screen
+// x:   0, y: 0.5, width:1.0, height:0.5   means the top half of the screen
+// x:   0, y:-0.5, width:1.0, height:0.5   means the bottom half of the screen
 
 
 // #§# Start of slides:
@@ -2808,7 +2817,7 @@ function show_slide_no (dst_slide, direction) {
   if (!--w) { duration=0.1; notes="Text written using html ->";
     goodbye_all();
     hello("bg6", {t:"rect", x:-0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
-    hello("a_html", {t:"html", html:`
+    hello("d_html", {t:"html", html:`
 <div>
 <h1>Text formatting</h1>
 <p>You need to learn <i>some</i> way of formatting <b>text</b>. This is html.</p>
@@ -2823,10 +2832,22 @@ function show_slide_no (dst_slide, direction) {
   }
 
 
+
+  if (!--w) { duration=1.0; notes="Dialog test 0";
+    goodbye_videos_immediately();
+    goodbye_all();
+    goodbye_cables();
+    init_dialog ("An interesting\nfact or two", 0.0, 0.0, 0.20, 0);
+  }  //
+  if (!--w) { duration=1.0; notes="Dialog fade";
+    fade_dialog_glpos(0,0);
+  }  //
+
+
   if (!--w) { duration=0.1; notes="Text written using markdown ->";
     goodbye_all();
-    hello("bg7", {t:"rect", x:-0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
-    hello("a_md", {t:"markdown", markdown:`
+    hello("bg7", {t:"rect", x:0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
+    hello("d_md", {t:"markdown", markdown:`
 # Text formatting
 
 You need to learn *some* way of formatting **text**. This is markdown.
@@ -2838,13 +2859,22 @@ In P-expo, you can use markdown for:
 *   _emphasis_
 
 <img src="media/image/jpg_image.jpg" width="100px">
-          `, x:-0.4, y:0.0, width:0.4, height:0.9});
+          `, x:0.4, y:0.0, width:0.4, height:0.9});
     // As the markdown syntax don't standardize how to scale images, we are forced
     // to fall back to the html syntax to scale it
     // Adding it with the native markdown syntax
     //     ![alt text](/path/to/img.jpg "Title")
     // works as long as you don't need to set the size of the image.
   }
+
+
+  if (!--w) { duration=1.0; notes="Dialog test 1";
+    goodbye_all();
+    init_dialog("Everything\nis going to be\nall right", 0.0, 0.0, 0.20, 1);
+  }  //
+  if (!--w) { duration=1.0; notes="Dialog fade 1";
+    fade_dialog_glpos(0.0,0);
+  }  //
 
 
   if (!--w) { duration=0.1; notes="A few examples of displaying text, png, transparent png, jpg, transparent svg ->";
@@ -2873,6 +2903,15 @@ In P-expo, you can use markdown for:
     goodbye("a_html5");
     goodbye("a_html7");
   }
+
+
+  if (!--w) { duration=1.0; notes="Dialog test 2";
+    goodbye_all();
+    init_dialog("[1992]\n\nHaier, R.J., Siegel, B.V., Jr.,\nMacLachlan, A., Soderling,\nE., Lottenberg, S. & Buchsbaum, M. S:\n\nRegional glucose metabolic changes\nafter learning a complex\nvisuospatial/motor task:\na positron emission tomographic study.\n\nBrain Research, 570, 134—143.", 0.0, 0.0, 0.09, 2);
+  }  //
+  if (!--w) { duration=1.0; notes="Dialog fade 2";
+    fade_dialog_glpos(0,1.0);
+  }  //
 
 
   if (!--w) { duration=0.1; notes="Displaying LaTeX equations ->";
@@ -3051,6 +3090,7 @@ In P-expo, you can use markdown for:
   // Animate position of image:
   if (!--w) { duration=1.0; notes="Animate position of SVG image";
     goodbye_all();
+    // Making the webcam image brighter, to make sure that black lines in the transparent graph are visible:
     hello("flow_bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.1, colour:"#ffffff50", a:0.0, dest_a:1.0});
     hello("my_flowchart", {t:"png", file:"media/image/graph/pexexp1_flow_explanation_simplified3_transparent.png", x:0.4, y:0.0, size:1.8, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
   }  // 
@@ -3208,8 +3248,6 @@ Seventeen, and that's the last
   }  // 
 
   if (!--w) { duration=1.0; notes="";
-//    init_dialog ("Brain Computer\nInterface\nin 90 seconds", 0.0, 0.0, 0.20, 0);
-//    init_dialog ("Research done 1960-2023\nand some keywords.\nThanks for watching!", 0.0, 0.0, 0.16, 0);
     init_dialog ("Thanks for reading!", 0.0, 0.0, 0.16, 0);
   }  // Paper
   if (!--w) { duration=2.0; notes="-> ";
@@ -3306,12 +3344,12 @@ Seventeen, and that's the last
     }
   }  // title
 
-  if (!--w) { duration=1.0; notes="5x5 videos, clipped";
+  if (!--w) { duration=1.0; notes="5x5 videos, cropped";
     hello("bg5", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.15, colour:"#404040", a:0.0, dest_a:1.0});
-    let clip_left = [0.5,0.25,0,0,0];
-    let clip_right = [0,0,0,0.25,.5];
-    let clip_top = [0.5,0.25,0,0,0];
-    let clip_bottom = [0,0,0,0.25,.5];
+    let crop_left = [0.5,0.25,0,0,0];
+    let crop_right = [0,0,0,0.25,.5];
+    let crop_top = [0.5,0.25,0,0,0];
+    let crop_bottom = [0,0,0,0.25,.5];
     goodbye_all()
     let nof_cols = 5;
     let nof_rows = 5;
@@ -3325,7 +3363,7 @@ Seventeen, and that's the last
 // n=3    x = -0.5, 0.0, 0.5
         let v_x = (0.5 + col) * v_width * 2 - 1.0;
         let v_y = (0.5 + row) * v_height * 2 - 1.0;
-        hello("i" + video_no, {t:"video", file:"media/video/ipad_screencast.mov", clip_left:clip_left[col], clip_right:clip_right[col], clip_top:clip_top[row], clip_bottom:clip_bottom[row], x:v_x, y:v_y, width:v_width*0.8, height:v_height*0.8, rate:1.0, a:0.0, dest_a:1.0, start_at:1.3, loop_at:4.0});
+        hello("i" + video_no, {t:"video", file:"media/video/ipad_screencast.mov", crop_left:crop_left[col], crop_right:crop_right[col], crop_top:crop_top[row], crop_bottom:crop_bottom[row], x:v_x, y:v_y, width:v_width*0.8, height:v_height*0.8, rate:1.0, a:0.0, dest_a:1.0, start_at:1.3, loop_at:4.0});
         video_no++;
       }
     }
@@ -3425,32 +3463,6 @@ Seventeen, and that's the last
     hello("t9", {t:"text", text:"x=0,y=1.0", x:0.0, y:1.0, align:"middle", colour:"#ffffff", fontsize:100, font:"Arial", fontweight:100, a:0.0, dest_a:0.8});
   }  // init. This is always slide number 0. The rest are auto-incrementing.
 
-
-  if (!--w) { duration=1.0; notes="Dialog test 0";
-    goodbye_videos_immediately();
-    goodbye_all();
-    goodbye_cables();
-    init_dialog ("An interesting\nfact or two", 0.0, 0.0, 0.20, 0);
-  }  //
-  if (!--w) { duration=1.0; notes="Dialog fade";
-    fade_dialog_glpos(0,0);
-  }  //
-
-  if (!--w) { duration=1.0; notes="Dialog test 1";
-    goodbye_all();
-    init_dialog ("Another important\nnotice goes here", 1.0, 0.0, 0.20, 1);
-  }  //
-  if (!--w) { duration=1.0; notes="Dialog fade 1";
-    fade_dialog_glpos(1.0,0);
-  }  //
-
-  if (!--w) { duration=1.0; notes="Dialog test 2";
-    goodbye_all();
-    init_dialog ("[1992]\n\nHaier, R.J., Siegel, B.V., Jr.,\nMacLachlan, A., Soderling,\nE., Lottenberg, S. & Buchsbaum, M. S:\n\nRegional glucose metabolic changes\nafter learning a complex\nvisuospatial/motor task:\na positron emission tomographic study.\n\nBrain Research, 570, 134—143.", 0.0, 0.0, 0.09, 2);
-  }  //
-  if (!--w) { duration=1.0; notes="Dialog fade 2";
-    fade_dialog_glpos(0,1.0);
-  }  //
 
 
   if (!--w) { duration=1.0; notes="->";
