@@ -91,9 +91,10 @@ window.MathJax = {
 <div id="notes" style="text-align: center"><p></p></div>
 Main cam: <select id="webcam_select"><option></option></select>
 Audio input: <select id="audioin_select"><option></option></select>
-<button id="webcam_start_button">Start camera</button>
-<button id="webcam_stop_button">Stop camera</button>
-<input type="checkbox" id="auto_progress" name="auto_progress" checked><label for="auto_progress">Auto progress:</label> <span id="duration"></span>
+<button id="webcam_start_button">Start cam</button>
+<button id="webcam_stop_button">Stop cam</button>
+Slide #<span id="slide_no"></span>
+<input type="checkbox" id="auto_progress" name="auto_progress"><label for="auto_progress">Auto progress:</label> <span id="duration"></span>
 <br>
 Audience cam, if any: <select id="audiencecam_select"><option></option></select>
 <button id="notes_button">Open notes window</button>
@@ -312,6 +313,7 @@ const g_value = document.getElementById("g_value");
 const b_value = document.getElementById("b_value");
 const threshold_colour_div = document.getElementById("threshold_colour");
 const clip_div=document.getElementById("clip");
+const slide_no_span=document.getElementById("slide_no");
 // An associative array with all SVG objects that are visible right now:
 let a = {}
 // The collected info about all objects:
@@ -3109,7 +3111,7 @@ In P-expo, you can use markdown for:
       audio_boom.currentTime = 0.0;
       audio_boom.play();
     }
-    hello("my_title", {t:"text", text:"Nothing is wrong at all", align:"middle", x:0, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, dest_a:0.8, a:1.0});
+    hello("my_title", {t:"text", text:"Everything is going to be all right", align:"middle", x:0, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, dest_a:0.8, a:1.0});
   }  // Title
 
 
@@ -3519,6 +3521,7 @@ Seventeen, and that's the last
   }
 
   current_slide = dst_slide;
+  slide_no_span.innerHTML=current_slide;
 }
 
 
