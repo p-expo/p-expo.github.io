@@ -94,12 +94,12 @@ Audio input: <select id="audioin_select"><option></option></select>
 <button id="webcam_start_button">Start cam</button>
 <button id="webcam_stop_button">Stop cam</button>
 Slide #<span id="slide_no"></span>
-<input type="checkbox" id="auto_progress" name="auto_progress"><label for="auto_progress">Auto progress:</label> <span id="duration"></span>
+<input type="checkbox" id="auto_progress" name="auto_progress"><label for="auto_progress">[A]uto progress:</label> <span id="duration"></span>
 <br>
 Audience cam, if any: <select id="audiencecam_select"><option></option></select>
-<button id="notes_button">Open notes window</button>
-<button id="set_screen_size">set Screen Size</button>
-<button id="full_screen">-> Full screen</button>
+<button id="notes_button">Open [n]otes window</button>
+<button id="set_screen_size">set [S]creen Size</button>
+<button id="full_screen">-> [F]ull screen</button>
 <br>
 <!--Replay events:<input type="file" id="event_file_to_load" accept="txt/*" value="js_saved_events_1646399449165.txt" />-->
 <button id="replay_events_button">Replay Events</button>
@@ -113,19 +113,23 @@ Replay timeline: <input type="range" min="0" max="100.0" value="0.0" id="replay_
 Muzak+FX volume: <input type="range" min="0" max="1.0" value="1.0" step="0.01" id="audio_volume_slider">
 Snippet volume: <input type="range" min="0" max="1.0" value="1.0" step="0.01" id="snippet_volume_slider">
 <br>
-Keyboard shortcuts:
-Shift+[1-0] start recording snippet,
-[1-0] start playback of snippet,
+Press:
+[->] or [space] = next.
+[<-] = back.
+Shift+[1-0] record snippet,
+[1-0] play snippet,
 § stop snippet.
 Snippet 8 is "left".
-Snippet 9 is "right".
-a = toggle auto progress<br>
+Snippet 9 is "right".<br>
+[a] = toggle auto progress<br>
+<span style="visibility:hidden">
 <span id="cam_effect_mode_display">Cam effect:</span>
 <span id="snippet_record_display"></span><br>
 <span style="color:#ff0000">&nbsp;R</span> <input type="range" min="0" max="255" value="70" id="slider_r"><span id="r_value">70</span><br>
 <span style="color:#00ff00">&nbsp;G</span> <input type="range" min="0" max="255" value="70" id="slider_g"><span id="g_value">70</span><br>
 <span style="color:#0000ff">&nbsp;B</span> <input type="range" min="0" max="255" value="70" id="slider_b"><span id="b_value">70</span><br>
 <div id="threshold_colour" width="300px" height="200px" style="background: #202020">= Threshold colour</div>
+</span>
 
 <script id="vSh" type="x-shader/x-vertex">
 precision mediump float;
@@ -717,6 +721,10 @@ let recorded_chunks;
 
 function stop_snippets() {
   console.log("stop snippets");
+  if (now_recording_snippet_no >= 0) {
+    // Stop recording the current snippet
+    snippet_recorder.stop();
+  }
   snippet_record_display.innerHTML = "";
   // Remove the video so it's not displayed anymore:
   snippet_element.pause();
@@ -778,7 +786,7 @@ function stop_recording_snippet() {
   snippet_recorder.stop();
 }
 
-function handle_snippets(snippet_no, shift_is_pressed) {
+function handle_snippets (snippet_no, shift_is_pressed) {
   console.log("handle_snippets(" + snippet_no + ",shift=" + shift_is_pressed + ")");
   if (shift_is_pressed == true) {
     start_recording_snippet(snippet_no);
@@ -1109,6 +1117,12 @@ function on_key_down (event) {
     toggle_auto_progress();
   } else if (event.key == "Escape") {
     goto(0);
+  } else if (event.key == "n") {
+    open_new_notes_window();
+  } else if (event.key == "s") {
+    set_screen_size(960, 540);
+  } else if (event.key == "f") {
+    goFullscreen();
   }
 }
 
