@@ -3096,21 +3096,23 @@ In P-expo, you can use markdown for:
     goodbye_all();
     hello("video1", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
   }  //
-  if (!--w) { duration=3.0; notes="Video animate position + width";
-    Snap.animate( 1.0, 0.25, function(value) {try {let v=document.getElementById('video1'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
-  }  //
+//  if (!--w) { duration=3.0; notes="Video animate position + width";
+//    Snap.animate( 1.0, 0.25, function(value) {try {let v=document.getElementById('video1'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
+//  }  //
 
-  if (!--w) { duration=1.0; notes="Video2";
-    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
+  if (!--w) { duration=1.0; notes="Video that pauses";
+    goodbye_all();
+    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, pause_at:3.4});
   }  //
-  if (!--w) { duration=3.0; notes="Video animate corners";
-    Snap.animate( 1.0, 0.45, function(value) {try {let v=document.getElementById('video2'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
-    Snap.animate( 0.0, 1.0, function(value) {try {let v=document.getElementById('video2'); v.style.transform = "translate("+(0+0.5*value) + "px,"+(0+0.5*value)+"px)";} catch {};}, 2000, mina.linear );
-    Snap.animate( 0.0, 135.0, function(value) {try {let v=document.getElementById('video2'); v.style.borderRadius = value+"px";} catch {};}, 2000, mina.linear );
-  }  //
+//  if (!--w) { duration=3.0; notes="Video animate corners";
+//    Snap.animate( 1.0, 0.45, function(value) {try {let v=document.getElementById('video2'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
+//    Snap.animate( 0.0, 1.0, function(value) {try {let v=document.getElementById('video2'); v.style.transform = "translate("+(0+0.5*value) + "px,"+(0+0.5*value)+"px)";} catch {};}, 2000, mina.linear );
+//    Snap.animate( 0.0, 135.0, function(value) {try {let v=document.getElementById('video2'); v.style.borderRadius = value+"px";} catch {};}, 2000, mina.linear );
+//  }  //
 
 
-  if (!--w) { duration=0.1; notes="Turn off sunburst";
+  if (!--w) { duration=0.1; notes="Fade out video";
+    goodbye_all();
     sunburst_div.style.display = "none";
   }  // 
   if (!--w) { duration=2.0; notes="";
