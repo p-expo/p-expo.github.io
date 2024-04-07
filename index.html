@@ -1569,6 +1569,7 @@ function hello (name, info) {
 // Animate parameters for objects of different types:
 let all_anims_a={};  // opacity
 let all_anims_tr={}; // transform (translate, scale, rotation)
+let all_anims_filter={};  // blur
 
 function change (name, params) {
   console.log("change:");
@@ -1597,6 +1598,31 @@ function change (name, params) {
         all_anims_a[name] = Snap.animate( current_a, info.dest_a, function(value) {the_element.style.opacity=value;}, params.duration, params.how);
 //      } catch {}
     }
+
+    if (params.blur != undefined){
+      console.log("animate blur");
+      let current_filter = the_element.style.filter;
+      console.log("current_filter=");
+      console.log(current_filter);
+      // blur(10px)
+      let current_blur = 0.0;
+      const re_blur = /blur\(\s*([-]?\d*\.?\d+)\s*(?:px)?\s*\)/g;
+      let match = re_blur.exec(current_filter);
+      console.log(match);
+      if (match != null) {
+        current_blur = parseFloat(match[1]);
+      }
+      console.log("current_blur=" + current_blur);
+      // If there is a blur animation still ongoing for this element, stop it:
+      if (all_anims_filter.name!=undefined){
+        console.log("STOP this filter anim");
+        all_anims_filter.name.stop();
+      }
+//      try {
+        all_anims_filter[name] = Snap.animate( current_blur, params.blur, function(value) {the_element.style.filter="blur("+value+"px)";}, params.duration, params.how);
+//      } catch {}
+    }
+
     if((params.x!=undefined)||(params.y!=undefined)||(params.rot!=undefined)||(params.scale!=undefined)){
       console.log("animate x y rot scale");
       let current_transform = the_element.style.transform;
@@ -2944,6 +2970,14 @@ function show_slide_no (dst_slide, direction) {
     goodbye_cables();
     hello("bg1", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#404040e0"});
     hello("c_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">ANIMATE<br>ME!</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
+  }
+
+  if (!--w) { duration=0.1; notes="blur 10";
+    change("c_html0", {blur:10.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="blur 0";
+    change("c_html0", {blur:0.0, how:mina.linear, duration:500});
   }
 
   if (!--w) { duration=0.1; notes="rot 10";
