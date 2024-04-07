@@ -1584,11 +1584,9 @@ function change (name, params) {
     console.log("html element");
     let the_element = document.getElementById(name);
     if (params.a != undefined){
-      console.log("animate a");
       let current_a = the_element.style.opacity;
       // If there is an opacity animation still ongoing for this element, stop it:
       if (all_anims_a.name!=undefined){
-        console.log("STOP this a anim");
         all_anims_a.name.stop();
       }
 //      try {
@@ -1600,22 +1598,16 @@ function change (name, params) {
     }
 
     if (params.blur != undefined){
-      console.log("animate blur");
       let current_filter = the_element.style.filter;
-      console.log("current_filter=");
-      console.log(current_filter);
       // blur(10px)
       let current_blur = 0.0;
       const re_blur = /blur\(\s*([-]?\d*\.?\d+)\s*(?:px)?\s*\)/g;
       let match = re_blur.exec(current_filter);
-      console.log(match);
       if (match != null) {
         current_blur = parseFloat(match[1]);
       }
-      console.log("current_blur=" + current_blur);
       // If there is a blur animation still ongoing for this element, stop it:
       if (all_anims_filter.name!=undefined){
-        console.log("STOP this filter anim");
         all_anims_filter.name.stop();
       }
 //      try {
@@ -1624,9 +1616,7 @@ function change (name, params) {
     }
 
     if((params.x!=undefined)||(params.y!=undefined)||(params.rot!=undefined)||(params.scale!=undefined)){
-      console.log("animate x y rot scale");
       let current_transform = the_element.style.transform;
-      console.log("current_transform=" + current_transform);
       // current_transform=translate(0px, -54px) rotate(-10deg)
       //const regex = /(?:\s*translate\(\s*([^,]+)\s*,\s*([^)]+)\s*\))?|(?:\s*scale\(\s*([^)]+)\s*\))?|(?:\s*rotate\(\s*([^)]+)\s*\))?/g;
       const current = { translateX: 0, translateY: 0, scale: 1, rotate: 0 };
@@ -1640,8 +1630,6 @@ function change (name, params) {
 
       const re_scale = /scale\(\s*([^)]+)\s*\)/g;
       match = re_scale.exec(current_transform);
-      console.log("scale_match=");
-      console.log(match);
       if (match != null) {
         current.scale = parseFloat(match[1]);
       }
@@ -1651,15 +1639,10 @@ function change (name, params) {
       if (match != null) {
         current.rotate = parseFloat(match[1]);
       }
-      console.log("current=");
-      console.log(current);
 
       if (all_anims_tr[name]!=undefined){
-        console.log("STOP this tr anim");
         all_anims_tr[name].stop();
       }
-
-
       let css_width = current_screen_width;
       if (info.width != null) {
         css_width = info.width * current_screen_width;
@@ -1683,8 +1666,6 @@ function change (name, params) {
       if (params.rot == undefined) rot = current.rotate;
       if (params.scale == undefined) a_scale = current.scale;
 
-      console.log("dest_rot=" + rot);
-      console.log("dest_scale=" + a_scale);
       all_anims_tr[name] = Snap.animate( 0.0, 1.0, function(value) {
         const start_x=current.translateX;
         const dest_x=css_offset_x;
@@ -3005,7 +2986,7 @@ function show_slide_no (dst_slide, direction) {
   }
 
   if (!--w) { duration=0.1; notes="x0 y0";
-    change("c_html0", {x:0.0, y:0.0, how:mina.linear, duration:500});
+    change("c_html0", {x:0.0, y:0.0, rot:10.0, scale:0.5, how:mina.linear, duration:500});
   }
 
 
