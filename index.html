@@ -307,6 +307,7 @@ const my_notes = document.getElementById("notes");
 const snippet_record_display = document.getElementById("snippet_record_display");
 const cam_effect_mode_display = document.getElementById("cam_effect_mode_display");
 const tr_div = document.getElementById("tr_div");
+const tr3d = document.getElementById("tr3d");
 const chart_holder = document.getElementById("chart_holder");
 const sunburst_div = document.getElementById("sunburst");
 const slider_r = document.getElementById("slider_r");
@@ -343,9 +344,9 @@ let camera_shake = 0.0;
 let webcam_texture = null;
 let pencil_texture_source = 0;
 let pencil_texture_dest = 1;
-let my_dpr = 2; // = Number of pixels per CSS pixel
-const w = 1920;
-const h = 1080;
+let my_dpr = 2; // = Number of pixels per CSS pixel.
+const w = 1920/my_dpr;
+const h = 1080/my_dpr;
 let aspect_ratio = w / h;
 let xmax = aspect_ratio;
 let ymax = 1.0;
@@ -1670,7 +1671,7 @@ function goodbye_immediately (name) {
 
 // WebGL stuff -----------------------------------------------------------------------------
 
-function init_webgl () {
+function init_webgl (width, height) {
   console.log("init_webgl");
   // About pre-multiplied alphas:
   // Three.js defaults to the canvas using premultipliedAlpha: true but defaults to materials outputting premultipliedAlpha: false.
@@ -1680,7 +1681,6 @@ function init_webgl () {
   //renderer.setPixelRatio(dpr);
   //renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setPixelRatio(my_dpr);
-  renderer.setSize(w, h, false); // false prevents any style updates to the output canvas
   renderer.setClearColor(0xe0e0e0, 1.0);
   renderer.state.buffers.depth.setClear(0.0);
   renderer.clear(true, true, true);
@@ -1688,34 +1688,7 @@ function init_webgl () {
   renderer.clear(true, true, true);
   scene = new THREE.Scene();
 
-  var camera_depth = 6.5;
-  camera_scale = new THREE.Vector4(0.5, 1.0, 1.0 / camera_depth, 1.0);
-  if (aspect_ratio > 1.0) {
-    // left, right, top, bottom, near, far
-    camera = new THREE.OrthographicCamera(-aspect_ratio, aspect_ratio, 1.0, -1.0, camera_depth, -camera_depth);
-    camera_scale.x = 1.0 / aspect_ratio;
-    camera_scale.y = 1.0;
-  } else {
-    camera = new THREE.OrthographicCamera(-1.0, 1.0, 1.0 / aspect_ratio, -1.0 / aspect_ratio, camera_depth, -camera_depth);
-    camera_scale.x = 1.0;
-    camera_scale.y = aspect_ratio;
-  }
-
-  camera.position.set(0, 0, 0);
-  camera.up = new THREE.Vector3(0, 1, 0);
-  camera.lookAt(new THREE.Vector3(0, 0, -10));
-
-  // update the camera
-  camera.aspect = aspect_ratio;
-  camera.left = -xmax;
-  camera.right = xmax;
-  camera.top = ymax;
-  camera.bottom = -ymax;
-  // For "fast" materials where the camera matrix isn't used:
-  camera_scale.x = 1.0 / xmax;
-  camera_scale.y = 1.0 / ymax;
-  // For "normal" materials:
-  camera.updateProjectionMatrix();
+  set_webgl_camera(width,height);
 
   let light = new THREE.AmbientLight(0xffffff, 0.55);
   light.name = "_light";
@@ -1800,6 +1773,37 @@ function init_webgl () {
   init_webgl_font();
 }
 
+function set_webgl_camera (width, height) {
+  aspect_ratio = width / height;
+  console.log("aspect_ratio=" + aspect_ratio);
+  var camera_depth = 6.5;
+  camera_scale = new THREE.Vector4(0.5, 1.0, 1.0 / camera_depth, 1.0);
+  if (aspect_ratio > 1.0) {
+    // left, right, top, bottom, near, far
+    camera = new THREE.OrthographicCamera(-aspect_ratio, aspect_ratio, 1.0, -1.0, camera_depth, -camera_depth);
+    camera_scale.x = 1.0 / aspect_ratio;
+    camera_scale.y = 1.0;
+  } else {
+    camera = new THREE.OrthographicCamera(-1.0, 1.0, 1.0 / aspect_ratio, -1.0 / aspect_ratio, camera_depth, -camera_depth);
+    camera_scale.x = 1.0;
+    camera_scale.y = aspect_ratio;
+  }
+  camera.position.set(0, 0, 0);
+  camera.up = new THREE.Vector3(0, 1, 0);
+  camera.lookAt(new THREE.Vector3(0, 0, -10));
+  // update the camera
+//  camera.aspect = aspect_ratio;
+//  camera.left = -xmax;
+//  camera.right = xmax;
+//  camera.top = ymax;
+//  camera.bottom = -ymax;
+  // For "fast" materials where the camera matrix isn't used:
+  camera_scale.x = 1.0 / xmax;
+  camera_scale.y = 1.0 / ymax;
+  // For "normal" materials:
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height, true); // false prevents any style updates to the output canvas
+}
 
 function load_3d_model (name, info) {
   console.log("### load 3d model");
@@ -2091,7 +2095,7 @@ function init_dialog (text, x, y, font_size, dialog_type) {
     if (dialog_type === 2) {
       // create a plane geometry for the image with a width of 10
       // and a height that preserves the image's aspect ratio
-      var border_geometry = new THREE.PlaneGeometry(2.5, 2.5*.75);
+      var border_geometry = new THREE.PlaneGeometry(2.5, 2.5*0.75);
       // combine our image geometry and material into a mesh
       var border_mesh = new THREE.Mesh(border_geometry, border_material);
       // set the position of the image mesh in the x,y,z dimensions
@@ -2133,9 +2137,16 @@ function init_dialog (text, x, y, font_size, dialog_type) {
           renderer.setClearColor(0x406040, 1.0);
         }
 
+        renderer.setSize(w,h,false);
+        camera.aspect = w/h;
+        camera.updateProjectionMatrix();
         renderer.setRenderTarget(dialog_texture);
         renderer.render(dialog_scene, camera);
         renderer.setClearColor(0x000000, 0.0); //#e0e0e0
+        renderer.setSize(current_screen_width,current_screen_height,false);
+        renderer.setSize(current_screen_width,current_screen_height,false);
+        camera.aspect = aspect_ratio;
+        camera.updateProjectionMatrix();
         renderer.setRenderTarget(null);
 
         var nof_arms = Math.floor(Math.random()*10);
@@ -2521,6 +2532,7 @@ let current_screen_height = 540;
 // goFullscreen is a one-way operation. Cannot go back to normal layout after this.
 // Just reload the page instead.
 function set_screen_size (screen_width, screen_height) {
+  console.log("set_screen_size("+screen_width+","+screen_height+");");
   // Used for pixel placement of videos:
   current_screen_width = screen_width;
   current_screen_height = screen_height;
@@ -2532,12 +2544,12 @@ function set_screen_size (screen_width, screen_height) {
   video_div.style.height = screen_height + "px";
   //tr3d.width = screen_width;
   //tr3d.height = screen_height;
-  tr3d.style.width = screen_width + "px";
-  tr3d.style.height = screen_height + "px";
+  //tr3d.style.width = screen_width + "px";
+  //tr3d.style.height = screen_height + "px";
   //tr_div.width = screen_width + "px";
   //tr_div.height = screen_height + "px";
-  tr_div.style.width = screen_width + "px";
-  tr_div.style.height = screen_height + "px";
+  //tr_div.style.width = screen_width + "px";
+  //tr_div.style.height = screen_height + "px";
   svg_element.style.width = screen_width + "px";
   svg_element.style.height = screen_height + "px";
   webcam_element.style.width = screen_width + "px";
@@ -2563,6 +2575,9 @@ function set_screen_size (screen_width, screen_height) {
   const html = document.documentElement;
   body.style.fontSize = new_font_size+"px";
   html.style.fontSize = new_font_size+"px";
+
+  set_webgl_camera(screen_width,screen_height);
+//  init_webgl(screen_width,screen_size);
 }
 
 function goFullscreen () {
@@ -2701,7 +2716,7 @@ function hello_cables (cable_name) {
 // The start of it all -----------------------------------------------------------------------------
 
 function init () {
-  init_webgl();
+  init_webgl(960,540);
   init_webcam();
   document.addEventListener('keydown', on_key_down);
   auto_progress_element.addEventListener('click', (e) => {
