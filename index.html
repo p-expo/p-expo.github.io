@@ -1567,6 +1567,8 @@ function hello (name, info) {
 let all_anims_a={};  // opacity
 let all_anims_tr={}; // transform (translate, scale, rotation)
 let all_anims_filter={};  // blur
+let all_anims_width={};  // size
+let all_anims_height={};  // size
 
 function move (name, params) {
   console.log("move:");
@@ -1611,6 +1613,30 @@ function move (name, params) {
         all_anims_filter[name] = Snap.animate( current_blur, params.blur, function(value) {the_element.style.filter="blur("+value+"px)";}, params.duration, params.how);
 //      } catch {}
     }
+
+
+    if (params.width != undefined){
+      let current_css_width=parseFloat(the_element.style.width);
+      console.log("current_css_width="+current_css_width);
+      let dest_css_width = params.width * current_screen_width;
+      // If there is a width animation still ongoing for this element, stop it:
+      if (all_anims_width.name!=undefined){
+        all_anims_width.name.stop();
+      }
+      all_anims_width[name] = Snap.animate( current_css_width, dest_css_width, function(value) {the_element.style.width=value+"px";}, params.duration, params.how);
+    }
+
+
+    if (params.height != undefined){
+      let current_css_height=parseFloat(the_element.style.height);
+      let dest_css_height = params.height * current_screen_height;
+      // If there is a height animation still ongoing for this element, stop it:
+      if (all_anims_height.name!=undefined){
+        all_anims_height.name.stop();
+      }
+      all_anims_height[name] = Snap.animate( current_css_height, dest_css_height, function(value) {the_element.style.height=value+"px";}, params.duration, params.how);
+    }
+
 
     if((params.x!=undefined)||(params.y!=undefined)||(params.rot!=undefined)||(params.scale!=undefined)){
       let current_transform = the_element.style.transform;
@@ -2946,59 +2972,16 @@ function show_slide_no (dst_slide, direction) {
     clip_div.style.clipPath="inset(0% 0% 0% 0% round 4rem)"; //This sets the rounded corners of the slides
   }
 
-  if (!--w) { duration=0.1; notes="Temporary test of animations";
-    goodbye_videos_immediately();
-    goodbye_all_immediately();
-    goodbye_cables();
-    hello("bg1", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#404040e0"});
-    hello("c_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">ANIMATE<br>ME!</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
+  if (!--w) { duration=0.1; notes="Trying out image animations";
+    goodbye_all();
+    hello("bg3", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#404020e0"});
+    hello("d_html", {t:"html", html:`<img src="media/image/png_image_square.png" height=100% style="border-radius:50px">`, x:0.0, y:0.0, width:0.5, height:0.5});
   }
 
-  if (!--w) { duration=0.1; notes="Adding element without default fade in";
-    hello("b_html1", {t:"html", html:`<div style="color:#ffffff">Press right arrow</div>`, x:0.0, y:-0.8, width:1.0, height:1.0, rot:0, default_fade_in:false});
-    move("c_html0", {blur:10.0, how:mina.linear, duration:500});
+  if (!--w) { duration=0.1; notes="width 1.0, height 1.0";
+    move("d_html", {width:1.0, height:1.0});
   }
 
-  if (!--w) { duration=0.1; notes="blur 0";
-    move("c_html0", {blur:0.0, how:mina.linear, duration:500});
-  }
-
-  if (!--w) { duration=0.1; notes="rot 10";
-    move("c_html0", {rot:10.0, how:mina.linear, duration:500});
-  }
-
-  if (!--w) { duration=0.1; notes="s 0.5";
-    move("c_html0", {scale:0.5, how:mina.elastic, duration:1500});
-  }
-
-  if (!--w) { duration=0.1; notes="x -1.0";
-    move("c_html0", {x:-1.0, how:mina.linear, duration:500});
-  }
-
-  if (!--w) { duration=0.1; notes="y -1.0";
-    move("c_html0", {y:-1.0, how:mina.linear, duration:500});
-  }
-
-  if (!--w) { duration=0.1; notes="x 1.0";
-    move("c_html0", {x:1.0, how:mina.linear, duration:500});
-  }
-
-  if (!--w) { duration=0.1; notes="y 1.0";
-    move("c_html0", {y:1.0, how:mina.linear, duration:500});
-  }
-
-  if (!--w) { duration=0.1; notes="x0 y0";
-    move("c_html0", {x:0.0, y:0.0, rot:10.0, scale:0.5, how:mina.linear, duration:500});
-  }
-
-
-  if (!--w) { duration=0.1; notes="a 0.1";
-    move("c_html0", {a:0.1, how:mina.linear, duration:500});
-  }
-
-  if (!--w) { duration=0.1; notes="a 1.0";
-    move("c_html0", {a:1.0, how:mina.linear, duration:1000});
-  }
 
   if (!--w) { duration=0.1; notes="Hello -> Brief introduction";
     goodbye_videos_immediately();
@@ -3399,6 +3382,61 @@ In P-expo, you can use markdown for:
     }
     hello("my_title", {t:"text", text:"Everything is going to be all right", align:"middle", x:0, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, dest_a:0.8, a:1.0});
   }  // Title
+
+
+  if (!--w) { duration=0.1; notes="Temporary test of animations";
+    goodbye_videos_immediately();
+    goodbye_all_immediately();
+    goodbye_cables();
+    hello("bg1", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#404040e0"});
+    hello("c_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">ANIMATE<br>ME!</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
+  }
+
+  if (!--w) { duration=0.1; notes="Adding element without default fade in";
+    hello("b_html1", {t:"html", html:`<div style="color:#ffffff">Press right arrow</div>`, x:0.0, y:-0.8, width:1.0, height:1.0, rot:0, default_fade_in:false});
+    move("c_html0", {blur:10.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="blur 0";
+    move("c_html0", {blur:0.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="rot 10";
+    move("c_html0", {rot:10.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="s 0.5";
+    move("c_html0", {scale:0.5, how:mina.elastic, duration:1500});
+  }
+
+  if (!--w) { duration=0.1; notes="x -1.0";
+    move("c_html0", {x:-1.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="y -1.0";
+    move("c_html0", {y:-1.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="x 1.0";
+    move("c_html0", {x:1.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="y 1.0";
+    move("c_html0", {y:1.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="x0 y0";
+    move("c_html0", {x:0.0, y:0.0, rot:10.0, scale:0.5, how:mina.linear, duration:500});
+  }
+
+
+  if (!--w) { duration=0.1; notes="a 0.1";
+    move("c_html0", {a:0.1, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="a 1.0";
+    move("c_html0", {a:1.0, how:mina.linear, duration:1000});
+  }
 
 
   // Commodore 64 screen:
