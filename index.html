@@ -1571,8 +1571,8 @@ let all_anims_a={};  // opacity
 let all_anims_tr={}; // transform (translate, scale, rotation)
 let all_anims_filter={};  // blur
 
-function change (name, params) {
-  console.log("change:");
+function move (name, params) {
+  console.log("move:");
   console.log(name);
   console.log(params);
   if (params.how==undefined) params.how=mina.linear;
@@ -2954,48 +2954,48 @@ function show_slide_no (dst_slide, direction) {
   }
 
   if (!--w) { duration=0.1; notes="blur 10";
-    change("c_html0", {blur:10.0, how:mina.linear, duration:500});
+    move("c_html0", {blur:10.0, how:mina.linear, duration:500});
   }
 
   if (!--w) { duration=0.1; notes="blur 0";
-    change("c_html0", {blur:0.0, how:mina.linear, duration:500});
+    move("c_html0", {blur:0.0, how:mina.linear, duration:500});
   }
 
   if (!--w) { duration=0.1; notes="rot 10";
-    change("c_html0", {rot:10.0, how:mina.linear, duration:500});
+    move("c_html0", {rot:10.0, how:mina.linear, duration:500});
   }
 
   if (!--w) { duration=0.1; notes="s 0.5";
-    change("c_html0", {scale:0.5, how:mina.elastic, duration:1500});
+    move("c_html0", {scale:0.5, how:mina.elastic, duration:1500});
   }
 
   if (!--w) { duration=0.1; notes="x -1.0";
-    change("c_html0", {x:-1.0, how:mina.linear, duration:500});
+    move("c_html0", {x:-1.0, how:mina.linear, duration:500});
   }
 
   if (!--w) { duration=0.1; notes="y -1.0";
-    change("c_html0", {y:-1.0, how:mina.linear, duration:500});
+    move("c_html0", {y:-1.0, how:mina.linear, duration:500});
   }
 
   if (!--w) { duration=0.1; notes="x 1.0";
-    change("c_html0", {x:1.0, how:mina.linear, duration:500});
+    move("c_html0", {x:1.0, how:mina.linear, duration:500});
   }
 
   if (!--w) { duration=0.1; notes="y 1.0";
-    change("c_html0", {y:1.0, how:mina.linear, duration:500});
+    move("c_html0", {y:1.0, how:mina.linear, duration:500});
   }
 
   if (!--w) { duration=0.1; notes="x0 y0";
-    change("c_html0", {x:0.0, y:0.0, rot:10.0, scale:0.5, how:mina.linear, duration:500});
+    move("c_html0", {x:0.0, y:0.0, rot:10.0, scale:0.5, how:mina.linear, duration:500});
   }
 
 
   if (!--w) { duration=0.1; notes="a 0.1";
-    change("c_html0", {a:0.1, how:mina.linear, duration:500});
+    move("c_html0", {a:0.1, how:mina.linear, duration:500});
   }
 
   if (!--w) { duration=0.1; notes="a 1.0";
-    change("c_html0", {a:1.0, how:mina.linear, duration:1000});
+    move("c_html0", {a:1.0, how:mina.linear, duration:1000});
   }
 
   if (!--w) { duration=0.1; notes="Hello -> Brief introduction";
