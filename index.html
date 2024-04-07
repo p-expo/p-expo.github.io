@@ -277,6 +277,8 @@ import {preloadFont} from "./js/troika-three-text.esm.js";
 let s = Snap("#svg");
 let logo = null;
 let default_opacity_fade_in_time;
+let default_blur_fade_in_time;
+let default_blur_fade_in_amount;
 let default_opacity_fade_out_time;
 
 // Global variables, how could we live without them? ----------------------------------------------------------------------------
@@ -1187,10 +1189,8 @@ function hello (name, info) {
   if (info.dest_blur == null) info.dest_blur = info.blur;
   if (info.line_height == null) info.line_height = "1.2em";
   // This is the default fade-in:
-  if (info.a == undefined) {
-    info.a=0.0;
-    info.dest_a=1.0;
-  }
+  if (info.a == undefined) info.a=1.0;
+
 
   if (info.t == "markdown") {
     // Convert the markdown into html using showdown.js
@@ -1215,7 +1215,6 @@ function hello (name, info) {
     // We only want the element itself centered, so wrap it into an inner div:
     //div_element.innerHTML='<div>' + info.html + '</div>';
     div_element.innerHTML=info.html;
-
     // Making sure that html content gets centered:
     div_element.style.display="flex";
 //    div_element.style.flexDirection="row"; /* or row-reverse, column, or column-reverse */
@@ -1236,12 +1235,10 @@ function hello (name, info) {
     } else {
       div_element.style.height = "auto";
     }
-
     let rotate_string="";
     if (info.rot!=null){
       rotate_string=" rotate(" + info.rot + "deg)";
     }
-
     let css_offset_y = 0;
     let css_offset_x = 0;
     if (info.y != null) {
@@ -1256,14 +1253,14 @@ function hello (name, info) {
       div_element.style.borderRadius = info.border_radius;
     }
 
-    let div_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {div_element.style.opacity = value;} catch {};}, 1000*default_opacity_fade_in_time, mina.linear );
-    info.a = info.dest_a;
-    if ((info.dest_y != info.y) || (info.dest_x != info.x)) {
-      let css_offset_y_dest = -css_height/2 + current_screen_height/2 + info.dest_y * current_screen_height / 2;
-      let css_offset_x_dest = -css_width/2 + current_screen_width/2 + info.dest_x * current_screen_width / 2;
-      // x, y
-      // Mina easing algorithms: https://codepen.io/mike-tempest/pen/myvbrw
-      let my_video2_animate = Snap.animate( 0.0, 1.0, function(value) {let x=css_offset_x * (1.0-value) + css_offset_x_dest * value; let y=css_offset_y * (1.0-value) + css_offset_y_dest * value; try {div_element.style.transform = "translate(" + x + "px, " + y + "px)";} catch {};}, 12000);
+    if (default_opacity_fade_in_time==0){
+      div_element.style.opacity=info.a;
+    } else {
+      // Setup the default opacity anim:
+      div_element.style.opacity=0.0;
+    }
+    if ((default_blur_fade_in_time!=0)&&(default_blur_fade_in_amount!=0)){
+      div_element.style.filter="blur(" + default_blur_fade_in_amount + "px)";
     }
 
     html_div.appendChild(div_element);
@@ -1272,17 +1269,6 @@ function hello (name, info) {
     if (info.html.indexOf("\\[") !== -1) {
       MathJax.typeset();
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
   } else if (info.t == "text") {
@@ -1564,6 +1550,15 @@ function hello (name, info) {
   }
   infos[name] = info;
   console.log(infos);
+  if (default_opacity_fade_in_time!=0){
+    console.log("Starting default a anim");
+    move(name,{a:info.a,duration:1000*default_opacity_fade_in_time});
+  }
+  if ((default_blur_fade_in_time!=0)&&(default_blur_fade_in_amount!=0)){
+    console.log("Starting default blur anim");
+    move(name,{blur:0,duration:1000*default_blur_fade_in_time});
+  }
+
 }
 
 // Animate parameters for objects of different types:
@@ -2940,8 +2935,12 @@ function show_slide_no (dst_slide, direction) {
     // This is where you initialize elements that you want as default:
     //start_default_webcam(); // <- Remove // if you want the webcam on at start
     auto_progress = false; // Set to true if you want auto progress in your project
-    default_opacity_fade_in_time = 1.0; // Default time it takes for elements to appear
+    default_opacity_fade_in_time = 1.0; // Default time it takes for elements to appear. 0 = instant
+    default_blur_fade_in_time = 0.5; // Set to 0 to disable default blur fade in animation
+    default_blur_fade_in_amount = 10; //unit: px
+
     default_opacity_fade_out_time = 0.5; // Default time it takes for elements to disappear
+
     clip_div.style.clipPath="inset(0% 0% 0% 0% round 4rem)"; //This sets the rounded corners of the slides
   }
 
