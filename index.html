@@ -1566,6 +1566,42 @@ function hello (name, info) {
   console.log(infos);
 }
 
+// Animate parameters for objects of different types:
+let all_anims_a={};
+
+function change (name, params) {
+  console.log("change:");
+  console.log(name);
+  console.log(params);
+  if (params.how==undefined) params.how=mina.linear;
+  if (params.duration==undefined) params.duration=500;
+
+  if (infos[name].t == "html"){
+    // Handle animations for html elements:
+    console.log("html element");
+    if (params.a != undefined){
+      console.log("animate a");
+      let the_element = document.getElementById(name);
+      let current_a = the_element.style.opacity;
+
+      // If there is an opacity animation still ongoing for this element, stop it:
+      if (all_anims_a.name!=undefined){
+        console.log("STOP this a anim");
+        all_anims_a.name.stop();
+      }
+
+//      try {
+        let info = infos[name];
+//        info.a = 1.0;
+        info.dest_a = params.a;
+//        let the_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {the_element.style.opacity=value;} catch {};}, params.duration, params.how );
+        all_anims_a[name] = Snap.animate( current_a, info.dest_a, function(value) {the_element.style.opacity=value;}, params.duration, params.how);
+//      } catch {}
+
+    }
+  }
+}
+
 function goodbye_all_3d_objects () {
   const keys = Object.keys(infos);
   keys.forEach((name, index) => {
@@ -2832,6 +2868,15 @@ function show_slide_no (dst_slide, direction) {
     hello("b_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">HELLO<br>P-EXPO</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
     hello("b_html1", {t:"html", html:`<div style="color:#ffffff">Press right arrow</div>`, x:0.0, y:-0.8, width:1.0, height:1.0, rot:0});
   }
+
+  if (!--w) { duration=0.1; notes="Hello -> Brief introduction";
+    change("b_html0", {a:0.1, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="Hello -> Brief introduction";
+    change("b_html0", {a:1.0, how:mina.linear, duration:1000});
+  }
+
 
   if (!--w) { duration=0.1; notes="Can use git for version control -> Source code";
     goodbye_all();
