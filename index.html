@@ -1253,13 +1253,13 @@ function hello (name, info) {
       div_element.style.borderRadius = info.border_radius;
     }
 
-    if (default_opacity_fade_in_time==0){
+    if ((info.default_fade_in==false)||(default_opacity_fade_in_time==0)){
       div_element.style.opacity=info.a;
     } else {
       // Setup the default opacity anim:
       div_element.style.opacity=0.0;
     }
-    if ((default_blur_fade_in_time!=0)&&(default_blur_fade_in_amount!=0)){
+    if ((info.default_fade_in!=false)&&(default_blur_fade_in_time!=0)&&(default_blur_fade_in_amount!=0)){
       div_element.style.filter="blur(" + default_blur_fade_in_amount + "px)";
     }
 
@@ -1550,11 +1550,13 @@ function hello (name, info) {
   }
   infos[name] = info;
   console.log(infos);
-  if (default_opacity_fade_in_time!=0){
+
+
+  if ((info.default_fade_in!=false)&&(default_opacity_fade_in_time!=0)){
     console.log("Starting default a anim");
     move(name,{a:info.a,duration:1000*default_opacity_fade_in_time});
   }
-  if ((default_blur_fade_in_time!=0)&&(default_blur_fade_in_amount!=0)){
+  if ((info.default_fade_in!=false)&&(default_blur_fade_in_time!=0)&&(default_blur_fade_in_amount!=0)){
     console.log("Starting default blur anim");
     move(name,{blur:0,duration:1000*default_blur_fade_in_time});
   }
@@ -2936,7 +2938,7 @@ function show_slide_no (dst_slide, direction) {
     //start_default_webcam(); // <- Remove // if you want the webcam on at start
     auto_progress = false; // Set to true if you want auto progress in your project
     default_opacity_fade_in_time = 1.0; // Default time it takes for elements to appear. 0 = instant
-    default_blur_fade_in_time = 0.5; // Set to 0 to disable default blur fade in animation
+    default_blur_fade_in_time = 0.75; // Set to 0 to disable default blur fade in animation
     default_blur_fade_in_amount = 10; //unit: px
 
     default_opacity_fade_out_time = 0.5; // Default time it takes for elements to disappear
@@ -2952,7 +2954,8 @@ function show_slide_no (dst_slide, direction) {
     hello("c_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">ANIMATE<br>ME!</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
   }
 
-  if (!--w) { duration=0.1; notes="blur 10";
+  if (!--w) { duration=0.1; notes="Adding element without default fade in";
+    hello("b_html1", {t:"html", html:`<div style="color:#ffffff">Press right arrow</div>`, x:0.0, y:-0.8, width:1.0, height:1.0, rot:0, default_fade_in:false});
     move("c_html0", {blur:10.0, how:mina.linear, duration:500});
   }
 
