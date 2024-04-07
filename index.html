@@ -1628,9 +1628,9 @@ function change (name, params) {
       console.log("current=");
       console.log(current);
 
-      if (all_anims_tr.name!=undefined){
+      if (all_anims_tr[name]!=undefined){
         console.log("STOP this tr anim");
-        all_anims_tr.name.stop();
+        all_anims_tr[name].stop();
       }
 
 
@@ -1660,7 +1660,6 @@ function change (name, params) {
       console.log("dest_rot=" + rot);
       console.log("dest_scale=" + a_scale);
       all_anims_tr[name] = Snap.animate( 0.0, 1.0, function(value) {
-        console.log("tr value="+value);
         const start_x=current.translateX;
         const dest_x=css_offset_x;
         let x=start_x*(1-value) + dest_x*value;
@@ -1674,7 +1673,6 @@ function change (name, params) {
         const dest_rot=rot;
         let rotate=start_rot*(1-value) + dest_rot*value;
         let transform_string = "translate(" + x + "px, " + y + "px) scale(" + scale + ") rotate(" + rotate + "deg)";
-        console.log(transform_string);
         the_element.style.transform=transform_string;
       }, params.duration, params.how);
     }
