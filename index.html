@@ -1567,7 +1567,8 @@ function hello (name, info) {
 }
 
 // Animate parameters for objects of different types:
-let all_anims_a={};
+let all_anims_a={};  // opacity
+let all_anims_tr={}; // transform (translate, scale, rotation)
 
 function change (name, params) {
   console.log("change:");
@@ -1575,30 +1576,109 @@ function change (name, params) {
   console.log(params);
   if (params.how==undefined) params.how=mina.linear;
   if (params.duration==undefined) params.duration=500;
+  let info = infos[name];
 
   if (infos[name].t == "html"){
     // Handle animations for html elements:
     console.log("html element");
+    let the_element = document.getElementById(name);
     if (params.a != undefined){
       console.log("animate a");
-      let the_element = document.getElementById(name);
       let current_a = the_element.style.opacity;
-
       // If there is an opacity animation still ongoing for this element, stop it:
       if (all_anims_a.name!=undefined){
         console.log("STOP this a anim");
         all_anims_a.name.stop();
       }
-
 //      try {
-        let info = infos[name];
 //        info.a = 1.0;
         info.dest_a = params.a;
 //        let the_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {the_element.style.opacity=value;} catch {};}, params.duration, params.how );
         all_anims_a[name] = Snap.animate( current_a, info.dest_a, function(value) {the_element.style.opacity=value;}, params.duration, params.how);
 //      } catch {}
-
     }
+    if((params.x!=undefined)||(params.y!=undefined)||(params.rot!=undefined)||(params.scale!=undefined)){
+      console.log("animate x y rot scale");
+      let current_transform = the_element.style.transform;
+      console.log("current_transform=" + current_transform);
+      // current_transform=translate(0px, -54px) rotate(-10deg)
+      //const regex = /(?:\s*translate\(\s*([^,]+)\s*,\s*([^)]+)\s*\))?|(?:\s*scale\(\s*([^)]+)\s*\))?|(?:\s*rotate\(\s*([^)]+)\s*\))?/g;
+      const current = { translateX: 0, translateY: 0, scale: 1, rotate: 0 };
+
+      const re_xy = /translate\(\s*([^,]+)\s*,\s*([^)]+)\s*\)/g;
+      let match = re_xy.exec(current_transform);
+      if (match[1] !== undefined && match[2] !== undefined) {
+        current.translateX = parseFloat(match[1]);
+        current.translateY = parseFloat(match[2]);
+      }
+
+      const re_scale = /scale\(\s*([^)]+)\s*\)/g;
+      match = re_scale.exec(current_transform);
+      console.log("scale_match=");
+      console.log(match);
+      if (match != null) {
+        current.scale = parseFloat(match[1]);
+      }
+
+      const re_rot = /rotate\(\s*([-]?\d*\.?\d+)\s*(?:deg)?\s*\)/g;
+      match = re_rot.exec(current_transform);
+      if (match != null) {
+        current.rotate = parseFloat(match[1]);
+      }
+      console.log("current=");
+      console.log(current);
+
+      if (all_anims_tr.name!=undefined){
+        console.log("STOP this tr anim");
+        all_anims_tr.name.stop();
+      }
+
+
+      let css_width = current_screen_width;
+      if (info.width != null) {
+        css_width = info.width * current_screen_width;
+      }
+      let css_height = current_screen_height;
+      if (info.height != null) {
+        css_height = info.height * current_screen_height;
+      }
+      let css_offset_y = 0;
+      let css_offset_x = 0;
+      if (params.y != null) {
+        css_offset_y = current_screen_height/2 - css_height/2 - params.y * current_screen_height / 2;
+      }
+      if (params.x != null) {
+        css_offset_x += -css_width/2 + current_screen_width/2 + params.x * current_screen_width / 2;
+      }
+      let rot = params.rot;
+      let a_scale = params.scale;
+      if (params.y == undefined) css_offset_y = current.translateY;
+      if (params.x == undefined) css_offset_x = current.translateX;
+      if (params.rot == undefined) rot = current.rotate;
+      if (params.scale == undefined) a_scale = current.scale;
+
+      console.log("dest_rot=" + rot);
+      console.log("dest_scale=" + a_scale);
+      all_anims_tr[name] = Snap.animate( 0.0, 1.0, function(value) {
+        console.log("tr value="+value);
+        const start_x=current.translateX;
+        const dest_x=css_offset_x;
+        let x=start_x*(1-value) + dest_x*value;
+        const start_y=current.translateY;
+        const dest_y=css_offset_y;
+        let y=start_y*(1-value) + dest_y*value;
+        const start_scale=current.scale;
+        const dest_scale=a_scale;
+        let scale=start_scale*(1-value) + dest_scale*value;
+        const start_rot=current.rotate;
+        const dest_rot=rot;
+        let rotate=start_rot*(1-value) + dest_rot*value;
+        let transform_string = "translate(" + x + "px, " + y + "px) scale(" + scale + ") rotate(" + rotate + "deg)";
+        console.log(transform_string);
+        the_element.style.transform=transform_string;
+      }, params.duration, params.how);
+    }
+
   }
 }
 
@@ -2860,6 +2940,51 @@ function show_slide_no (dst_slide, direction) {
     clip_div.style.clipPath="inset(0% 0% 0% 0% round 4rem)"; //This sets the rounded corners of the slides
   }
 
+  if (!--w) { duration=0.1; notes="Temporary test of animations";
+    goodbye_videos_immediately();
+    goodbye_all_immediately();
+    goodbye_cables();
+    hello("bg1", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#404040e0"});
+    hello("c_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">ANIMATE<br>ME!</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
+  }
+
+  if (!--w) { duration=0.1; notes="rot 10";
+    change("c_html0", {rot:10.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="s 0.5";
+    change("c_html0", {scale:0.5, how:mina.elastic, duration:1500});
+  }
+
+  if (!--w) { duration=0.1; notes="x -1.0";
+    change("c_html0", {x:-1.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="y -1.0";
+    change("c_html0", {y:-1.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="x 1.0";
+    change("c_html0", {x:1.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="y 1.0";
+    change("c_html0", {y:1.0, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="x0 y0";
+    change("c_html0", {x:0.0, y:0.0, how:mina.linear, duration:500});
+  }
+
+
+  if (!--w) { duration=0.1; notes="a 0.1";
+    change("c_html0", {a:0.1, how:mina.linear, duration:500});
+  }
+
+  if (!--w) { duration=0.1; notes="a 1.0";
+    change("c_html0", {a:1.0, how:mina.linear, duration:1000});
+  }
+
   if (!--w) { duration=0.1; notes="Hello -> Brief introduction";
     goodbye_videos_immediately();
     goodbye_all_immediately();
@@ -2868,15 +2993,6 @@ function show_slide_no (dst_slide, direction) {
     hello("b_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">HELLO<br>P-EXPO</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
     hello("b_html1", {t:"html", html:`<div style="color:#ffffff">Press right arrow</div>`, x:0.0, y:-0.8, width:1.0, height:1.0, rot:0});
   }
-
-  if (!--w) { duration=0.1; notes="Hello -> Brief introduction";
-    change("b_html0", {a:0.1, how:mina.linear, duration:500});
-  }
-
-  if (!--w) { duration=0.1; notes="Hello -> Brief introduction";
-    change("b_html0", {a:1.0, how:mina.linear, duration:1000});
-  }
-
 
   if (!--w) { duration=0.1; notes="Can use git for version control -> Source code";
     goodbye_all();
