@@ -3,23 +3,23 @@
 <title>P-expo Presentation</title>
 <style>
 html,body {margin:0 0;overflow:hidden;background:#000;color:#ccc;font-size:16px}
-#all {margin:0 0; width:960px; height:540px; border:0px;}
-#clip {width:100%; height:100%; clip-path:inset(0% 0% 0% 0%)}
-#all svg {display:inline-block; position:absolute; top:0; left:0; margin:0px 0px; width:960px; height:540px;}
-#webcam_element {width: 960px; height: 540px; background-color: #000; transform: scaleX(-1); z-index:3}
-#audiencecam_element {position: absolute; top:0px; left:350px;width: 610px; height: 343.125px; background-color: #666; transform: scaleX(-1); z-index:4; display: none}
-#video_div {display: block; position: absolute; overflow: hidden; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; z-index: 5}
-#html_div {display: block; position: absolute; overflow: hidden; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; z-index: 5}
-#snippet_element {display: inline-block; position: absolute; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; transform: scaleX(-1); z-index: 3.5}
-#replay_element {display: inline-block; position: absolute; top: 0; left: 0; margin: 0px 0px; width: 960px; height: 540px; transform: scaleX(-1); z-index: 3.1}
-#notes {width: 960px; height: 250px; line-height: 250px; background-color: #000000; font-size: 300%; z-index: 19}
-#notes p {line-height: 45px; vertical-align: middle; display: inline-block; background-color: #000000; color: #ffa090; font-family: "Arial"; text-shadow: #ffff00 0px 0px 3px; -webkit-font-smoothing: antialiased; z-index: 20;}
-#sunburst {position: absolute; width: 960px; height: 540px; overflow: hidden; opacity: 40%; z-index: 10; display: none;}
-.inner {width: 300%; height: 300%; position: absolute; top: 110%; left: 50%; transform: translate(-50%, -50%); animation: spin 55s linear infinite;}
-@keyframes spin {from{transform: translate(-50%, -50%) rotate(0deg);} to {transform: translate(-50%, -50%) rotate(360deg);}}
-.gradient-wrap {width: 100%; height: 60%; overflow: hidden;}
-.gradient-wrap:last-child {transform: rotate(180deg);}
-.gradient {width: 100%; height: 200%; background: repeating-conic-gradient(hsl(0deg 0% 80% / 31%) 0deg 15deg, hsla(0,0%,100%,0) 0deg 30deg) #3c1c32 }
+#all {margin:0 0;width:960px;height:540px;border:0px}
+#clip {width:100%;height:100%;clip-path:inset(0% 0% 0% 0%)}
+#all svg {display:inline-block;position:absolute;top:0;left:0;margin:0px 0px;width:960px;height:540px}
+#webcam_element {width:960px;height:540px;background-color:#000;transform:scaleX(-1);z-index:3}
+#audiencecam_element {position:absolute;top:0px;left:350px;width:610px;height:343.125px;background-color:#666;transform:scaleX(-1);z-index:4;display:none}
+#video_div {display:block;position:absolute;overflow:hidden;top:0;left:0;margin:0px0px;width:960px;height:540px;z-index:5}
+#html_div {display:block;position:absolute;overflow:hidden;top:0;left:0;margin:0px0px;width:960px;height:540px;z-index:5}
+#snippet_element {display:inline-block;position:absolute;top:0;left:0;margin:0px 0px;width:960px;height:540px;transform:scaleX(-1);z-index:3.5}
+#replay_element {display:inline-block;position:absolute;top:0;left:0;margin:0px 0px;width:960px;height:540px;transform:scaleX(-1);z-index:3.1}
+#notes {width:960px;height:250px;line-height:250px;background-color:#000000;font-size:300%;z-index:19}
+#notes p {line-height:45px;vertical-align:middle;display:inline-block;background-color:#000000;color:#ffa090;font-family:"Arial";text-shadow:#ffff00 0px 0px 3px;-webkit-font-smoothing:antialiased;z-index:20}
+#sunburst {position:absolute;width:960px;height:540px;overflow:hidden;opacity:40%;z-index:10;display:none}
+.inner {width:300%;height:300%;position:absolute;top:110%;left:50%;transform:translate(-50%,-50%);animation:spin 55s linear infinite;}
+@keyframes spin {from{transform:translate(-50%, -50%) rotate(0deg);} to {transform:translate(-50%, -50%) rotate(360deg);}}
+.gradient-wrap {width:100%;height:60%;overflow:hidden}
+.gradient-wrap:last-child {transform:rotate(180deg);}
+.gradient {width:100%;height:200%;background:repeating-conic-gradient(hsl(0deg 0% 80% / 31%) 0deg 15deg,hsla(0,0%,100%,0) 0deg 30deg) #3c1c32 }
 #tr_div {position:fixed;left:0px;top:0px;width:960px;height:540px;z-index:8;display:block;overflow:hidden}
 #tr3d {position:fixed;left:0px;top:0px;width:960px;height:540px;z-index:8;display:block;overflow:hidden}
 #chart_holder {position:absolute;left:0px;top:0px;width:540px;height:540px;z-index:2;display:block;overflow:hidden}
@@ -36,11 +36,11 @@ html,body {margin:0 0;overflow:hidden;background:#000;color:#ccc;font-size:16px}
 #logo1 {position:absolute;left:875px;top:40px;width:960px;height:540px;z-index:999;display:block;overflow:hidden;outline:0;opacity:0.5}
 #logo2 {position:absolute;left:855px;top:130px;width:960px;height:540px;z-index:999;display:block;overflow:hidden;outline:0;opacity:0.5}
 math-field{border:0;background:none}
-math-field:focus-within{outline:2px solid #808080;border-radius:4px;background:rgba(200,200,200,.3);}
-math-field::part(virtual-keyboard-toggle){display:none;}
-math-field::part(menu-toggle){display:none;}
+math-field:focus-within{outline:2px solid #808080;border-radius:4px;background:rgba(200,200,200,.3)}
+math-field::part(virtual-keyboard-toggle){display:none}
+math-field::part(menu-toggle){display:none}
 /* disable on touch highlights of html elements, especially on mobile! */
-* { -webkit-tap-highlight-color: transparent; -webkit-touch-callout:none; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;}
+* {-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
 </style>
 <script src="js/snap.svg-min.js"></script>
 <script type="module" src="js/three.module.js"></script>
@@ -1242,13 +1242,13 @@ function hello (name, info) {
     let css_offset_y = 0;
     let css_offset_x = 0;
     if (info.y != null) {
-      css_offset_y = current_screen_height/2 - css_height/2 - info.y * current_screen_height / 2;
+      css_offset_y = current_screen_height/2 - info.y * current_screen_height / 2;
     }
     if (info.x != null) {
-      css_offset_x += -css_width/2 + current_screen_width/2 + info.x * current_screen_width / 2;
+      css_offset_x = current_screen_width/2 + info.x * current_screen_width / 2;
     }
     // x, y
-    div_element.style.transform = "translate(" + css_offset_x + "px, " + css_offset_y + "px)" + rotate_string;
+    div_element.style.transform = "translate(-50%, -50%) translate(" + css_offset_x + "px, " + css_offset_y + "px)" + rotate_string;
     if (info.border_radius != null) {
       div_element.style.borderRadius = info.border_radius;
     }
@@ -1554,11 +1554,11 @@ function hello (name, info) {
 
   if ((info.default_fade_in!=false)&&(default_opacity_fade_in_time!=0)){
     console.log("Starting default a anim");
-    move(name,{a:info.a,duration:1000*default_opacity_fade_in_time});
+    move(name,{a:info.a,duration:default_opacity_fade_in_time});
   }
   if ((info.default_fade_in!=false)&&(default_blur_fade_in_time!=0)&&(default_blur_fade_in_amount!=0)){
     console.log("Starting default blur anim");
-    move(name,{blur:0,duration:1000*default_blur_fade_in_time});
+    move(name,{blur:0,duration:default_blur_fade_in_time});
   }
 
 }
@@ -1575,7 +1575,7 @@ function move (name, params) {
   console.log(name);
   console.log(params);
   if (params.how==undefined) params.how=mina.linear;
-  if (params.duration==undefined) params.duration=500;
+  if (params.duration==undefined) params.duration=0.5;
   let info = infos[name];
 
   if (infos[name].t == "html"){
@@ -1592,7 +1592,7 @@ function move (name, params) {
 //        info.a = 1.0;
         info.dest_a = params.a;
 //        let the_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {the_element.style.opacity=value;} catch {};}, params.duration, params.how );
-        all_anims_a[name] = Snap.animate( current_a, info.dest_a, function(value) {the_element.style.opacity=value;}, params.duration, params.how);
+        all_anims_a[name] = Snap.animate( current_a, info.dest_a, function(value) {the_element.style.opacity=value;}, params.duration*1000, params.how);
 //      } catch {}
     }
 
@@ -1610,7 +1610,7 @@ function move (name, params) {
         all_anims_filter.name.stop();
       }
 //      try {
-        all_anims_filter[name] = Snap.animate( current_blur, params.blur, function(value) {the_element.style.filter="blur("+value+"px)";}, params.duration, params.how);
+        all_anims_filter[name] = Snap.animate( current_blur, params.blur, function(value) {the_element.style.filter="blur("+value+"px)";}, params.duration*1000, params.how);
 //      } catch {}
     }
 
@@ -1623,7 +1623,7 @@ function move (name, params) {
       if (all_anims_width.name!=undefined){
         all_anims_width.name.stop();
       }
-      all_anims_width[name] = Snap.animate( current_css_width, dest_css_width, function(value) {the_element.style.width=value+"px";}, params.duration, params.how);
+      all_anims_width[name] = Snap.animate( current_css_width, dest_css_width, function(value) {the_element.style.width=value+"px";}, params.duration*1000, params.how);
     }
 
 
@@ -1634,18 +1634,26 @@ function move (name, params) {
       if (all_anims_height.name!=undefined){
         all_anims_height.name.stop();
       }
-      all_anims_height[name] = Snap.animate( current_css_height, dest_css_height, function(value) {the_element.style.height=value+"px";}, params.duration, params.how);
+      all_anims_height[name] = Snap.animate( current_css_height, dest_css_height, function(value) {the_element.style.height=value+"px";}, params.duration*1000, params.how);
     }
 
 
     if((params.x!=undefined)||(params.y!=undefined)||(params.rot!=undefined)||(params.scale!=undefined)){
       let current_transform = the_element.style.transform;
+      console.log("current_transform=");
+      console.log(current_transform);
+      // translate(-50%, -50%) translate(480px, 216px) rotate(-10deg)
       // current_transform=translate(0px, -54px) rotate(-10deg)
       //const regex = /(?:\s*translate\(\s*([^,]+)\s*,\s*([^)]+)\s*\))?|(?:\s*scale\(\s*([^)]+)\s*\))?|(?:\s*rotate\(\s*([^)]+)\s*\))?/g;
       const current = { translateX: 0, translateY: 0, scale: 1, rotate: 0 };
 
-      const re_xy = /translate\(\s*([^,]+)\s*,\s*([^)]+)\s*\)/g;
+      // This regexp will give me the first 2 numbers (-50 and -50) from the % above:
+      //const re_xy = /translate\(\s*([^,]+)\s*,\s*([^)]+)\s*\)/g;
+      // This regexp will give me the translate coordinates that have the unit px:
+      const re_xy = /translate\((-?\d*\.?\d+)px,\s*(-?\d*\.?\d+)px\)/g;
+
       let match = re_xy.exec(current_transform);
+      console.log(match);
       if (match[1] !== undefined && match[2] !== undefined) {
         current.translateX = parseFloat(match[1]);
         current.translateY = parseFloat(match[2]);
@@ -1662,25 +1670,18 @@ function move (name, params) {
       if (match != null) {
         current.rotate = parseFloat(match[1]);
       }
+      console.log(current);
 
       if (all_anims_tr[name]!=undefined){
         all_anims_tr[name].stop();
       }
-      let css_width = current_screen_width;
-      if (info.width != null) {
-        css_width = info.width * current_screen_width;
-      }
-      let css_height = current_screen_height;
-      if (info.height != null) {
-        css_height = info.height * current_screen_height;
-      }
       let css_offset_y = 0;
       let css_offset_x = 0;
       if (params.y != null) {
-        css_offset_y = current_screen_height/2 - css_height/2 - params.y * current_screen_height / 2;
+        css_offset_y = current_screen_height/2 - params.y * current_screen_height / 2;
       }
       if (params.x != null) {
-        css_offset_x += -css_width/2 + current_screen_width/2 + params.x * current_screen_width / 2;
+        css_offset_x = current_screen_width/2 + params.x * current_screen_width / 2;
       }
       let rot = params.rot;
       let a_scale = params.scale;
@@ -1702,9 +1703,9 @@ function move (name, params) {
         const start_rot=current.rotate;
         const dest_rot=rot;
         let rotate=start_rot*(1-value) + dest_rot*value;
-        let transform_string = "translate(" + x + "px, " + y + "px) scale(" + scale + ") rotate(" + rotate + "deg)";
+        let transform_string = "translate(-50%,-50%) translate(" + x + "px, " + y + "px) scale(" + scale + ") rotate(" + rotate + "deg)";
         the_element.style.transform=transform_string;
-      }, params.duration, params.how);
+      }, params.duration*1000, params.how);
     }
 
   }
@@ -2979,7 +2980,7 @@ function show_slide_no (dst_slide, direction) {
   }
 
   if (!--w) { duration=0.1; notes="width 1.0, height 1.0";
-    move("d_html", {width:1.0, height:1.0});
+    move("d_html", {width:1.0, height:1.0, duration:4.0});
   }
 
 
@@ -3394,48 +3395,48 @@ In P-expo, you can use markdown for:
 
   if (!--w) { duration=0.1; notes="Adding element without default fade in";
     hello("b_html1", {t:"html", html:`<div style="color:#ffffff">Press right arrow</div>`, x:0.0, y:-0.8, width:1.0, height:1.0, rot:0, default_fade_in:false});
-    move("c_html0", {blur:10.0, how:mina.linear, duration:500});
+    move("c_html0", {blur:10.0, how:mina.linear, duration:0.5});
   }
 
   if (!--w) { duration=0.1; notes="blur 0";
-    move("c_html0", {blur:0.0, how:mina.linear, duration:500});
+    move("c_html0", {blur:0.0, how:mina.linear, duration:0.5});
   }
 
   if (!--w) { duration=0.1; notes="rot 10";
-    move("c_html0", {rot:10.0, how:mina.linear, duration:500});
+    move("c_html0", {rot:10.0, how:mina.linear, duration:0.5});
   }
 
   if (!--w) { duration=0.1; notes="s 0.5";
-    move("c_html0", {scale:0.5, how:mina.elastic, duration:1500});
+    move("c_html0", {scale:0.5, how:mina.elastic, duration:1.5});
   }
 
   if (!--w) { duration=0.1; notes="x -1.0";
-    move("c_html0", {x:-1.0, how:mina.linear, duration:500});
+    move("c_html0", {x:-1.0, how:mina.linear, duration:0.5});
   }
 
   if (!--w) { duration=0.1; notes="y -1.0";
-    move("c_html0", {y:-1.0, how:mina.linear, duration:500});
+    move("c_html0", {y:-1.0, how:mina.linear, duration:0.5});
   }
 
   if (!--w) { duration=0.1; notes="x 1.0";
-    move("c_html0", {x:1.0, how:mina.linear, duration:500});
+    move("c_html0", {x:1.0, how:mina.linear, duration:0.5});
   }
 
   if (!--w) { duration=0.1; notes="y 1.0";
-    move("c_html0", {y:1.0, how:mina.linear, duration:500});
+    move("c_html0", {y:1.0, how:mina.linear, duration:0.5});
   }
 
   if (!--w) { duration=0.1; notes="x0 y0";
-    move("c_html0", {x:0.0, y:0.0, rot:10.0, scale:0.5, how:mina.linear, duration:500});
+    move("c_html0", {x:0.0, y:0.0, rot:10.0, scale:0.5, how:mina.linear, duration:0.5});
   }
 
 
   if (!--w) { duration=0.1; notes="a 0.1";
-    move("c_html0", {a:0.1, how:mina.linear, duration:500});
+    move("c_html0", {a:0.1, how:mina.linear, duration:0.5});
   }
 
   if (!--w) { duration=0.1; notes="a 1.0";
-    move("c_html0", {a:1.0, how:mina.linear, duration:1000});
+    move("c_html0", {a:1.0, how:mina.linear, duration:1.0});
   }
 
 
