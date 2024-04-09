@@ -1127,6 +1127,8 @@ function on_key_down (event) {
     set_screen_size(960, 540);
   } else if (event.key == "f") {
     goFullscreen();
+  } else if (event.key == "d") {
+    toggle_development_mode();
   }
 }
 
@@ -1640,20 +1642,14 @@ function move (name, params) {
 
     if((params.x!=undefined)||(params.y!=undefined)||(params.rot!=undefined)||(params.scale!=undefined)){
       let current_transform = the_element.style.transform;
-      console.log("current_transform=");
-      console.log(current_transform);
       // translate(-50%, -50%) translate(480px, 216px) rotate(-10deg)
-      // current_transform=translate(0px, -54px) rotate(-10deg)
       //const regex = /(?:\s*translate\(\s*([^,]+)\s*,\s*([^)]+)\s*\))?|(?:\s*scale\(\s*([^)]+)\s*\))?|(?:\s*rotate\(\s*([^)]+)\s*\))?/g;
       const current = { translateX: 0, translateY: 0, scale: 1, rotate: 0 };
 
-      // This regexp will give me the first 2 numbers (-50 and -50) from the % above:
-      //const re_xy = /translate\(\s*([^,]+)\s*,\s*([^)]+)\s*\)/g;
       // This regexp will give me the translate coordinates that have the unit px:
       const re_xy = /translate\((-?\d*\.?\d+)px,\s*(-?\d*\.?\d+)px\)/g;
 
       let match = re_xy.exec(current_transform);
-      console.log(match);
       if (match[1] !== undefined && match[2] !== undefined) {
         current.translateX = parseFloat(match[1]);
         current.translateY = parseFloat(match[2]);
@@ -1670,7 +1666,6 @@ function move (name, params) {
       if (match != null) {
         current.rotate = parseFloat(match[1]);
       }
-      console.log(current);
 
       if (all_anims_tr[name]!=undefined){
         all_anims_tr[name].stop();
@@ -1707,7 +1702,6 @@ function move (name, params) {
         the_element.style.transform=transform_string;
       }, params.duration*1000, params.how);
     }
-
   }
 }
 
@@ -2880,98 +2874,37 @@ function init () {
   animate();
 }
 
-// Slides -----------------------------------------------------------------------------
-//
-// All slides adhere to this structure:
-// if (!w) { notes = "Whatever I need to see on the screen to be able to tell my story.\n-> What's on the next slide";
-//   Cleanup from slide above when going forward
-//   The new stuff
-//   Cleanup from slide below when going backward
-// }  // Name of this slide
-
-//  if (!--w) { notes = "\n-> ";
-//  }  // 
 
 
-// For audience cam, you will need to initialize the camera a second before you want to show it.
-// They can be painfully slow in getting up and running, so prepare it a few slides ahead:
-// 2 slides before, do
-//    stop_audience_cam();
-// 1 slide before do:
-//    start_audience_cam();
-// Then on the slide you want the camera to be seen:
-//    audiencecam_element.style.opacity = 0.0;
-//    audiencecam_element.style.display = "inline-block";
-//    Snap.animate( 0.0, 1.0, function(value) {try {audiencecam_element.style.opacity = value;} catch {};}, 1000, mina.linear );
-// After slide:
-//    Snap.animate( 1.0, 0.0, function(value) {try {audiencecam_element.style.opacity = value;} catch {};}, 1000, mina.linear );
-// Then:
-//    stop_audience_cam();
-//    audiencecam_element.style.display = "none";
+// Development Slides -----------------------------------------------------------------------------
+//  These are here to check that coordinates and functions work as expected.
+//  They are not ment to be pretty, they are here to ensure functionality.
+//  
 
+let development_mode = false;
+function toggle_development_mode() {
+  development_mode = !development_mode;
+  goto(0);
+}
 
-
-// hello() options for "3d"
-// hello("brain", {t:"3d", file:"/3d_models/brain_v04.glb", x:-1.0, y:-0.55, scale:0.12, rx:-Math.PI * 0.4, rz:-Math.PI * 0.25});
-// x : -1.77 is to the far left. +1.77 is to the far right. 0.0 is the center.
-// y : -1.0 is to the top. +1.0 is at the bottom. 0.0 is the center.
-// scale: 1.0 is original scale
-// rx: rotation in radians
-// ry: rotation in radians
-
-// When this function returns true, abort any kind of iterative jump.
-function show_slide_no (dst_slide, direction) {
+function show_development_slide_no (dst_slide, direction) {
   let w = dst_slide;
   let notes = "";
   duration = 10.0;
   let my_border = "1.5px solid #000000";
   let my_box_shadow = "14px 14px 15px 0px rgba(0, 0, 0, .35)"; // offset-x | offset-y | blur-radius | spread-radius | color
-
-// Use this to "start" at a certain slide number:
-//  w = w + 1;
-
   w++;
 
-
-// Coordinate system: (x=0,y=0) is in the middle of the screen.
-// x:-1.0 to 1.0    x=-1 is the left edge of the screen. x=1 is the right edge of the screen.
-// y:-1.0 to 1.0    y=-1 is the bottom of the screen. y=1 is the top of the screen.
-// width:  1.0 is the whole screen width.
-// height: 1.0 is the whole screen height.
-
-// Examples:
-// x:   0, y:   0, width:1.0, height:1.0   means fullscreen
-// x:   0, y:   0, width:0.5, height:0.5   means a rectangle in the middle of the screen
-// x: 0.5, y:   0, width:0.5, height:1.0   means the right half of the screen
-// x:-0.5, y:   0, width:0.5, height:1.0   means the left half of the screen
-// x:   0, y: 0.5, width:1.0, height:0.5   means the top half of the screen
-// x:   0, y:-0.5, width:1.0, height:0.5   means the bottom half of the screen
-
-// Font sizes. Please use font sizes that are related to html and body base font size.
-// This is set to 16px when in windowed mode. In fullscreen mode, this font size
-// is adjusted to match the size when in windowed mode. So, please use:
-//   font-size: 200%  // double size
-// or
-//   font-size: 2em   // also double size
-
-
-// #§# Start of slides:
-
-  // 
-  // Basic configuration of p-expo is done here:
-  // 
+  // #§# Developemnt slides start here:
   if (!--w) { duration=0.0; notes="";
-    // This is where you initialize elements that you want as default:
-    //start_default_webcam(); // <- Remove // if you want the webcam on at start
-    auto_progress = false; // Set to true if you want auto progress in your project
-    default_opacity_fade_in_time = 1.0; // Default time it takes for elements to appear. 0 = instant
-    default_blur_fade_in_time = 0.75; // Set to 0 to disable default blur fade in animation
-    default_blur_fade_in_amount = 10; //unit: px
-
-    default_opacity_fade_out_time = 0.5; // Default time it takes for elements to disappear
-
-    clip_div.style.clipPath="inset(0% 0% 0% 0% round 4rem)"; //This sets the rounded corners of the slides
+    auto_progress = false;
+    default_opacity_fade_in_time = 1.0;
+    default_blur_fade_in_time = 0.75;
+    default_blur_fade_in_amount = 10;
+    default_opacity_fade_out_time = 0.5;
+    clip_div.style.clipPath="inset(0% 0% 0% 0% round 4rem)";
   }
+
 
   if (!--w) { duration=0.1; notes="Trying out image animations";
     goodbye_all();
@@ -2982,407 +2915,6 @@ function show_slide_no (dst_slide, direction) {
   if (!--w) { duration=0.1; notes="width 1.0, height 1.0";
     move("d_html", {width:1.0, height:1.0, duration:4.0});
   }
-
-
-  if (!--w) { duration=0.1; notes="Hello -> Brief introduction";
-    goodbye_videos_immediately();
-    goodbye_all_immediately();
-    goodbye_cables();
-    hello("bg", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#ff80ffe0"});
-    hello("b_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">HELLO<br>P-EXPO</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
-    hello("b_html1", {t:"html", html:`<div style="color:#ffffff">Press right arrow</div>`, x:0.0, y:-0.8, width:1.0, height:1.0, rot:0});
-  }
-
-  if (!--w) { duration=0.1; notes="Can use git for version control -> Source code";
-    goodbye_all();
-    hello("bg2", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#204040e0"});
-    hello("a_html", {t:"html", html:`<div style="font-size:170%;text-align:center">
-          P-expo is a <i>write your presentation in text</i> framework.<br>
-          P-expo handles text, images, videos, audio, webcams, 3d-models, shaders, charts, javascript,
-          and LaTeX equations like \\[u(t)=K\\left[e(t)+\\frac{1}{T_i}\\,\\int\\limits^t\\,e(\\tau)\\,d\\tau\\,+ T_d \\frac{de(t) }{ dt}\\right]\\]
-          by typing.</div>`, x:0.0, y:0.0, width:0.7, height:1.0});
-  }
-
-  if (!--w) { duration=0.1; notes="It's open-source -> The rest of the presentation";
-    goodbye_all();
-    hello("bg3", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#404020e0"});
-    hello("c_html", {t:"html", html:`<div style="font-size:170%;text-align:center">
-          Make your own presentation from this template at<br>
-          https://github.com/p-expo/p-expo.github.io<br><br>
-          The next slide will start your webcam.</div>`, x:0.3, y:0.0, width:0.6, height:1.0});
-    hello("d_html", {t:"html", html:`<img src="media/image/png_image_square.png" height=100% style="border-radius:50px">`, x:-0.65, y:0.0, width:0.5, height:0.5});
-  }
-
-  if (!--w) { duration=0.1; notes="You can cut & paste as you wish from these examples -> LaTeX equations";
-    start_default_webcam();
-    goodbye_all();
-    hello("bg4", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#505050e0"});
-    hello("e_html", {t:"html", html:`<div style="font-size:170%;text-align:center">
-          The remaining slides in this presentation contain examples of media types you may want to use.<br><br>
-          Enjoy! / Pex Tufvesson
-          </div>`, x:0.0, y:0.0, width:0.65, height:1.0});
-  }
-
-
-
-  if (!--w) { duration=0.1; notes="Text written using html ->";
-    goodbye_all();
-    hello("bg6", {t:"rect", x:-0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
-    hello("f_html", {t:"html", html:`
-<div>
-<h1>Text formatting</h1>
-<p>You need to learn <i>some</i> way of formatting <b>text</b>. This is html.</p>
-<h2>Sub header</h2>
-<p>In P-expo, you can use html for anything:</p>
-<ul>
-<li>lists</li>
-<li><i>emphasis</i></li>
-</ul>
-<p><img src="media/image/jpg_image.jpg" alt="Vokalas" title="Vokalas" width="100px"></p></div>
-          `, x:-0.4, y:0.0, width:0.4, height:0.9});
-  }
-
-
-
-  if (!--w) { duration=1.0; notes="Dialog test 0";
-    init_dialog ("Grab the attention\nwith dialogs", 0.0, 0.0, 0.20, 0);
-  }  //
-
-
-  if (!--w) { duration=0.1; notes="Text written using markdown ->";
-    fade_dialog_glpos(0,0);
-    goodbye_all();
-    hello("bg7", {t:"rect", x:0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
-    hello("d_md", {t:"markdown", markdown:`
-# Text formatting
-
-You need to learn *some* way of formatting **text**. This is markdown.
-
-## Sub header
-
-In P-expo, you can use markdown for:
-*   lists
-*   _emphasis_
-
-<img src="media/image/jpg_image.jpg" width="100px">
-          `, x:0.4, y:0.0, width:0.4, height:0.9});
-    // As the markdown syntax don't standardize how to scale images, we are forced
-    // to fall back to the html syntax to scale it
-    // Adding it with the native markdown syntax
-    //     ![alt text](/path/to/img.jpg "Title")
-    // works as long as you don't need to set the size of the image.
-  }
-
-  if (!--w) { duration=1.0; notes="Dialog test 1";
-    init_dialog("Everything\nis going to be\nall right", 0.0, 0.0, 0.20, 1);
-  }  //
-
-
-  // 3d object with animations:
-  if (!--w) { duration=2.0; notes="The skull -> brain";
-    try {
-      let info = infos["cbm3"];
-      info.a = 1.0;
-      info.dest_a = 0.0;
-      let video_element = document.getElementById("cbm1");
-      let video_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {video_element.style.opacity = value;} catch {};}, 400, mina.linear );
-    } catch {}
-    goodbye_all();
-    //hello("bci3text", {t:"text", text:["BCI","Performance"], align:"middle", line_height:"0.9em", x:0.0, y:-0.2, colour:"#ffffff", fontsize:230, font:"Arial", fontweight:800, dest_a:1.0, a:0.0});
-    hello("brain", {t:"3d", file:"/3d/brain_v04.glb", x:0.0, y:-0.55, scale:0.12, rx:-Math.PI * 0.4, rz:-Math.PI * 0.25});
-  }  // 
-
-  if (!--w) { duration=5.0; notes="5W for keeping it alive, 15W for signalling, folded to maximize the reacheable area for the support network, 86000 millions of neurons -> Sensor locations";
-    Snap.animate( -0.55, -0.2, function(value) {try {all_3d_models["brain"].position.y = value;} catch {};}, 3000, mina.elastic );
-    Snap.animate( 0.12, 0.3, function(value) {try {all_3d_models["brain"].scale.x = value; all_3d_models["brain"].scale.y = value; all_3d_models["brain"].scale.z = value;} catch {};}, 3000, mina.elastic );
-    Snap.animate(1.0, 0.0, function(value) {try {all_3d_models["brain"].children[4].material.opacity = value;} catch {};}, 4000, mina.linear);
-  }  // in_brain
-
-  if (!--w) { duration=7.0; notes="Brain is 3d. We can measure the surface 'cortical'. Highly complex. Highly connected. ->";
-    console.log(all_3d_models["brain"]);
-    Snap.animate( -0.2, -0.4, function(value) {try {all_3d_models["brain"].position.y = value;} catch {};}, 5000, mina.linear );
-    Snap.animate( 0.0, 2.5, function(value) {try {all_3d_models["brain"].children[1].position.x = value;} catch {};}, 5000, mina.linear );
-    Snap.animate( 0.0, -2.5, function(value) {try {all_3d_models["brain"].children[3].position.x = value;} catch {};}, 5000, mina.linear );
-    Snap.animate( 0.0, 1.5, function(value) {try {all_3d_models["brain"].children[0].position.y = value;} catch {};}, 5000, mina.linear );
-  }  // expand_brain
-
-
-  if (!--w) { duration=0.1; notes="A few examples of displaying text, png, transparent png, jpg, transparent svg ->";
-    fade_dialog_glpos(0.0,0);
-    goodbye_all();
-    hello("bg0", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#8080ff40"});
-    hello("a_html1", {t:"html", html:`<div style="width:100%;height:100%;background:#ffffff80;color:#000000">Hello world bottom left corner!</div>`, x:-0.667, y:-0.667, width:0.33, height:0.33});
-    hello("a_html2", {t:"html", html:`<img src="media/image/jpg_image.jpg" height=100%>`, x:-0.667, y:0, width:0.33, height:0.33});
-    hello("a_html3", {t:"html", html:`<img src="media/image/png_image_square.png" height=100%>`, x:-0.667, y:0.667, width:0.33, height:0.33});
-    hello("a_html5", {t:"html", html:`<img src="media/image/svg_image.svg" width=100%>`, x:0.667, y:0.667, width:0.33, height:0.33});
-    hello("a_html6", {t:"html", html:`<img src="media/image/png_image_wide.png" height=100%>`, x:0.667, y:0.0, width:0.33, height:0.33, a:0.0, dest_a:0.5});
-    hello("a_html7", {t:"html", html:`<img src="media/image/graph/clear_by_mind_hardware_schematic_simplified.png" height=100%>`, x:0.667, y:-0.667, width:0.33, height:0.33, a:0.0, dest_a:1.0});
-  }
-
-  if (!--w) { duration=0.1; notes="Nine examples of displaying text, png, transparent png, jpg, transparent svg ->";
-    // Add more elements:
-    hello("a_html0", {t:"html", html:`Hello world!`, x:0.0, y:0.0, width:0.33, height:0.33, rot:-10});
-    hello("a_html4", {t:"html", html:`<img src="media/image/png_image_transparent.png" height=100%>`, x:0, y:0.667, width:0.33, height:0.33});
-    hello("a_html8", {t:"html", html:`<img src="media/image/graph/pexexp1_flow_explanation_simplified3_transparent.png" height=100%>`, x:0.0, y:-0.667, width:0.33, height:0.33, a:0.0, dest_a:1.0});
-  }
-
-  if (!--w) { duration=0.1; notes="Four examples of displaying text, png, transparent png, jpg, transparent svg ->";
-    // Remove some elements:
-    goodbye("a_html0");
-    goodbye("a_html1");
-    goodbye("a_html3");
-    goodbye("a_html5");
-    goodbye("a_html7");
-  }
-
-
-  if (!--w) { duration=1.0; notes="Dialog test 2";
-    init_dialog("[1992]\n\nHaier, R.J., Siegel, B.V., Jr.,\nMacLachlan, A., Soderling,\nE., Lottenberg, S. & Buchsbaum, M. S:\n\nRegional glucose metabolic changes\nafter learning a complex\nvisuospatial/motor task:\na positron emission tomographic study.\n\nBrain Research, 570, 134—143.", 0.0, 0.0, 0.09, 2);
-  }  //
-
-
-  if (!--w) { duration=0.1; notes="Displaying LaTeX equations ->";
-    fade_dialog_glpos(0,1.0);
-    goodbye_all();
-    hello("bg8", {t:"rect", x:0.2, y:-0.6, width:0.75, height:0.35, colour:"#00000080", corner_radius:0.2});
-    hello("my_topic", {t:"text", text:"The solution", align:"middle", x:-0.94, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0, rot:-90});
-    hello("x_html0", {t:"html", html:`<div style="font-size:400%;">\\[x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}\\]</div>`, x:0.2, y:-0.6, width:0.75, height:0.5});
-  }
-
-
-  if (!--w) { duration=0.1; notes="Including an external web page, from<br>https://lu-pze.github.io ->";
-    goodbye_all();
-    // Beware that at the time of your presentation your
-    // internet connection MAY BE REALLY BAD.
-    // Especially at conferences with many participants.
-    // So, getting media from external sites should be a last resort.
-    // I do recommend to grab a screenshot, and show that image instead:
-    hello("b_html0", {t:"html", html:`<iframe src="https://lu-pze.github.io" title="Just a webpage" width="100%" height="100%"></iframe>`, x:0.0, y:0.0, width:0.95, height:0.9, a:0.0, dest_a:0.9});
-  }
-
-
-  // PACMAN
-  if (!--w) { duration=3.0; notes="Showing a pie chart -> pacman eating";
-    goodbye_all();
-    Chart.defaults.font.size = 40;
-    hello("pacman", {t:"chart", chart_data:pacman_config, width:540, height:540, a:1.0});
-  }  // Pacman
-
-  if (!--w) { duration=5.0; notes="->";
-    Chart.defaults.animation.duration = 700;
-    let dot_1 = document.createElement('div');
-    dot_1.setAttribute('id', 'dot_1');
-    dot_1.setAttribute('opacity', 1.0);
-    document.body.appendChild(dot_1);
-    //Snap.animate( 0, 1.0, function(value) {try {dot_1.style.opacity = value;} catch {};}, 500, mina.linear );
-    Snap.animate( 0, 45, function(value) {try {dot_1.style.height = value + "px"; dot_1.style.top = (200-(value/2)) + "px";} catch {};}, 1500, mina.elastic );
-    Snap.animate( 0, 45, function(value) {try {dot_1.style.width = value + "px"; dot_1.style.left = (620-(value/2)) + "px";} catch {};}, 1900, mina.elastic );
-
-    let dot_2 = document.createElement('div');
-    dot_2.setAttribute('id', 'dot_2');
-    dot_2.setAttribute('opacity', 1.0);
-    document.body.appendChild(dot_2);
-    //Snap.animate( 0, 1.0, function(value) {try {dot_2.style.opacity = value;} catch {};}, 800, mina.linear );
-    Snap.animate( 0, 45, function(value) {try {dot_2.style.height = value + "px"; dot_2.style.top = (200-(value/2)) + "px";} catch {};}, 2500, mina.elastic );
-    Snap.animate( 0, 45, function(value) {try {dot_2.style.width = value + "px"; dot_2.style.left = (820-(value/2)) + "px";} catch {};}, 3200, mina.elastic );
-    try {
-      window.my_chart.data.datasets[0].data = [98, 2];
-      window.my_chart.options.rotation = 135 - 40;
-      window.my_chart.options.animation.delay = 0;
-      window.my_chart.update();
-      setTimeout(function(){ window.my_chart.data.datasets[0].data = [75,25]; window.my_chart.options.rotation = 135; window.my_chart.update(); }, 600);
-      setTimeout(function(){ window.my_chart.data.datasets[0].data = [98, 2]; window.my_chart.options.rotation = 135-40; window.my_chart.update(); }, 1200);
-      setTimeout(function(){ window.my_chart.data.datasets[0].data = [75,25]; window.my_chart.options.rotation = 135; window.my_chart.update(); }, 1800);
-      setTimeout(function(){ window.my_chart.data.datasets[0].data = [98, 2]; window.my_chart.options.rotation = 135-40; window.my_chart.update(); }, 2400);
-      setTimeout(function(){ window.my_chart.data.datasets[0].data = [75,25]; window.my_chart.options.rotation = 135; window.my_chart.update(); }, 3000);
-      Snap.animate( 0, 950, function(value) {try {chart_holder.style.transform = "translate("+ (value) + "px";} catch {};}, 4000, mina.linear );
-    } catch {}
-    setTimeout(function(){ dot_1.parentNode.removeChild(dot_1); }, 1800);
-    setTimeout(function(){ dot_2.parentNode.removeChild(dot_2); }, 2800);
-    goodbye("my_signal_path");
-  }  // Pacman eating
-
-  if (!--w) { duration=0.1; notes="Showing a pdf file ->";
-    goodbye_all();
-    // Examples of picking parts of a pdf to view:
-    //http://example.com/doc.pdf#Chapter5
-    //http://example.com/doc.pdf#page=5
-    //http://example.com/doc.pdf#page=3&zoom=200,250,100
-    //http://example.com/doc.pdf#zoom=100
-    //http://example.com/doc.pdf#page=72&view=fitH,100
-    //Disable and Hide Toolbar in PDF Web Viewer:
-    //<embed src="files/Brochure.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" width="100%" height="600px" />
-    hello("c_html0", {t:"html", html:`<embed src="media/image/matplotlib.pdf#page=1&view=fitH&toolbar=0&navpanes=0&scrollbar=0" width="45%" height="100%">`, x:0.5, y:-0.4, width:1.0, height:0.55, a:0.0, dest_a:1.0});
-  }
-
-
-  if (!--w) { duration=0.1; notes="Many html elements ->";
-    goodbye_all();
-    let nof_cols = 4;
-    let nof_rows = 4;
-    let height = 1.0/nof_rows;
-    let width = 1.0/nof_cols;
-    let element_no = 0;
-    for (let row = 0; row < nof_rows; row++) {
-      for (let col = 0; col < nof_cols; col++) {
-        let x = 2*width*(col+0.5) - 1.0;
-        let y = 2*height*(row+0.5) - 1.0;
-//        hello("h"+element_no, {t:"html", html:`<div style="background:#20802080">Hello world!<br>Yet</div>`, x:x, y:y, width:width, height:height, a:0.0, dest_a:1.0});
-        if (element_no != 9) hello("h"+element_no, {t:"html", html:`<img src="media/image/jpg_image.jpg" height=100%>`, x:x, y:y, width:width, height:height, a:0.0, dest_a:1.0});
-        element_no++;
-      }
-    }
-  }
-
-
-// MonteCarlo sim
-  if (!--w) { duration=2.0; notes="Showing code for a Monte Carlo simulation -> Run Monte Carlo sim";
-    goodbye("pacman");
-    goodbye_all();
-    hello("my_solution713", {t:"png", file:"media/image/png_image_js_code.png", x:0, y:0.6, size:3.0, a:0.0, dest_a:0.8, blur:10, dest_blur:0});
-    try {
-      monte_slider_div.parentNode.removeChild(monte_slider_div);
-    } catch {}
-    try {
-      monte_sliderN_div.parentNode.removeChild(monte_sliderN_div);
-    } catch {}
-    try {
-      monte_sliderSigma2_div.parentNode.removeChild(monte_sliderSigma2_div);
-    } catch {}
-    try {
-      monte_sliderA_div.parentNode.removeChild(monte_sliderA_div);
-    } catch {}
-    clearInterval(monte_carlo_interval);
-  }  // my solution 7.13
-
-  if (!--w) { duration=4.0; notes="Running the simulation ->";
-    goodbye("my_solution713");
-    current_nof_monte_carlo_simulation_runs = 1;
-    monte_carlo_data = [];
-    assignment = 713;
-    N = 5;
-    sigma2 = 1.4;
-    A = 1.0;
-    Chart.defaults.font.size = 20;
-    hello("monte_carlo", {t:"chart", chart_data:monte_carlo_config, width:850, height:560, a:0.8});
-    monte_carlo_interval = setInterval(monte_carlo_interval_function, 25);
-    monte_slider_div = document.createElement('div');
-    monte_slider_div.setAttribute('id', "monte_slider_div");
-    monte_slider_div.setAttribute('opacity', 1.0);
-    monte_slider_div.innerHTML = '<font color="#ffffff"">#Sim:</font> <input type="range" min="1" max="10000" value="1" id="slider_monte" style="width:800px"><span id="monte_slider_display">1</span>';
-    document.body.appendChild(monte_slider_div);
-    Snap.animate( 0, 1.0, function(value) {try {monte_slider_div.style.opacity = value;} catch {};}, 2000, mina.linear );
-    slider_monte.oninput = function() {update_monte(this.value)};
-    monte_sliderN_div = document.createElement('div');
-    monte_sliderN_div.setAttribute('id', "monte_sliderN_div");
-    monte_sliderN_div.setAttribute('opacity', 1.0);
-    monte_sliderN_div.innerHTML = '<font color="#ffffff"">#N:</font> <input type="range" min="1" max="500" value="5" id="slider_monteN" style="width:800px"><span id="monte_sliderN_display"><font color="#ffffff">5</font></span>';
-    document.body.appendChild(monte_sliderN_div);
-    Snap.animate( 0, 1.0, function(value) {try {monte_sliderN_div.style.opacity = value;} catch {};}, 1500, mina.linear );
-    slider_monteN.oninput = function() {update_monteN(this.value)};
-    monte_sliderA_div = document.createElement('div');
-    monte_sliderA_div.setAttribute('id', "monte_sliderA_div");
-    monte_sliderA_div.setAttribute('opacity', 1.0);
-    monte_sliderA_div.innerHTML = '<font color="#ffffff"">#A:</font> <input type="range" min="-2.2" max="2.0" step="0.01" value="1" id="slider_monteA" style="width:800px"><span id="monte_sliderA_display"><font color="#ffffff">1.0</font></span>';
-    document.body.appendChild(monte_sliderA_div);
-    Snap.animate( 0, 1.0, function(value) {try {monte_sliderA_div.style.opacity = value;} catch {};}, 500, mina.linear );
-    slider_monteA.oninput = function() {update_monteA(this.value)};
-    monte_sliderSigma2_div = document.createElement('div');
-    monte_sliderSigma2_div.setAttribute('id', "monte_sliderSigma2_div");
-    monte_sliderSigma2_div.setAttribute('opacity', 1.0);
-    monte_sliderSigma2_div.innerHTML = '<font color="#ffffff"">#Sigma2:</font> <input type="range" min="0.01" max="2" step="0.01" value="1.4" id="slider_monteSigma2" style="width:800px"><span id="monte_sliderSigma2_display"><font color="#ffffff">1.4</font></span>';
-    document.body.appendChild(monte_sliderSigma2_div);
-    Snap.animate( 0, 1.0, function(value) {try {monte_sliderSigma2_div.style.opacity = value;} catch {};}, 1000, mina.linear );
-    slider_monteSigma2.oninput = function() {update_monteSigma2(this.value)};
-    Chart.defaults.animation.duration = 1000;
-  }
-
-  if (!--w) { duration=1.0; notes="Ending chart simulation ->";
-    goodbye_all();
-    try {
-      monte_slider_div.parentNode.removeChild(monte_slider_div);
-    } catch {}
-    try {
-      monte_sliderN_div.parentNode.removeChild(monte_sliderN_div);
-    } catch {}
-    try {
-      monte_sliderSigma2_div.parentNode.removeChild(monte_sliderSigma2_div);
-    } catch {}
-    try {
-      monte_sliderA_div.parentNode.removeChild(monte_sliderA_div);
-    } catch {}
-    clearInterval(monte_carlo_interval);
-  }  // Monte carlo cleanup done
-
-
-  // Animate position of image:
-  if (!--w) { duration=1.0; notes="Animate position of SVG image";
-    goodbye_all();
-    // Making the webcam image brighter, to make sure that black lines in the transparent graph are visible:
-    hello("flow_bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.1, colour:"#ffffff50", a:0.0, dest_a:1.0});
-    hello("my_flowchart", {t:"png", file:"media/image/graph/pexexp1_flow_explanation_simplified3_transparent.png", x:0.4, y:0.0, size:1.8, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
-  }  // 
-  if (!--w) { duration=1.0; notes="->";
-    try {
-      a["my_flowchart"].animate({ transform: 't-780,0' }, 2000, mina.elastic);
-    } catch {}
-    goodbye("my_overview");
-  }  // flowchart left
-
-
-
-// Make a video loop at a certain time:
-  if (!--w) { duration=1.0; notes="Video that loops ->";
-    goodbye_all();
-    hello("video1", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
-  }  //
-//  if (!--w) { duration=3.0; notes="Video animate position + width";
-//    Snap.animate( 1.0, 0.25, function(value) {try {let v=document.getElementById('video1'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
-//  }  //
-
-  if (!--w) { duration=1.0; notes="Video that pauses";
-    goodbye_all();
-    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, pause_at:3.4});
-  }  //
-//  if (!--w) { duration=3.0; notes="Video animate corners";
-//    Snap.animate( 1.0, 0.45, function(value) {try {let v=document.getElementById('video2'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
-//    Snap.animate( 0.0, 1.0, function(value) {try {let v=document.getElementById('video2'); v.style.transform = "translate("+(0+0.5*value) + "px,"+(0+0.5*value)+"px)";} catch {};}, 2000, mina.linear );
-//    Snap.animate( 0.0, 135.0, function(value) {try {let v=document.getElementById('video2'); v.style.borderRadius = value+"px";} catch {};}, 2000, mina.linear );
-//  }  //
-
-
-  if (!--w) { duration=0.1; notes="Fade out video";
-    goodbye_all();
-    sunburst_div.style.display = "none";
-  }  // 
-  if (!--w) { duration=2.0; notes="";
-    goodbye_videos_immediately();
-    goodbye_all();
-    hello("my_thanks", {t:"text", text:"Thanks for listening!", align:"middle", x:0, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, dest_a:1.0, a:0.0});
-    hello("my_topic", {t:"text", text:"What am I thinking of?", align:"middle", x:-0.94, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0, rot:-90});
-    hello("my_name", {t:"text", text:"Your Name", x:0.94, y:0.6, align:"right", colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0});
-    hello("my_name2", {t:"text", text:"Department of Perfectly Fine Plants", x:0.94, y:0.75, align:"right", colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0});
-    hello("my_name3", {t:"text", text:"Your University", x:0.94, y:0.9, align:"right", colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0});
-    hello("logo", {t:"png", file:"media/logotypes/the_logo.png", x:0.85, y:-0.38, size:0.32, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
-    sunburst_div.style.display = "inline";
-  }  // The end
-  if (!--w) { duration=0.1; notes="Turn off sunburst -> Audio boom";
-    sunburst_div.style.display = "none";
-  }  // 
-
-
-  if (!--w) { duration=1.0; notes="Audio boom";
-    goodbye_videos_immediately();
-    goodbye_all();
-    if (direction == 1) {
-      // Only trigger when going "forward" in the slides:
-      camera_shake = 1.0;
-      audio_muzak.pause();
-      audio_boom.currentTime = 0.0;
-      audio_boom.play();
-    }
-    hello("my_title", {t:"text", text:"Everything is going to be all right", align:"middle", x:0, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, dest_a:0.8, a:1.0});
-  }  // Title
 
 
   if (!--w) { duration=0.1; notes="Temporary test of animations";
@@ -3439,47 +2971,6 @@ In P-expo, you can use markdown for:
     move("c_html0", {a:1.0, how:mina.linear, duration:1.0});
   }
 
-
-  // Commodore 64 screen:
-  if (!--w) { duration=1.0; notes="";
-    goodbye_all();
-//23456789012345678901234567890123456789
-    let big_fat_table = `By the sea, beneath the sky so wide,
-Students gather, their dreams abide.
-In the salty breeze, their minds unfurl,
-Yearning for the pearls of the world.
- 
-The waves whisper of knowledge untold,
-While under the sun's warm hold.
-But in their hearts, a longing grows,
-For lectures, what the future bestows.
- 
-They gaze the horizon, lost in thought,
-Wish for lessons that can't be bought.
-Oh, to be back in those hallowed halls,
-Where learning echoes through the walls.
- 
-Each ripple, each tide, a gentle plea,
-To the classroom, to feel truly free.
-For in education, they find their light,
-Guiding them through the night.
- 
-So let them dream by the gentle roar,
-equations solved & knowledge to explore.
-For soon they return where they belong,
-the classroom, where dreams are strong.`;
-    let big_fat_array = big_fat_table.split("\n");
-    hello("cyborg_bg2", {t:"rect", x:-0.35, y:0.0, width:0.70, height:0.85, colour:"#6C5EB5", a:0.0, dest_a:0.6});
-    hello("cyborg_bg", {t:"rect", x:-0.35, y:0.0, width:0.58, height:0.63, colour:"#352879", a:0.0, dest_a:0.8});
-    hello("cyborg", {t:"text", text:big_fat_array, x:-0.93, y:-0.58, align:"left", colour:"#6C5EB5", line_height:"1.0em", fontsize:27.84, font:"PetMe64", fontweight:100, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
-  }  //
-
-
-  if (!--w) { duration=1.0; notes="<span style='color:#80ff80'>FACT:</span> Cows that sees green fields and nice weather in VR produces more milk. -> next";
-    goodbye_all();
-    hello("cow70", {t:"png", file:"media/image/png_image_square.png", x:0.34, dest_x:0.89, y:0.0, size:2.4, dest_size:4.0, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
-    hello("bci70text", {t:"text", text:["MORE","MILK"], align:"middle", x:-0.68, y:0.0, line_height:"0.9em", colour:"#ffff80", fontsize:260, font:"Arial", fontweight:800, a:0.0, dest_a:1.0, rot:-90});
-  }  // 
 
 
   // Lots of text example:
@@ -3755,6 +3246,576 @@ Seventeen, and that's the last
     goodbye_all();
     goodbye_cables();
   }  //
+
+
+
+
+  if (!--w) { duration=1.0; notes="Restart";
+    goodbye_all();
+    // Restart the whole thing:
+    current_slide = -1;
+    // Make sure to not iteratively step any further:
+    return true;
+  }  // 
+
+
+  console.log(notes)
+  if (notes.indexOf("->") >= 0) {
+    // Yes, there is a -> in the notes. Let's make it white:
+    notes = notes.replace("->","<br><span style='color:#ff0000'>-></span><span style='color:#ffffff'>");
+    notes += "</span>";
+    console.log(notes)
+  }
+  my_notes.innerHTML = "<p>" + notes + "</p>";
+  if (notes_window != null) {
+    // Send the notes to an external window as well:
+    notes_window.postMessage(notes, "*");
+  }
+
+  current_slide = dst_slide;
+  slide_no_span.innerHTML=current_slide;
+  return false; // <- Allow to iteratively step further.
+}
+
+
+
+// Slides -----------------------------------------------------------------------------
+//
+// All slides adhere to this structure:
+// if (!w) { notes = "Whatever I need to see on the screen to be able to tell my story.\n-> What's on the next slide";
+//   Cleanup from slide above when going forward
+//   The new stuff
+//   Cleanup from slide below when going backward
+// }  // Name of this slide
+
+//  if (!--w) { notes = "\n-> ";
+//  }  // 
+
+
+// For audience cam, you will need to initialize the camera a second before you want to show it.
+// They can be painfully slow in getting up and running, so prepare it a few slides ahead:
+// 2 slides before, do
+//    stop_audience_cam();
+// 1 slide before do:
+//    start_audience_cam();
+// Then on the slide you want the camera to be seen:
+//    audiencecam_element.style.opacity = 0.0;
+//    audiencecam_element.style.display = "inline-block";
+//    Snap.animate( 0.0, 1.0, function(value) {try {audiencecam_element.style.opacity = value;} catch {};}, 1000, mina.linear );
+// After slide:
+//    Snap.animate( 1.0, 0.0, function(value) {try {audiencecam_element.style.opacity = value;} catch {};}, 1000, mina.linear );
+// Then:
+//    stop_audience_cam();
+//    audiencecam_element.style.display = "none";
+
+
+
+// hello() options for "3d"
+// hello("brain", {t:"3d", file:"/3d_models/brain_v04.glb", x:-1.0, y:-0.55, scale:0.12, rx:-Math.PI * 0.4, rz:-Math.PI * 0.25});
+// x : -1.77 is to the far left. +1.77 is to the far right. 0.0 is the center.
+// y : -1.0 is to the top. +1.0 is at the bottom. 0.0 is the center.
+// scale: 1.0 is original scale
+// rx: rotation in radians
+// ry: rotation in radians
+
+// When this function returns true, abort any kind of iterative jump.
+function show_slide_no (dst_slide, direction) {
+  if (development_mode==true) {
+    return show_development_slide_no(dst_slide, direction);
+  }
+  let w = dst_slide;
+  let notes = "";
+  duration = 10.0;
+  let my_border = "1.5px solid #000000";
+  let my_box_shadow = "14px 14px 15px 0px rgba(0, 0, 0, .35)"; // offset-x | offset-y | blur-radius | spread-radius | color
+
+  w++;
+
+
+// Coordinate system: (x=0,y=0) is in the middle of the screen.
+// x:-1.0 to 1.0    x=-1 is the left edge of the screen. x=1 is the right edge of the screen.
+// y:-1.0 to 1.0    y=-1 is the bottom of the screen. y=1 is the top of the screen.
+// width:  1.0 is the whole screen width.
+// height: 1.0 is the whole screen height.
+
+// Examples:
+// x:   0, y:   0, width:1.0, height:1.0   means fullscreen
+// x:   0, y:   0, width:0.5, height:0.5   means a rectangle in the middle of the screen
+// x: 0.5, y:   0, width:0.5, height:1.0   means the right half of the screen
+// x:-0.5, y:   0, width:0.5, height:1.0   means the left half of the screen
+// x:   0, y: 0.5, width:1.0, height:0.5   means the top half of the screen
+// x:   0, y:-0.5, width:1.0, height:0.5   means the bottom half of the screen
+
+// Font sizes. Please use font sizes that are related to html and body base font size.
+// This is set to 16px when in windowed mode. In fullscreen mode, this font size
+// is adjusted to match the size when in windowed mode. So, please use:
+//   font-size: 200%  // double size
+// or
+//   font-size: 2em   // also double size
+
+
+// #§# Start of slides:
+
+  // 
+  // Basic configuration of p-expo is done here:
+  // 
+  if (!--w) { duration=0.0; notes="";
+    // This is where you initialize elements that you want as default:
+    //start_default_webcam(); // <- Remove // if you want the webcam on at start
+    auto_progress = false; // Set to true if you want auto progress in your project
+    default_opacity_fade_in_time = 1.0; // Default time it takes for elements to appear. 0 = instant
+    default_blur_fade_in_time = 0.75; // Set to 0 to disable default blur fade in animation
+    default_blur_fade_in_amount = 10; //unit: px
+
+    default_opacity_fade_out_time = 0.5; // Default time it takes for elements to disappear
+
+    clip_div.style.clipPath="inset(0% 0% 0% 0% round 4rem)"; //This sets the rounded corners of the slides
+  }
+
+  if (!--w) { duration=0.1; notes="Hello -> Brief introduction";
+    goodbye_videos_immediately();
+    goodbye_all_immediately();
+    goodbye_cables();
+    hello("bg", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#ff80ffe0"});
+    hello("b_html0", {t:"html", html:`<div style="font-size:800%;font-family:Arial;font-weight:800;color:#ffffff;text-align:center;line-height:0.9em;letter-spacing:-0.04em;">HELLO<br>P-EXPO</div>`, x:0.0, y:0.2, width:1.0, height:1.0, rot:-10});
+    hello("b_html1", {t:"html", html:`<div style="color:#ffffff">Press right arrow</div>`, x:0.0, y:-0.8, width:1.0, height:1.0, rot:0});
+  }
+
+  if (!--w) { duration=0.1; notes="Can use git for version control -> Source code";
+    goodbye_all();
+    hello("bg2", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#204040e0"});
+    hello("a_html", {t:"html", html:`<div style="font-size:170%;text-align:center">
+          P-expo is a <i>write your presentation in text</i> framework.<br>
+          P-expo handles text, images, videos, audio, webcams, 3d-models, shaders, charts, javascript,
+          and LaTeX equations like \\[u(t)=K\\left[e(t)+\\frac{1}{T_i}\\,\\int\\limits^t\\,e(\\tau)\\,d\\tau\\,+ T_d \\frac{de(t) }{ dt}\\right]\\]
+          by typing.</div>`, x:0.0, y:0.0, width:0.7, height:1.0});
+  }
+
+  if (!--w) { duration=0.1; notes="It's open-source -> The rest of the presentation";
+    goodbye_all();
+    hello("bg3", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#404020e0"});
+    hello("c_html", {t:"html", html:`<div style="font-size:170%;text-align:center">
+          Make your own presentation from this template at<br>
+          https://github.com/p-expo/p-expo.github.io<br><br>
+          The next slide will start your webcam.</div>`, x:0.3, y:0.0, width:0.6, height:1.0});
+    hello("d_html", {t:"html", html:`<img src="media/image/png_image_square.png" height=100% style="border-radius:50px">`, x:-0.65, y:0.0, width:0.5, height:0.5});
+  }
+
+  if (!--w) { duration=0.1; notes="You can cut & paste as you wish from these examples -> LaTeX equations";
+    start_default_webcam();
+    goodbye_all();
+    hello("bg4", {t:"rect", x:0.0, y:0.0, width:2.0, height:2.0, colour:"#505050e0"});
+    hello("e_html", {t:"html", html:`<div style="font-size:170%;text-align:center">
+          The remaining slides in this presentation contain examples of media types you may want to use.<br><br>
+          Enjoy! / Pex Tufvesson
+          </div>`, x:0.0, y:0.0, width:0.65, height:1.0});
+  }
+
+
+
+  if (!--w) { duration=0.1; notes="Text written using html ->";
+    goodbye_all();
+    hello("bg6", {t:"rect", x:-0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
+    hello("f_html", {t:"html", html:`
+<div>
+<h1>Text formatting</h1>
+<p>You need to learn <i>some</i> way of formatting <b>text</b>. This is html.</p>
+<h2>Sub header</h2>
+<p>In P-expo, you can use html for anything:</p>
+<ul>
+<li>lists</li>
+<li><i>emphasis</i></li>
+</ul>
+<p><img src="media/image/jpg_image.jpg" alt="Vokalas" title="Vokalas" width="100px"></p></div>
+          `, x:-0.4, y:0.0, width:0.4, height:0.9});
+  }
+
+
+
+  if (!--w) { duration=1.0; notes="Dialog test 0";
+    init_dialog ("Grab the attention\nwith dialogs", 0.0, 0.0, 0.20, 0);
+  }  //
+
+
+  if (!--w) { duration=0.1; notes="Text written using markdown ->";
+    fade_dialog_glpos(0,0);
+    goodbye_all();
+    hello("bg7", {t:"rect", x:0.4, y:0.0, width:0.45, height:0.9, colour:"#00000080", corner_radius:0.2});
+    hello("d_md", {t:"markdown", markdown:`
+# Text formatting
+
+You need to learn *some* way of formatting **text**. This is markdown.
+
+## Sub header
+
+In P-expo, you can use markdown for:
+*   lists
+*   _emphasis_
+
+<img src="media/image/jpg_image.jpg" width="100px">
+          `, x:0.4, y:0.0, width:0.4, height:0.9});
+    // As the markdown syntax don't standardize how to scale images, we are forced
+    // to fall back to the html syntax to scale it
+    // Adding it with the native markdown syntax
+    //     ![alt text](/path/to/img.jpg "Title")
+    // works as long as you don't need to set the size of the image.
+  }
+
+  if (!--w) { duration=1.0; notes="Dialog test 1";
+    init_dialog("Everything\nis going to be\nall right", 0.0, 0.0, 0.20, 1);
+  }  //
+
+
+  // 3d object with animations:
+  if (!--w) { duration=2.0; notes="The skull -> brain";
+    try {
+      let info = infos["cbm3"];
+      info.a = 1.0;
+      info.dest_a = 0.0;
+      let video_element = document.getElementById("cbm1");
+      let video_element_animate = Snap.animate( info.a, info.dest_a, function(value) {try {video_element.style.opacity = value;} catch {};}, 400, mina.linear );
+    } catch {}
+    goodbye_all();
+    //hello("bci3text", {t:"text", text:["BCI","Performance"], align:"middle", line_height:"0.9em", x:0.0, y:-0.2, colour:"#ffffff", fontsize:230, font:"Arial", fontweight:800, dest_a:1.0, a:0.0});
+    hello("brain", {t:"3d", file:"/3d/brain_v04.glb", x:0.0, y:-0.55, scale:0.12, rx:-Math.PI * 0.4, rz:-Math.PI * 0.25});
+  }  // 
+
+  if (!--w) { duration=5.0; notes="5W for keeping it alive, 15W for signalling, folded to maximize the reacheable area for the support network, 86000 millions of neurons -> Sensor locations";
+    Snap.animate( -0.55, -0.2, function(value) {try {all_3d_models["brain"].position.y = value;} catch {};}, 3000, mina.elastic );
+    Snap.animate( 0.12, 0.3, function(value) {try {all_3d_models["brain"].scale.x = value; all_3d_models["brain"].scale.y = value; all_3d_models["brain"].scale.z = value;} catch {};}, 3000, mina.elastic );
+    Snap.animate(1.0, 0.0, function(value) {try {all_3d_models["brain"].children[4].material.opacity = value;} catch {};}, 4000, mina.linear);
+  }  // in_brain
+
+  if (!--w) { duration=7.0; notes="Brain is 3d. We can measure the surface 'cortical'. Highly complex. Highly connected. ->";
+    console.log(all_3d_models["brain"]);
+    Snap.animate( -0.2, -0.4, function(value) {try {all_3d_models["brain"].position.y = value;} catch {};}, 5000, mina.linear );
+    Snap.animate( 0.0, 2.5, function(value) {try {all_3d_models["brain"].children[1].position.x = value;} catch {};}, 5000, mina.linear );
+    Snap.animate( 0.0, -2.5, function(value) {try {all_3d_models["brain"].children[3].position.x = value;} catch {};}, 5000, mina.linear );
+    Snap.animate( 0.0, 1.5, function(value) {try {all_3d_models["brain"].children[0].position.y = value;} catch {};}, 5000, mina.linear );
+  }  // expand_brain
+
+
+  if (!--w) { duration=0.1; notes="A few examples of displaying text, png, transparent png, jpg, transparent svg ->";
+    fade_dialog_glpos(0.0,0);
+    goodbye_all();
+    hello("bg0", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, colour:"#8080ff40"});
+    hello("a_html1", {t:"html", html:`<div style="width:100%;height:100%;background:#ffffff80;color:#000000">Hello world bottom left corner!</div>`, x:-0.667, y:-0.667, width:0.33, height:0.33});
+    hello("a_html2", {t:"html", html:`<img src="media/image/jpg_image.jpg" height=100%>`, x:-0.667, y:0, width:0.33, height:0.33});
+    hello("a_html3", {t:"html", html:`<img src="media/image/png_image_square.png" height=100%>`, x:-0.667, y:0.667, width:0.33, height:0.33});
+    hello("a_html5", {t:"html", html:`<img src="media/image/svg_image.svg" width=100%>`, x:0.667, y:0.667, width:0.33, height:0.33});
+    hello("a_html6", {t:"html", html:`<img src="media/image/png_image_wide.png" height=100%>`, x:0.667, y:0.0, width:0.33, height:0.33, a:0.0, dest_a:0.5});
+    hello("a_html7", {t:"html", html:`<img src="media/image/graph/clear_by_mind_hardware_schematic_simplified.png" height=100%>`, x:0.667, y:-0.667, width:0.33, height:0.33, a:0.0, dest_a:1.0});
+  }
+
+  if (!--w) { duration=0.1; notes="Nine examples of displaying text, png, transparent png, jpg, transparent svg ->";
+    // Add more elements:
+    hello("a_html0", {t:"html", html:`Hello world!`, x:0.0, y:0.0, width:0.33, height:0.33, rot:-10});
+    hello("a_html4", {t:"html", html:`<img src="media/image/png_image_transparent.png" height=100%>`, x:0, y:0.667, width:0.33, height:0.33});
+    hello("a_html8", {t:"html", html:`<img src="media/image/graph/pexexp1_flow_explanation_simplified3_transparent.png" height=100%>`, x:0.0, y:-0.667, width:0.33, height:0.33, a:0.0, dest_a:1.0});
+  }
+
+  if (!--w) { duration=0.1; notes="Four examples of displaying text, png, transparent png, jpg, transparent svg ->";
+    // Remove some elements:
+    goodbye("a_html0");
+    goodbye("a_html1");
+    goodbye("a_html3");
+    goodbye("a_html5");
+    goodbye("a_html7");
+  }
+
+
+  if (!--w) { duration=1.0; notes="Dialog test 2";
+    init_dialog("[1992]\n\nHaier, R.J., Siegel, B.V., Jr.,\nMacLachlan, A., Soderling,\nE., Lottenberg, S. & Buchsbaum, M. S:\n\nRegional glucose metabolic changes\nafter learning a complex\nvisuospatial/motor task:\na positron emission tomographic study.\n\nBrain Research, 570, 134—143.", 0.0, 0.0, 0.09, 2);
+  }  //
+
+
+  if (!--w) { duration=0.1; notes="Displaying LaTeX equations ->";
+    fade_dialog_glpos(0,1.0);
+    goodbye_all();
+    hello("bg8", {t:"rect", x:0.2, y:-0.6, width:0.75, height:0.35, colour:"#00000080", corner_radius:0.2});
+    hello("my_topic", {t:"text", text:"The solution", align:"middle", x:-0.94, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0, rot:-90});
+    hello("x_html0", {t:"html", html:`<div style="font-size:400%;">\\[x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}\\]</div>`, x:0.2, y:-0.6, width:0.75, height:0.5});
+  }
+
+
+  if (!--w) { duration=0.1; notes="Including an external web page, from<br>https://lu-pze.github.io ->";
+    goodbye_all();
+    // Beware that at the time of your presentation your
+    // internet connection MAY BE REALLY BAD.
+    // Especially at conferences with many participants.
+    // So, getting media from external sites should be a last resort.
+    // I do recommend to grab a screenshot, and show that image instead:
+    hello("b_html0", {t:"html", html:`<iframe src="https://lu-pze.github.io" title="Just a webpage" width="100%" height="100%"></iframe>`, x:0.0, y:0.0, width:0.95, height:0.9, a:0.0, dest_a:0.9});
+  }
+
+
+  // PACMAN
+  if (!--w) { duration=3.0; notes="Showing a pie chart -> pacman eating";
+    goodbye_all();
+    Chart.defaults.font.size = 40;
+    hello("pacman", {t:"chart", chart_data:pacman_config, width:540, height:540, a:1.0});
+  }  // Pacman
+
+  if (!--w) { duration=5.0; notes="->";
+    Chart.defaults.animation.duration = 700;
+    let dot_1 = document.createElement('div');
+    dot_1.setAttribute('id', 'dot_1');
+    dot_1.setAttribute('opacity', 1.0);
+    document.body.appendChild(dot_1);
+    //Snap.animate( 0, 1.0, function(value) {try {dot_1.style.opacity = value;} catch {};}, 500, mina.linear );
+    Snap.animate( 0, 45, function(value) {try {dot_1.style.height = value + "px"; dot_1.style.top = (200-(value/2)) + "px";} catch {};}, 1500, mina.elastic );
+    Snap.animate( 0, 45, function(value) {try {dot_1.style.width = value + "px"; dot_1.style.left = (620-(value/2)) + "px";} catch {};}, 1900, mina.elastic );
+
+    let dot_2 = document.createElement('div');
+    dot_2.setAttribute('id', 'dot_2');
+    dot_2.setAttribute('opacity', 1.0);
+    document.body.appendChild(dot_2);
+    //Snap.animate( 0, 1.0, function(value) {try {dot_2.style.opacity = value;} catch {};}, 800, mina.linear );
+    Snap.animate( 0, 45, function(value) {try {dot_2.style.height = value + "px"; dot_2.style.top = (200-(value/2)) + "px";} catch {};}, 2500, mina.elastic );
+    Snap.animate( 0, 45, function(value) {try {dot_2.style.width = value + "px"; dot_2.style.left = (820-(value/2)) + "px";} catch {};}, 3200, mina.elastic );
+    try {
+      window.my_chart.data.datasets[0].data = [98, 2];
+      window.my_chart.options.rotation = 135 - 40;
+      window.my_chart.options.animation.delay = 0;
+      window.my_chart.update();
+      setTimeout(function(){ window.my_chart.data.datasets[0].data = [75,25]; window.my_chart.options.rotation = 135; window.my_chart.update(); }, 600);
+      setTimeout(function(){ window.my_chart.data.datasets[0].data = [98, 2]; window.my_chart.options.rotation = 135-40; window.my_chart.update(); }, 1200);
+      setTimeout(function(){ window.my_chart.data.datasets[0].data = [75,25]; window.my_chart.options.rotation = 135; window.my_chart.update(); }, 1800);
+      setTimeout(function(){ window.my_chart.data.datasets[0].data = [98, 2]; window.my_chart.options.rotation = 135-40; window.my_chart.update(); }, 2400);
+      setTimeout(function(){ window.my_chart.data.datasets[0].data = [75,25]; window.my_chart.options.rotation = 135; window.my_chart.update(); }, 3000);
+      Snap.animate( 0, 950, function(value) {try {chart_holder.style.transform = "translate("+ (value) + "px";} catch {};}, 4000, mina.linear );
+    } catch {}
+    setTimeout(function(){ dot_1.parentNode.removeChild(dot_1); }, 1800);
+    setTimeout(function(){ dot_2.parentNode.removeChild(dot_2); }, 2800);
+    goodbye("my_signal_path");
+  }  // Pacman eating
+
+  if (!--w) { duration=0.1; notes="Showing a pdf file ->";
+    goodbye_all();
+    // Examples of picking parts of a pdf to view:
+    //http://example.com/doc.pdf#Chapter5
+    //http://example.com/doc.pdf#page=5
+    //http://example.com/doc.pdf#page=3&zoom=200,250,100
+    //http://example.com/doc.pdf#zoom=100
+    //http://example.com/doc.pdf#page=72&view=fitH,100
+    //Disable and Hide Toolbar in PDF Web Viewer:
+    //<embed src="files/Brochure.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" width="100%" height="600px" />
+    hello("c_html0", {t:"html", html:`<embed src="media/image/matplotlib.pdf#page=1&view=fitH&toolbar=0&navpanes=0&scrollbar=0" width="45%" height="100%">`, x:0.5, y:-0.4, width:1.0, height:0.55, a:0.0, dest_a:1.0});
+  }
+
+
+  if (!--w) { duration=0.1; notes="Many html elements ->";
+    goodbye_all();
+    let nof_cols = 4;
+    let nof_rows = 4;
+    let height = 1.0/nof_rows;
+    let width = 1.0/nof_cols;
+    let element_no = 0;
+    for (let row = 0; row < nof_rows; row++) {
+      for (let col = 0; col < nof_cols; col++) {
+        let x = 2*width*(col+0.5) - 1.0;
+        let y = 2*height*(row+0.5) - 1.0;
+//        hello("h"+element_no, {t:"html", html:`<div style="background:#20802080">Hello world!<br>Yet</div>`, x:x, y:y, width:width, height:height, a:0.0, dest_a:1.0});
+        if (element_no != 9) hello("h"+element_no, {t:"html", html:`<img src="media/image/jpg_image.jpg" height=100%>`, x:x, y:y, width:width, height:height, a:0.0, dest_a:1.0});
+        element_no++;
+      }
+    }
+  }
+
+
+// MonteCarlo sim
+  if (!--w) { duration=2.0; notes="Showing code for a Monte Carlo simulation -> Run Monte Carlo sim";
+    goodbye("pacman");
+    goodbye_all();
+    hello("my_solution713", {t:"png", file:"media/image/png_image_js_code.png", x:0, y:0.6, size:3.0, a:0.0, dest_a:0.8, blur:10, dest_blur:0});
+//    hello(("my_solution713", {t:"html", html:`<img src="media/image/png_image_js_code.png" height=100%>`, x:0.0, y:0.0, width:0.95, height:0.95});
+
+    try {
+      monte_slider_div.parentNode.removeChild(monte_slider_div);
+    } catch {}
+    try {
+      monte_sliderN_div.parentNode.removeChild(monte_sliderN_div);
+    } catch {}
+    try {
+      monte_sliderSigma2_div.parentNode.removeChild(monte_sliderSigma2_div);
+    } catch {}
+    try {
+      monte_sliderA_div.parentNode.removeChild(monte_sliderA_div);
+    } catch {}
+    clearInterval(monte_carlo_interval);
+  }  // my solution 7.13
+
+  if (!--w) { duration=4.0; notes="Running the simulation ->";
+    goodbye("my_solution713");
+    current_nof_monte_carlo_simulation_runs = 1;
+    monte_carlo_data = [];
+    assignment = 713;
+    N = 5;
+    sigma2 = 1.4;
+    A = 1.0;
+    Chart.defaults.font.size = 20;
+    hello("monte_carlo", {t:"chart", chart_data:monte_carlo_config, width:850, height:560, a:0.8});
+    monte_carlo_interval = setInterval(monte_carlo_interval_function, 25);
+    monte_slider_div = document.createElement('div');
+    monte_slider_div.setAttribute('id', "monte_slider_div");
+    monte_slider_div.setAttribute('opacity', 1.0);
+    monte_slider_div.innerHTML = '<font color="#ffffff"">#Sim:</font> <input type="range" min="1" max="10000" value="1" id="slider_monte" style="width:800px"><span id="monte_slider_display">1</span>';
+    document.body.appendChild(monte_slider_div);
+    Snap.animate( 0, 1.0, function(value) {try {monte_slider_div.style.opacity = value;} catch {};}, 2000, mina.linear );
+    slider_monte.oninput = function() {update_monte(this.value)};
+    monte_sliderN_div = document.createElement('div');
+    monte_sliderN_div.setAttribute('id', "monte_sliderN_div");
+    monte_sliderN_div.setAttribute('opacity', 1.0);
+    monte_sliderN_div.innerHTML = '<font color="#ffffff"">#N:</font> <input type="range" min="1" max="500" value="5" id="slider_monteN" style="width:800px"><span id="monte_sliderN_display"><font color="#ffffff">5</font></span>';
+    document.body.appendChild(monte_sliderN_div);
+    Snap.animate( 0, 1.0, function(value) {try {monte_sliderN_div.style.opacity = value;} catch {};}, 1500, mina.linear );
+    slider_monteN.oninput = function() {update_monteN(this.value)};
+    monte_sliderA_div = document.createElement('div');
+    monte_sliderA_div.setAttribute('id', "monte_sliderA_div");
+    monte_sliderA_div.setAttribute('opacity', 1.0);
+    monte_sliderA_div.innerHTML = '<font color="#ffffff"">#A:</font> <input type="range" min="-2.2" max="2.0" step="0.01" value="1" id="slider_monteA" style="width:800px"><span id="monte_sliderA_display"><font color="#ffffff">1.0</font></span>';
+    document.body.appendChild(monte_sliderA_div);
+    Snap.animate( 0, 1.0, function(value) {try {monte_sliderA_div.style.opacity = value;} catch {};}, 500, mina.linear );
+    slider_monteA.oninput = function() {update_monteA(this.value)};
+    monte_sliderSigma2_div = document.createElement('div');
+    monte_sliderSigma2_div.setAttribute('id', "monte_sliderSigma2_div");
+    monte_sliderSigma2_div.setAttribute('opacity', 1.0);
+    monte_sliderSigma2_div.innerHTML = '<font color="#ffffff"">#Sigma2:</font> <input type="range" min="0.01" max="2" step="0.01" value="1.4" id="slider_monteSigma2" style="width:800px"><span id="monte_sliderSigma2_display"><font color="#ffffff">1.4</font></span>';
+    document.body.appendChild(monte_sliderSigma2_div);
+    Snap.animate( 0, 1.0, function(value) {try {monte_sliderSigma2_div.style.opacity = value;} catch {};}, 1000, mina.linear );
+    slider_monteSigma2.oninput = function() {update_monteSigma2(this.value)};
+    Chart.defaults.animation.duration = 1000;
+  }
+
+  if (!--w) { duration=1.0; notes="Ending chart simulation ->";
+    goodbye_all();
+    try {
+      monte_slider_div.parentNode.removeChild(monte_slider_div);
+    } catch {}
+    try {
+      monte_sliderN_div.parentNode.removeChild(monte_sliderN_div);
+    } catch {}
+    try {
+      monte_sliderSigma2_div.parentNode.removeChild(monte_sliderSigma2_div);
+    } catch {}
+    try {
+      monte_sliderA_div.parentNode.removeChild(monte_sliderA_div);
+    } catch {}
+    clearInterval(monte_carlo_interval);
+  }  // Monte carlo cleanup done
+
+
+  // Animate position of image:
+  if (!--w) { duration=1.0; notes="Animate position of SVG image";
+    goodbye_all();
+    // Making the webcam image brighter, to make sure that black lines in the transparent graph are visible:
+    hello("flow_bg", {t:"rect", x:0.0, y:0.0, width:1.0, height:1.0, corner_radius:0.1, colour:"#ffffff50", a:0.0, dest_a:1.0});
+    hello("my_flowchart", {t:"png", file:"media/image/graph/pexexp1_flow_explanation_simplified3_transparent.png", x:0.4, y:0.0, size:1.8, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+  }  // 
+  if (!--w) { duration=1.0; notes="->";
+    try {
+      a["my_flowchart"].animate({ transform: 't-780,0' }, 2000, mina.elastic);
+    } catch {}
+    goodbye("my_overview");
+  }  // flowchart left
+
+
+
+// Make a video loop at a certain time:
+  if (!--w) { duration=1.0; notes="Video that loops ->";
+    goodbye_all();
+    hello("video1", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, loop_at:2.9});
+  }  //
+//  if (!--w) { duration=3.0; notes="Video animate position + width";
+//    Snap.animate( 1.0, 0.25, function(value) {try {let v=document.getElementById('video1'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
+//  }  //
+
+  if (!--w) { duration=1.0; notes="Video that pauses";
+    goodbye_all();
+    hello("video2", {t:"video", file:"media/video/ipad_screencast.mov", width:1.0, height:1.0, crop_left:0.2, crop_right:0.13, crop_top:0.05, crop_bottom:0.15, x:0.0, y:0.0, rate:1.0, a:0.0, dest_a:1.0, start_at:1.6, pause_at:3.4});
+  }  //
+//  if (!--w) { duration=3.0; notes="Video animate corners";
+//    Snap.animate( 1.0, 0.45, function(value) {try {let v=document.getElementById('video2'); v.style.width = (current_screen_width*value) + "px"; v.style.height = (540*value) + "px";} catch {};}, 2000, mina.linear );
+//    Snap.animate( 0.0, 1.0, function(value) {try {let v=document.getElementById('video2'); v.style.transform = "translate("+(0+0.5*value) + "px,"+(0+0.5*value)+"px)";} catch {};}, 2000, mina.linear );
+//    Snap.animate( 0.0, 135.0, function(value) {try {let v=document.getElementById('video2'); v.style.borderRadius = value+"px";} catch {};}, 2000, mina.linear );
+//  }  //
+
+
+  if (!--w) { duration=0.1; notes="Fade out video";
+    goodbye_all();
+    sunburst_div.style.display = "none";
+  }  // 
+  if (!--w) { duration=2.0; notes="";
+    goodbye_videos_immediately();
+    goodbye_all();
+    hello("my_thanks", {t:"text", text:"Thanks for listening!", align:"middle", x:0, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, dest_a:1.0, a:0.0});
+    hello("my_topic", {t:"text", text:"What am I thinking of?", align:"middle", x:-0.94, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0, rot:-90});
+    hello("my_name", {t:"text", text:"Your Name", x:0.94, y:0.6, align:"right", colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0});
+    hello("my_name2", {t:"text", text:"Department of Perfectly Fine Plants", x:0.94, y:0.75, align:"right", colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0});
+    hello("my_name3", {t:"text", text:"Your University", x:0.94, y:0.9, align:"right", colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, a:0.0, dest_a:1.0});
+    hello("logo", {t:"png", file:"media/logotypes/the_logo.png", x:0.85, y:-0.38, size:0.32, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+    sunburst_div.style.display = "inline";
+  }  // The end
+  if (!--w) { duration=0.1; notes="Turn off sunburst -> Audio boom";
+    sunburst_div.style.display = "none";
+  }  // 
+
+
+  if (!--w) { duration=1.0; notes="Audio boom";
+    goodbye_videos_immediately();
+    goodbye_all();
+    if (direction == 1) {
+      // Only trigger when going "forward" in the slides:
+      camera_shake = 1.0;
+      audio_muzak.pause();
+      audio_boom.currentTime = 0.0;
+      audio_boom.play();
+    }
+    hello("my_title", {t:"text", text:"Everything is going to be all right", align:"middle", x:0, y:0, colour:"#ffffff", fontsize:80, font:"Arial", fontweight:100, dest_a:0.8, a:1.0});
+  }  // Title
+
+
+  // Commodore 64 screen:
+  if (!--w) { duration=1.0; notes="";
+    goodbye_all();
+//23456789012345678901234567890123456789
+    let big_fat_table = `By the sea, beneath the sky so wide,
+Students gather, their dreams abide.
+In the salty breeze, their minds unfurl,
+Yearning for the pearls of the world.
+ 
+The waves whisper of knowledge untold,
+While under the sun's warm hold.
+But in their hearts, a longing grows,
+For lectures, what the future bestows.
+ 
+They gaze the horizon, lost in thought,
+Wish for lessons that can't be bought.
+Oh, to be back in those hallowed halls,
+Where learning echoes through the walls.
+ 
+Each ripple, each tide, a gentle plea,
+To the classroom, to feel truly free.
+For in education, they find their light,
+Guiding them through the night.
+ 
+So let them dream by the gentle roar,
+equations solved & knowledge to explore.
+For soon they return where they belong,
+the classroom, where dreams are strong.`;
+    let big_fat_array = big_fat_table.split("\n");
+    hello("cyborg_bg2", {t:"rect", x:-0.35, y:0.0, width:0.70, height:0.85, colour:"#6C5EB5", a:0.0, dest_a:0.6});
+    hello("cyborg_bg", {t:"rect", x:-0.35, y:0.0, width:0.58, height:0.63, colour:"#352879", a:0.0, dest_a:0.8});
+    hello("cyborg", {t:"text", text:big_fat_array, x:-0.93, y:-0.58, align:"left", colour:"#6C5EB5", line_height:"1.0em", fontsize:27.84, font:"PetMe64", fontweight:100, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+  }  //
+
+
+  if (!--w) { duration=1.0; notes="<span style='color:#80ff80'>FACT:</span> Cows that sees green fields and nice weather in VR produces more milk. -> next";
+    goodbye_all();
+    hello("cow70", {t:"png", file:"media/image/png_image_square.png", x:0.34, dest_x:0.89, y:0.0, size:2.4, dest_size:4.0, a:0.0, dest_a:1.0, blur:10, dest_blur:0});
+    hello("bci70text", {t:"text", text:["MORE","MILK"], align:"middle", x:-0.68, y:0.0, line_height:"0.9em", colour:"#ffff80", fontsize:260, font:"Arial", fontweight:800, a:0.0, dest_a:1.0, rot:-90});
+  }  // 
+
 
 
   if (!--w) { duration=1.0; notes="Restart";
